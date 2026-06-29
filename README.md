@@ -14,19 +14,17 @@ A=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64); curl -fsSL https://d
 
 ## 配置 / Config
 
-写 `~/.config/oixcloud-external-proxy-program/config.json`（chmod 600）。**用户只需填账号**，其余全部内置。
-Write `~/.config/oixcloud-external-proxy-program/config.json` (chmod 600). **You only fill credentials**; everything else is built in.
+一条命令写好账号(只需邮箱+密码)/ one command, just email + password:
 
-邮箱密码 / email + password:
-```json
+```bash
+mkdir -p ~/.config/oixcloud-external-proxy-program && cat > ~/.config/oixcloud-external-proxy-program/config.json <<'EOF'
 { "email": "you@example.com", "password": "your-password" }
-```
-或 token / or token:
-```json
-{ "accessToken": "<access token>" }
+EOF
+chmod 600 ~/.config/oixcloud-external-proxy-program/config.json
 ```
 
-可选 / optional: `nodeName`、`localPort`、`oixParams`。
+也可用 `"accessToken"` 代替账号;可选 `nodeName`、`localPort`、`oixParams`。
+Or use `"accessToken"` instead; optional: `nodeName`, `localPort`, `oixParams`.
 
 ## 运行 / Run
 
