@@ -9,7 +9,7 @@ External-proxy helper for Surge: logs in, fetches and resolves a node, and serve
 一键安装(自动识别芯片)/ one command (auto-detects chip):
 
 ```bash
-A=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64); curl -fsSL https://raw.githubusercontent.com/pickrui/oixcloud-external-proxy-program/main/oixcloud-external-proxy-program-$A -o /tmp/oepp && sudo install -m755 /tmp/oepp /usr/local/bin/oixcloud-external-proxy-program && sudo xattr -dr com.apple.quarantine /usr/local/bin/oixcloud-external-proxy-program
+A=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64); curl -fsSL https://dl.dler.io/oixcloud-external-proxy-program-$A -o /tmp/oepp && sudo install -m755 /tmp/oepp /usr/local/bin/oixcloud-external-proxy-program && sudo xattr -dr com.apple.quarantine /usr/local/bin/oixcloud-external-proxy-program
 ```
 
 ## 配置 / Config
