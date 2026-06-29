@@ -6,13 +6,15 @@ External-proxy helper for Surge: logs in, fetches and resolves a node, and serve
 
 ## 安装 / Install
 
-按芯片选二进制(Apple Silicon 用 arm64,Intel 用 amd64),去隔离并放入 PATH:
-Pick the binary for your chip (arm64 = Apple Silicon, amd64 = Intel), de-quarantine, and install:
+按芯片选 `arm64`(Apple Silicon)或 `amd64`(Intel),下载、去隔离并放入 PATH:
+Pick `arm64` (Apple Silicon) or `amd64` (Intel), then download, de-quarantine, and install:
 
 ```bash
-chmod +x oixcloud-external-proxy-program-arm64                       # 或 / or -amd64
-xattr -dr com.apple.quarantine oixcloud-external-proxy-program-arm64 # 解未签名拦截 / unsigned gatekeeper
-sudo cp oixcloud-external-proxy-program-arm64 /usr/local/bin/oixcloud-external-proxy-program
+ARCH=arm64   # Intel 改 amd64 / Intel: amd64
+curl -fsSLO https://raw.githubusercontent.com/pickrui/oixcloud-external-proxy-program/main/oixcloud-external-proxy-program-$ARCH
+chmod +x oixcloud-external-proxy-program-$ARCH
+xattr -dr com.apple.quarantine oixcloud-external-proxy-program-$ARCH   # 解未签名拦截 / unsigned gatekeeper
+sudo mv oixcloud-external-proxy-program-$ARCH /usr/local/bin/oixcloud-external-proxy-program
 ```
 
 ## 配置 / Config
