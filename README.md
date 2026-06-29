@@ -15,14 +15,6 @@ xattr -dr com.apple.quarantine oixcloud-external-proxy-program-arm64 # 解未签
 sudo cp oixcloud-external-proxy-program-arm64 /usr/local/bin/oixcloud-external-proxy-program
 ```
 
-## 从源码构建 / Build (optional)
-
-```bash
-cd oixcloud-external-proxy-program
-swift build -c release --arch arm64 --arch x86_64    # 通用二进制 / universal
-sudo cp .build/apple/Products/Release/oixcloud-external-proxy-program /usr/local/bin/
-```
-
 ## 配置 / Config
 
 写 `~/.config/oixcloud-external-proxy-program/config.json`（chmod 600）。**用户只需填账号**，其余全部内置。
