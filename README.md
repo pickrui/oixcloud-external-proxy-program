@@ -6,17 +6,16 @@ External-proxy helper for Surge: logs in, fetches and resolves a node, and serve
 
 ## 安装 / Install
 
-按芯片选二进制(Apple Silicon 用 arm64,Intel 用 amd64),下载、去隔离并放入 PATH:
-Pick the binary for your chip (arm64 = Apple Silicon, amd64 = Intel), download, de-quarantine, and install:
+自动识别芯片,下载、去隔离并放入 PATH:
+Auto-detect your chip, download, de-quarantine, and install:
 
 ```bash
-# 下载,按芯片二选一 / download — pick your chip
-curl -fL https://dl.dler.io/oixcloud-external-proxy-program-arm64 -o oixcloud-external-proxy-program-arm64    # Apple Silicon
-# curl -fL https://dl.dler.io/oixcloud-external-proxy-program-amd64 -o oixcloud-external-proxy-program-amd64  # Intel
-
-chmod +x oixcloud-external-proxy-program-arm64                       # 或 / or -amd64
-xattr -dr com.apple.quarantine oixcloud-external-proxy-program-arm64 # 解未签名拦截 / unsigned gatekeeper
-sudo cp oixcloud-external-proxy-program-arm64 /usr/local/bin/oixcloud-external-proxy-program
+# 自动识别芯片 / detect chip (Apple Silicon → arm64, Intel → amd64)
+ARCH=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
+curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ARCH" -o oixcloud-external-proxy-program
+chmod +x oixcloud-external-proxy-program
+xattr -dr com.apple.quarantine oixcloud-external-proxy-program   # 解未签名拦截 / unsigned gatekeeper
+sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program
 ```
 
 ## 使用 / Usage
