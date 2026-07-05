@@ -106,7 +106,21 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 ```
 
 - `proxyMode = "single"`：现有方式（单本地端口，默认 `7100`）。
-- `proxyMode = "map"`：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制），Surge 配置保留原有规则，只把节点替换为本地端口。
+- `proxyMode = "map"`：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制，每个端口同时支持 SOCKS5 与 HTTP），Surge 配置保留原有规则，只把节点替换为本地端口。
+
+`map` 模式还可用 `listeners` 声明固定端口，把指定节点绑定到指定本地端口（端口不随节点增删漂移）；不填则自动分配：
+
+```json
+{
+	"proxyMode": "map",
+	"listeners": [
+		{ "name": "香港", "port": 7801, "node": "香港 01" },
+		{ "name": "日本", "type": "socks5", "port": 7802, "node": "日本 01" }
+	]
+}
+```
+
+- `type`：`mixed`（默认，同端口 SOCKS5 + HTTP）/ `socks5` / `http`；`node`：要绑定的节点名；`listen`：默认 `127.0.0.1`。
 
 ### 停止 / 卸载
 
@@ -251,7 +265,21 @@ Optional mode config (single-port by default):
 ```
 
 - `proxyMode = "single"`: existing one-port behavior (`7100` by default).
-- `proxyMode = "map"`: local multi-port mapping (one local port per node, starting at `mapBasePort`); the Surge profile keeps the original rules and swaps proxies to local ports.
+- `proxyMode = "map"`: local multi-port mapping (one local port per node, starting at `mapBasePort`, each port serving both SOCKS5 and HTTP); the Surge profile keeps the original rules and swaps proxies to local ports.
+
+In `map` mode you can also declare fixed ports with `listeners`, binding a named node to a specific local port (ports don't drift as nodes are added or removed); omit it to auto-assign:
+
+```json
+{
+	"proxyMode": "map",
+	"listeners": [
+		{ "name": "hk", "port": 7801, "node": "香港 01" },
+		{ "name": "jp", "type": "socks5", "port": 7802, "node": "日本 01" }
+	]
+}
+```
+
+- `type`: `mixed` (default, SOCKS5 + HTTP on one port) / `socks5` / `http`; `node`: the node name to bind; `listen`: `127.0.0.1` by default.
 
 ### Stop / uninstall
 
