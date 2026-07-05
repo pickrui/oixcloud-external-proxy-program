@@ -22,6 +22,8 @@ xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program
 ```
 
+也可以双击仓库里的 `启动 oixCloud.command`：脚本会检查最新发布版本、校验 Developer ID 签名后更新 `/usr/local/bin/oixcloud-external-proxy-program`，再让你选择临时启动、常驻启动，或卸载自动启动。
+
 ### 第 2 步 · 启动菜单栏 App
 
 临时运行（关闭终端即退出）：
@@ -156,6 +158,8 @@ chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program
 ```
+
+You can also double-click `启动 oixCloud.command` from this repo: it checks the latest release, verifies the Developer ID signature, updates `/usr/local/bin/oixcloud-external-proxy-program`, then lets you choose temporary startup, persistent startup, or removing autostart.
 
 ### Step 2 · Start the menu bar app
 
