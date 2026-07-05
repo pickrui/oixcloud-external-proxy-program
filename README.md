@@ -124,6 +124,14 @@ rm ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 - **看不到 ☁️ 图标**：重新运行 `oixcloud-external-proxy-program --tray`；确认是在本机图形界面（非 SSH／远程会话）下运行；刘海屏若菜单栏图标太多，☁️ 可能被折叠，退掉一些其他菜单栏图标或用菜单栏管理工具查看。
 - **提示未登录**：点 ☁️ 里的「登录…」即可，无需删配置。
 - **Surge 里连不上**：确认 ☁️ 在、已选好节点（或开了「自动选择」），且 Surge 已开「Set as System Proxy」。
+- **双击 `启动 oixCloud.command` 提示没有正确的访问权限**：这是 macOS 在运行脚本前发现文件没有执行权限，脚本本身还没启动，无法在脚本内部自动修复。请在脚本所在目录打开终端后运行：
+
+  ```bash
+  chmod +x "启动 oixCloud.command"
+  xattr -d com.apple.quarantine "启动 oixCloud.command" 2>/dev/null || true
+  ```
+
+  然后再双击脚本。
 - **完全打不开／闪退**：重新执行第 1 步（重新下载覆盖），并确认已运行 `xattr -dr com.apple.quarantine`。
 
 ### 进阶（可选，命令行）
@@ -261,6 +269,14 @@ Just quit the current instance: "Quit" in the ☁️ menu.
 - **No ☁️ icon**: run `oixcloud-external-proxy-program --tray` again; make sure you're in a local graphical session (not SSH/remote); on notch Macs a crowded menu bar can hide the icon — quit some other menu bar apps or use a menu bar manager.
 - **Shown as logged out**: click "Log in…" from the ☁️ menu — no need to delete any files.
 - **Can't connect in Surge**: make sure ☁️ is present, a node is selected (or Auto-select is on), and Surge has "Set as System Proxy" on.
+- **Double-clicking `启动 oixCloud.command` says you do not have the correct access permissions**: macOS checks the executable bit before it starts the script, so the script has not run yet and cannot fix its own permissions. Open Terminal in the folder that contains the script and run:
+
+  ```bash
+  chmod +x "启动 oixCloud.command"
+  xattr -d com.apple.quarantine "启动 oixCloud.command" 2>/dev/null || true
+  ```
+
+  Then double-click the script again.
 - **Nothing happens / it crashes on launch**: redo Step 1 (re-download over the old file) and make sure you ran `xattr -dr com.apple.quarantine`.
 
 ### Advanced (optional, CLI)
@@ -279,4 +295,3 @@ oixcloud-external-proxy-program --version               # print version fingerpr
 ### License
 
 Proprietary software; see [NOTICE](NOTICE).
-
