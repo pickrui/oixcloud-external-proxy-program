@@ -161,6 +161,20 @@ oixcloud-external-proxy-program --help                  # 查看全部参数
 oixcloud-external-proxy-program --version               # 输出版本指纹
 ```
 
+### 局域网共享（可选）
+
+默认只监听 `127.0.0.1`。要让同网络的其他设备也能访问托管配置和代理，把监听地址设为 `0.0.0.0`：
+
+```bash
+# 配置服务器与各代理端口都监听 0.0.0.0；其他设备用本机局域网 IP 访问
+oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6171 --bind 0.0.0.0
+```
+
+- `--listen [host:]port`：本地订阅服务器的监听地址（默认 `127.0.0.1`）。
+- `--bind <host>`：各代理端口的监听地址；也可用配置项 `"listenAddress"`，`map` 模式下 `listeners` 内每条还能单独设 `listen`。
+- **生成配置里的节点 server 跟随请求来源地址**：设备从 `http://<本机IP>:6171/` 拉取配置时，Surge/Clash 里的节点会自动指向 `<本机IP>` 而非 `127.0.0.1`（本机访问仍为 `127.0.0.1`）。
+- ⚠️ 监听 `0.0.0.0` 的端口**没有鉴权**，请仅在可信网络中使用。
+
 ### 许可
 
 专有软件，详见 [NOTICE](NOTICE)。
@@ -319,6 +333,20 @@ oixcloud-external-proxy-program --serve --mode map --listen 6171
 oixcloud-external-proxy-program --help                  # show all options
 oixcloud-external-proxy-program --version               # print version fingerprint
 ```
+
+### LAN sharing (optional)
+
+By default only `127.0.0.1` is bound. To let other devices on your network reach the managed config and the proxies, bind `0.0.0.0`:
+
+```bash
+# Bind the config server and every proxy port to 0.0.0.0; other devices use this Mac's LAN IP
+oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6171 --bind 0.0.0.0
+```
+
+- `--listen [host:]port`: bind address of the local subscription server (default `127.0.0.1`).
+- `--bind <host>`: bind address for the proxy ports; you can also set `"listenAddress"` in the config, and in `map` mode each entry in `listeners` can set its own `listen`.
+- **Node servers follow the request address**: when a device fetches the config from `http://<this-Mac-IP>:6171/`, the nodes in Surge/Clash automatically point at `<this-Mac-IP>` instead of `127.0.0.1` (local access stays `127.0.0.1`).
+- ⚠️ A port bound to `0.0.0.0` has **no authentication** — use it only on trusted networks.
 
 ### License
 
