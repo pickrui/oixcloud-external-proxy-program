@@ -77,9 +77,12 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | SOCKS5 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
 | 开机启动 | 开关登录时自动启动 ☁️ |
 | 本地端口… | 修改本地 SOCKS5 端口，默认 `7100` |
+| 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
 | 接入模式… | 在「现有单端口」和「本地多端口映射」之间切换 |
 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
 | 更新节点 | 重新拉取节点列表 |
+| 诊断… | 一键检查面板连通、节点连通、端口监听与 Surge 状态，结果可拷贝 |
+| 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
 | 注销 | 退出登录并清除本机缓存（☁️ 保留，可立即重新登录）|
 | 退出 | 退出 ☁️ App |
 
@@ -254,9 +257,12 @@ Done ✅ Day to day, pick a node in the ☁️ menu, or enable "Auto-select".
 | SOCKS5 127.0.0.1:7100 | The local egress address Surge connects to |
 | Launch at login | Toggle auto-start of ☁️ at login |
 | Local Port… | Change the local SOCKS5 port (default `7100`) |
+| Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
 | Connection Mode… | Switch between "Single Port" and "Local Multi-Port Mapping" |
 | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
 | Refresh | Re-fetch the node list |
+| Diagnostics… | One-click check of panel reachability, node connectivity, port listeners and Surge status; result is copyable |
+| Update to vX.Y… | Appears when a new release is available; downloads, verifies the signature, swaps atomically and restarts the tray |
 | Log out | Sign out and clear the local cache (☁️ stays; log in again anytime) |
 | Quit | Quit the ☁️ app |
 
