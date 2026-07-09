@@ -25,6 +25,8 @@ INSTALL_PATH="/usr/local/bin/oixcloud-external-proxy-program"
 EXPECTED_TEAM_ID="WJHBZFHR7D"
 TAG_FILE="${SCRIPT_DIR}/.oixcloud-external-proxy-program.version"
 LOG_FILE="${SCRIPT_DIR}/oixcloud-external-proxy-program.log"
+TRAY_LOG_DIR="${HOME}/Library/Logs/oixcloud"
+TRAY_LOG_FILE="${TRAY_LOG_DIR}/com.oixcloud.external-proxy-program.tray.log"
 PLIST_LABEL="com.oixcloud.external-proxy-program.tray"
 PLIST_PATH="${HOME}/Library/LaunchAgents/${PLIST_LABEL}.plist"
 LAUNCHD_SERVICE="gui/$(id -u)/${PLIST_LABEL}"
@@ -169,10 +171,21 @@ ensure_installed_command() {
     return 1
   fi
 
+  # 不要原地 cp 覆盖 INSTALL_PATH：正在运行的旧进程（托盘 / Surge 拉起的实例）
+  # 的代码签名会立即失效并被系统终止（Surge 会提示“客户端已终止”）。
+  # 先复制到同目录临时文件，再 mv 原子替换（换 inode），旧进程不受影响。
+  local install_tmp="${INSTALL_PATH}.new.$$"
   /usr/bin/sudo -p "请输入管理员密码：" /bin/mkdir -p /usr/local/bin || return 1
-  /usr/bin/sudo -p "请输入管理员密码：" /bin/cp "$PROGRAM_PATH" "$INSTALL_PATH" || return 1
-  /usr/bin/sudo -p "请输入管理员密码：" /bin/chmod 755 "$INSTALL_PATH" || return 1
-  /usr/bin/sudo -p "请输入管理员密码：" /usr/bin/xattr -dr com.apple.quarantine "$INSTALL_PATH" >/dev/null 2>&1 || true
+  if ! /usr/bin/sudo -p "请输入管理员密码：" /bin/cp "$PROGRAM_PATH" "$install_tmp"; then
+    /usr/bin/sudo -p "请输入管理员密码：" /bin/rm -f "$install_tmp" >/dev/null 2>&1 || true
+    return 1
+  fi
+  /usr/bin/sudo -p "请输入管理员密码：" /bin/chmod 755 "$install_tmp" || return 1
+  /usr/bin/sudo -p "请输入管理员密码：" /usr/bin/xattr -dr com.apple.quarantine "$install_tmp" >/dev/null 2>&1 || true
+  if ! /usr/bin/sudo -p "请输入管理员密码：" /bin/mv -f "$install_tmp" "$INSTALL_PATH"; then
+    /usr/bin/sudo -p "请输入管理员密码：" /bin/rm -f "$install_tmp" >/dev/null 2>&1 || true
+    return 1
+  fi
 
   if ! matches_digest "$INSTALL_PATH" "$expected_digest"; then
     log "已安装命令的校验值与 ${latest_tag} 不匹配。"
@@ -247,6 +260,7 @@ update_if_needed() {
 
 write_launch_agent() {
   /bin/mkdir -p "$HOME/Library/LaunchAgents"
+  /bin/mkdir -p "$TRAY_LOG_DIR"
   /bin/cat > "$PLIST_PATH" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -256,8 +270,8 @@ write_launch_agent() {
 <string>${INSTALL_PATH}</string><string>--tray</string></array>
 <key>RunAtLoad</key><true/>
 <key>KeepAlive</key><true/>
-<key>StandardOutPath</key><string>${LOG_FILE}</string>
-<key>StandardErrorPath</key><string>${LOG_FILE}</string>
+<key>StandardOutPath</key><string>${TRAY_LOG_FILE}</string>
+<key>StandardErrorPath</key><string>${TRAY_LOG_FILE}</string>
 </dict></plist>
 EOF
 }

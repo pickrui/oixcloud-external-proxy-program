@@ -19,8 +19,11 @@ ARCH=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
 curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ARCH" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
-sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program
+sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
+sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
 ```
+
+> 更新时不要直接 `cp` 覆盖 `/usr/local/bin/oixcloud-external-proxy-program`：正在运行的旧进程会因代码签名失效被系统终止（Surge 会提示客户端已终止）。按上面先 `cp` 到临时名再 `mv` 原子替换。
 
 也可以双击仓库里的 `启动 oixCloud.command`：脚本会检查最新发布版本、校验 Developer ID 签名后更新 `/usr/local/bin/oixcloud-external-proxy-program`，再让你选择临时启动、常驻启动，或卸载自动启动。
 
@@ -135,7 +138,8 @@ rm ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 
 ### 排错
 
-- **看不到 ☁️ 图标**：重新运行 `oixcloud-external-proxy-program --tray`；确认是在本机图形界面（非 SSH／远程会话）下运行；刘海屏若菜单栏图标太多，☁️ 可能被折叠，退掉一些其他菜单栏图标或用菜单栏管理工具查看。
+- **查日志**：托盘运行日志在 `~/Library/Logs/oixcloud/`；安装脚本日志在脚本同目录的 `oixcloud-external-proxy-program.log`；由 Surge 拉起的节点进程日志在 Surge 自己的日志里（搜 `oixcloud-external-proxy-program`）；若怀疑闪退，看 `~/Library/Logs/DiagnosticReports/` 下 `oixcloud-*` 开头的崩溃报告。反馈问题时请附 `oixcloud-external-proxy-program --version` 的输出。
+- **看不到 ☁️ 图标**：重新运行 `oixcloud-external-proxy-program --tray`；确认是在本机图形界面（非 SSH／远程会话）下运行；刘海屏若菜单栏图标太多，☁️ 可能被折叠，退掉一些其他菜单栏图标或用菜单栏管理工具查看。另注意：同一时间只允许一个客户端（托盘或 `--serve`）运行，后启动的会自动退出并在日志里说明。
 - **提示未登录**：点 ☁️ 里的「登录…」即可，无需删配置。
 - **Surge 里连不上**：确认 ☁️ 在、已选好节点（或开了「自动选择」），且 Surge 已开「Set as System Proxy」。
 - **双击 `启动 oixCloud.command` 提示没有正确的访问权限**：这是 macOS 在运行脚本前发现文件没有执行权限，脚本本身还没启动，无法在脚本内部自动修复。请在脚本所在目录打开终端后运行：
@@ -192,8 +196,11 @@ ARCH=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
 curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ARCH" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
-sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program
+sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
+sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
 ```
+
+> When updating, do not `cp` directly over `/usr/local/bin/oixcloud-external-proxy-program`: overwriting the binary in place invalidates the code signature of already-running processes and the system kills them (Surge reports the client terminated). Use the `cp` + `mv` atomic replace above.
 
 You can also double-click `启动 oixCloud.command` from this repo: it checks the latest release, verifies the Developer ID signature, updates `/usr/local/bin/oixcloud-external-proxy-program`, then lets you choose temporary startup, persistent startup, or removing autostart.
 
@@ -308,7 +315,8 @@ Just quit the current instance: "Quit" in the ☁️ menu.
 
 ### Troubleshooting
 
-- **No ☁️ icon**: run `oixcloud-external-proxy-program --tray` again; make sure you're in a local graphical session (not SSH/remote); on notch Macs a crowded menu bar can hide the icon — quit some other menu bar apps or use a menu bar manager.
+- **Check the logs**: tray runtime logs live in `~/Library/Logs/oixcloud/` (timestamped); the installer script logs next to itself as `oixcloud-external-proxy-program.log`; per-node processes spawned by Surge log into Surge's own log (search `oixcloud-external-proxy-program`); for suspected crashes check `~/Library/Logs/DiagnosticReports/` for reports starting with `oixcloud-`. Please include the output of `oixcloud-external-proxy-program --version` when reporting issues.
+- **No ☁️ icon**: run `oixcloud-external-proxy-program --tray` again; make sure you're in a local graphical session (not SSH/remote); on notch Macs a crowded menu bar can hide the icon — quit some other menu bar apps or use a menu bar manager. Also note: only one client (tray or `--serve`) may run at a time — a second one exits immediately and says so in the log.
 - **Shown as logged out**: click "Log in…" from the ☁️ menu — no need to delete any files.
 - **Can't connect in Surge**: make sure ☁️ is present, a node is selected (or Auto-select is on), and Surge has "Set as System Proxy" on.
 - **Double-clicking `启动 oixCloud.command` says you do not have the correct access permissions**: macOS checks the executable bit before it starts the script, so the script has not run yet and cannot fix its own permissions. Open Terminal in the folder that contains the script and run:
