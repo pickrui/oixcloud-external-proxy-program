@@ -1,3 +1,4 @@
 oixcloud-external-proxy-program-amd64
 oixcloud-external-proxy-program-arm64
-oixcloud-external-proxy-program-legacy-amd64
+oixcloud-external-proxy-program-legacy
+__pycache__/
