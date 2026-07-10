@@ -12,11 +12,16 @@ A menu bar app that brings oixCloud nodes into Surge. Log in, connect Surge, and
 
 ### 第 1 步 · 安装
 
-在终端运行（自动识别芯片架构）：
+在终端运行（自动识别系统版本与芯片架构，下发对应二进制）：
 
 ```bash
-ARCH=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ARCH" -o oixcloud-external-proxy-program
+MAJOR=$(sw_vers -productVersion | cut -d. -f1)
+if [ "$MAJOR" -ge 14 ]; then
+  ASSET=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
+else
+  ASSET=legacy; echo "⚠️ macOS $MAJOR（低于 14）：使用 legacy 版，未经充分测试。"
+fi
+curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ASSET" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
@@ -25,21 +30,21 @@ sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oix
 
 > 更新时不要直接 `cp` 覆盖 `/usr/local/bin/oixcloud-external-proxy-program`：正在运行的旧进程会因代码签名失效被系统终止（Surge 会提示客户端已终止）。按上面先 `cp` 到临时名再 `mv` 原子替换。
 
-#### 老版本 macOS（Intel 芯片 · ⚠️ 未经测试）
+#### 老版本 macOS（macOS 11 / 12 / 13 · ⚠️ 未经测试）
 
-默认二进制要求 **macOS 14+**。如果你的 Mac 是 **Intel 芯片**、系统停留在 **macOS 11 Big Sur / 12 Monterey** 且无法升级，改用 legacy 版：x86_64、最低 macOS 11、由相同 Developer ID（Team `WJHBZFHR7D`）签名。Apple Silicon（M 系列）机型请用上面的默认版。
+默认二进制要求 **macOS 14+**；系统低于 14（**macOS 11 Big Sur / 12 Monterey / 13 Ventura**）时，第 1 步的命令会**自动下发**下面这个 legacy 版：通用二进制（Intel x86_64 + Apple Silicon arm64）、最低 macOS 11、由相同 Developer ID 签名。能升级到 macOS 14+ 的机型请用默认版；也可用下面的命令手动安装 legacy。
 
 > ⚠️ **该版本尚未经过实机测试**，仅供无法升级系统的用户尝试，可能不稳定，请自行评估风险。为在 macOS 11 上运行，它用自实现的 HPKE 提供 ECH；握手已通过与标准实现的互操作校验，但整体尚未充分验证。
 
 ```bash
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-legacy-amd64" -o oixcloud-external-proxy-program
+curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-legacy" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
 sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
 ```
 
-装好后用法与默认版完全一致（继续「第 2 步」）。`启动 oixCloud.command` 和菜单里的「更新到 vX.Y」暂不支持 legacy 版，请按上面手动更新。
+装好后用法与默认版完全一致（继续「第 2 步」）。`启动 oixCloud.command` 和菜单里的「更新到 vX.Y」都会按系统版本自动选择对应版本（低于 macOS 14 自动用 legacy）。
 
 也可以双击仓库里的 `启动 oixCloud.command`：脚本会检查最新发布版本、校验 Developer ID 签名后更新 `/usr/local/bin/oixcloud-external-proxy-program`，再让你选择临时启动、常驻启动，或卸载自动启动。
 
@@ -208,11 +213,16 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6171 --bind 
 
 ### Step 1 · Install
 
-Run in Terminal (auto-detects your chip architecture):
+Run in Terminal (auto-detects your macOS version and chip, downloading the matching binary):
 
 ```bash
-ARCH=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ARCH" -o oixcloud-external-proxy-program
+MAJOR=$(sw_vers -productVersion | cut -d. -f1)
+if [ "$MAJOR" -ge 14 ]; then
+  ASSET=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
+else
+  ASSET=legacy; echo "⚠️ macOS $MAJOR (<14): using the legacy build (not fully tested)."
+fi
+curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ASSET" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
@@ -221,21 +231,21 @@ sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oix
 
 > When updating, do not `cp` directly over `/usr/local/bin/oixcloud-external-proxy-program`: overwriting the binary in place invalidates the code signature of already-running processes and the system kills them (Surge reports the client terminated). Use the `cp` + `mv` atomic replace above.
 
-#### Older macOS (Intel · ⚠️ untested)
+#### Older macOS (macOS 11 / 12 / 13 · ⚠️ untested)
 
-The default binary requires **macOS 14+**. If your Mac is **Intel** and stuck on **macOS 11 Big Sur / 12 Monterey** with no upgrade path, use the legacy build: x86_64, minimum macOS 11, signed with the same Developer ID (Team `WJHBZFHR7D`). Apple Silicon Macs should use the default build above.
+The default binary requires **macOS 14+**; on systems below 14 (**macOS 11 Big Sur / 12 Monterey / 13 Ventura**), Step 1 **auto-installs** the legacy build below: a universal binary (Intel x86_64 + Apple Silicon arm64), minimum macOS 11, signed with the same Developer ID. Macs that can run macOS 14+ should use the default; you can also install legacy manually with the command below.
 
 > ⚠️ **This build has not been tested on real hardware** — it's provided only for users who cannot upgrade and may be unstable; use at your own risk. To run on macOS 11 it ships a self-implemented HPKE for ECH; the handshake is verified to interoperate with standard implementations, but the build as a whole is not fully validated.
 
 ```bash
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-legacy-amd64" -o oixcloud-external-proxy-program
+curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-legacy" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
 xattr -dr com.apple.quarantine oixcloud-external-proxy-program
 sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
 sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
 ```
 
-After installing, usage is identical to the default build (continue with Step 2). `启动 oixCloud.command` and the in-app "Update to vX.Y" don't support the legacy build yet — update manually as above.
+After installing, usage is identical to the default build (continue with Step 2). Both `启动 oixCloud.command` and the in-app "Update to vX.Y" now auto-select the right build by macOS version (legacy below macOS 14).
 
 You can also double-click `启动 oixCloud.command` from this repo: it checks the latest release, verifies the Developer ID signature, updates `/usr/local/bin/oixcloud-external-proxy-program`, then lets you choose temporary startup, persistent startup, or removing autostart.
 

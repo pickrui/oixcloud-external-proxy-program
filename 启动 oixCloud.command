@@ -17,7 +17,12 @@ case "$ARCH" in
     ;;
 esac
 
-ASSET_NAME="oixcloud-external-proxy-program-${ASSET_ARCH}"
+MAJOR="$(/usr/bin/sw_vers -productVersion | /usr/bin/cut -d. -f1)"
+if [[ "$MAJOR" -ge 14 ]]; then
+  ASSET_NAME="oixcloud-external-proxy-program-${ASSET_ARCH}"
+else
+  ASSET_NAME="oixcloud-external-proxy-program-legacy"
+fi
 ASSET_PATH="${SCRIPT_DIR}/${ASSET_NAME}"
 PROGRAM_PATH="${SCRIPT_DIR}/oixcloud-external-proxy-program"
 INSTALL_PATH="/usr/local/bin/oixcloud-external-proxy-program"
@@ -118,7 +123,7 @@ download_and_install() {
   fi
 
   if ! verify_signature "$temp_bin"; then
-    log "代码签名校验失败（要求 Developer ID Team ${EXPECTED_TEAM_ID}），已终止安装。"
+    log "代码签名校验失败（要求发布方 Developer ID 签名），已终止安装。"
     rm -f "$temp_bin"
     return 1
   fi
@@ -160,7 +165,7 @@ ensure_installed_command() {
   fi
 
   if ! verify_signature "$PROGRAM_PATH"; then
-    log "本地程序代码签名校验失败（要求 Developer ID Team ${EXPECTED_TEAM_ID}），已终止安装。"
+    log "本地程序代码签名校验失败（要求发布方 Developer ID 签名），已终止安装。"
     return 1
   fi
 
