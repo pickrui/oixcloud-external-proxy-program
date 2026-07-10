@@ -93,7 +93,8 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 连接设置 | 接入模式… | 在「本地多端口映射」（默认）和「单端口」之间切换 |
 | 连接设置 | 精简规则 | 只保留基础分流规则，配置更精简（改后重新点「接入 Surge」生效）|
 | 连接设置 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
-| 工具 | 诊断… | 一键检查面板连通、节点连通、端口监听与 Surge 状态，结果可拷贝 |
+| 工具 | 诊断… | 一键检查面板连通、账户状态、节点连通、端口监听（含每个映射端口）与 Surge 状态，结果可拷贝 |
+| 工具 | 检查更新 | 立刻检查新版本（另每 24 小时自动检查一次）；发现新版后变为「更新到 vX.Y…」一键安装 |
 | 工具 | 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
 | — | 退出 | 退出 ☁️ App |
 
@@ -284,7 +285,8 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Connection | Connection Mode… | Switch between "Local Multi-Port Mapping" (default) and "Single Port" |
 | Connection | Simple Rules | Keep only the basic routing rules for a leaner profile (click "Connect Surge" again after changing) |
 | Connection | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
-| Tools | Diagnostics… | One-click check of panel reachability, node connectivity, port listeners and Surge status; result is copyable |
+| Tools | Diagnostics… | One-click check of panel reachability, account status, node connectivity, port listeners (incl. every mapped port) and Surge status; result is copyable |
+| Tools | Check for Updates | Checks for a new release now (an automatic check also runs every 24h); when one is found it becomes "Update to vX.Y…" for one-click install |
 | Tools | Update to vX.Y… | Appears when a new release is available; downloads, verifies the signature, swaps atomically and restarts the tray |
 | — | Quit | Quit the ☁️ app |
 
