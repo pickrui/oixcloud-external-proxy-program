@@ -71,7 +71,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 1. **登录** —— 选「账户 › 登录…」，粘贴 **Access Token**（推荐）；也可改填邮箱 + 密码。
 2. **接入 Surge** —— 选「连接设置 › 接入 Surge」；**首次**会打开 Surge，点「安装」确认后再开启「Set as System Proxy」。装好后换节点是透明的，无需再次接入。
 
-完成 ✅ 日常在 ☁️ 菜单「节点」分组里选节点，或开「自动选择」。
+完成 ✅ 默认为「本地多端口映射」模式，日常直接在 Surge 的策略组里选节点；若在「连接设置 › 接入模式…」切到「单端口」，则改在 ☁️ 菜单「节点」分组里选，或开「自动选择」。
 
 ### ☁️ 菜单一览
 
@@ -90,7 +90,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 连接设置 | 开机启动 | 开关登录时自动启动 ☁️ |
 | 连接设置 | 本地端口… | 修改本地 SOCKS5 端口，默认 `7100` |
 | 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
-| 连接设置 | 接入模式… | 在「现有单端口」和「本地多端口映射」之间切换 |
+| 连接设置 | 接入模式… | 在「本地多端口映射」（默认）和「单端口」之间切换 |
 | 连接设置 | 精简规则 | 只保留基础分流规则，配置更精简（改后重新点「接入 Surge」生效）|
 | 连接设置 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
 | 工具 | 诊断… | 一键检查面板连通、节点连通、端口监听与 Surge 状态，结果可拷贝 |
@@ -98,7 +98,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | — | 退出 | 退出 ☁️ App |
 
 > 改「本地端口」或「接入模式」后，重新点一次「接入 Surge」同步。
-> 「本地多端口映射」模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」。
+> 「本地多端口映射」（默认）模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」。
 
 ### 登录与配置
 
@@ -113,17 +113,17 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 
 或改用邮箱密码：`{ "email": "you@example.com", "password": "你的密码" }`
 
-可选模式配置（默认单端口）：
+可选模式配置（默认本地多端口映射）：
 
 ```json
 {
-	"proxyMode": "single",
+	"proxyMode": "map",
 	"mapBasePort": 7200
 }
 ```
 
-- `proxyMode = "single"`：现有方式（单本地端口，默认 `7100`）。
-- `proxyMode = "map"`：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制，每个端口同时支持 SOCKS5 与 HTTP），Surge 配置保留原有规则，只把节点替换为本地端口。
+- `proxyMode = "map"`（默认）：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制，每个端口同时支持 SOCKS5 与 HTTP），Surge 配置保留原有规则，只把节点替换为本地端口。
+- `proxyMode = "single"`：单本地端口（默认 `7100`），在 ☁️ 菜单选节点。
 
 `map` 模式还可用 `listeners` 声明固定端口，把指定节点绑定到指定本地端口（端口不随节点增删漂移）；不填则自动分配：
 
@@ -262,7 +262,7 @@ Click the ☁️ icon at the top-right, then:
 1. **Log in** — choose "Account › Log in…" and paste your **Access Token** (recommended); or use email + password.
 2. **Connect Surge** — choose "Connection › Connect Surge"; the **first time**, Surge opens so you can click "Install" to confirm, then turn on "Set as System Proxy". After that, switching nodes is transparent — no need to reconnect.
 
-Done ✅ Day to day, pick a node in the ☁️ menu's "Nodes" group, or enable "Auto-select".
+Done ✅ "Local Multi-Port Mapping" is the default mode, so day to day you pick nodes right inside Surge's policy groups; if you switch to "Single Port" via "Connection › Connection Mode…", pick nodes in the ☁️ menu's "Nodes" group instead, or enable "Auto-select".
 
 ### The ☁️ menu at a glance
 
@@ -281,7 +281,7 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Connection | Launch at login | Toggle auto-start of ☁️ at login |
 | Connection | Local Port… | Change the local SOCKS5 port (default `7100`) |
 | Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
-| Connection | Connection Mode… | Switch between "Single Port" and "Local Multi-Port Mapping" |
+| Connection | Connection Mode… | Switch between "Local Multi-Port Mapping" (default) and "Single Port" |
 | Connection | Simple Rules | Keep only the basic routing rules for a leaner profile (click "Connect Surge" again after changing) |
 | Connection | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
 | Tools | Diagnostics… | One-click check of panel reachability, node connectivity, port listeners and Surge status; result is copyable |
@@ -289,7 +289,7 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | — | Quit | Quit the ☁️ app |
 
 > After changing "Local Port" or "Connection Mode", click "Connect Surge" again.
-> In "Local Multi-Port Mapping" mode you pick nodes in Surge, so the "Nodes" group hides "Auto-select / Latency test / node list".
+> In "Local Multi-Port Mapping" mode (the default) you pick nodes in Surge, so the "Nodes" group hides "Auto-select / Latency test / node list".
 
 ### Login & config
 
@@ -304,17 +304,17 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 
 Or use email + password: `{ "email": "you@example.com", "password": "your password" }`
 
-Optional mode config (single-port by default):
+Optional mode config (local multi-port mapping by default):
 
 ```json
 {
-	"proxyMode": "single",
+	"proxyMode": "map",
 	"mapBasePort": 7200
 }
 ```
 
-- `proxyMode = "single"`: existing one-port behavior (`7100` by default).
-- `proxyMode = "map"`: local multi-port mapping (one local port per node, starting at `mapBasePort`, each port serving both SOCKS5 and HTTP); the Surge profile keeps the original rules and swaps proxies to local ports.
+- `proxyMode = "map"` (default): local multi-port mapping (one local port per node, starting at `mapBasePort`, each port serving both SOCKS5 and HTTP); the Surge profile keeps the original rules and swaps proxies to local ports.
+- `proxyMode = "single"`: a single local port (`7100` by default); pick nodes in the ☁️ menu.
 
 In `map` mode you can also declare fixed ports with `listeners`, binding a named node to a specific local port (ports don't drift as nodes are added or removed); omit it to auto-assign:
 
