@@ -68,33 +68,37 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 
 点屏幕右上角的 ☁️ 图标，依次：
 
-1. **登录** —— 选「登录…」，粘贴 **Access Token**（推荐）；也可留空 Token，改填邮箱 + 密码。
-2. **接入 Surge** —— 选「接入 Surge」；**首次**会打开 Surge，点「安装」确认后再开启「Set as System Proxy」。装好后换节点是透明的，无需再次接入。
+1. **登录** —— 选「账户 › 登录…」，粘贴 **Access Token**（推荐）；也可改填邮箱 + 密码。
+2. **接入 Surge** —— 选「连接设置 › 接入 Surge」；**首次**会打开 Surge，点「安装」确认后再开启「Set as System Proxy」。装好后换节点是透明的，无需再次接入。
 
-完成 ✅ 日常在 ☁️ 菜单选节点，或开「自动选择」。
+完成 ✅ 日常在 ☁️ 菜单「节点」分组里选节点，或开「自动选择」。
 
 ### ☁️ 菜单一览
 
-| 菜单项 | 作用 |
-|---|---|
-| 登录… | 未登录时显示，弹窗填 Access Token 或邮箱 + 密码 |
-| 自动选择 | 自动测速并切到延迟最低的节点，定期复测 |
-| 延迟测试 | 立刻给所有节点测速，延迟按 🟢 绿 / 🟡 黄 / 🔴 红 标注 |
-| 节点列表 | 点一下即切换 |
-| SOCKS5 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
-| 开机启动 | 开关登录时自动启动 ☁️ |
-| 本地端口… | 修改本地 SOCKS5 端口，默认 `7100` |
-| 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
-| 接入模式… | 在「现有单端口」和「本地多端口映射」之间切换 |
-| 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
-| 更新节点 | 重新拉取节点列表 |
-| 诊断… | 一键检查面板连通、节点连通、端口监听与 Surge 状态，结果可拷贝 |
-| 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
-| 注销 | 退出登录并清除本机缓存（☁️ 保留，可立即重新登录）|
-| 退出 | 退出 ☁️ App |
+菜单按「账户 / 节点 / 连接设置 / 工具」分组：
+
+| 分组 | 菜单项 | 作用 |
+|---|---|---|
+| 账户 | 账户信息 | 打开菜单时自动刷新：套餐、到期、今日/已用/剩余流量、余额、佣金、积分 |
+| 账户 | 登录… / 注销 | 弹窗填 Access Token 或邮箱 + 密码；注销清除本机缓存（☁️ 保留，可立即重新登录） |
+| 账户 | 用户中心（+备用） | 在浏览器打开 oixCloud 用户中心 |
+| 节点 | 自动选择 | 自动测速并切到延迟最低的节点，定期复测 |
+| 节点 | 延迟测试 | 立刻给所有节点测速，延迟按 🟢 绿 / 🟡 黄 / 🔴 红 标注 |
+| 节点 | 节点列表 | 点一下即切换 |
+| 节点 | 更新节点 | 重新拉取节点列表 |
+| 连接设置 | SOCKS5 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
+| 连接设置 | 开机启动 | 开关登录时自动启动 ☁️ |
+| 连接设置 | 本地端口… | 修改本地 SOCKS5 端口，默认 `7100` |
+| 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
+| 连接设置 | 接入模式… | 在「现有单端口」和「本地多端口映射」之间切换 |
+| 连接设置 | 精简规则 | 只保留基础分流规则，配置更精简（改后重新点「接入 Surge」生效）|
+| 连接设置 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
+| 工具 | 诊断… | 一键检查面板连通、节点连通、端口监听与 Surge 状态，结果可拷贝 |
+| 工具 | 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
+| — | 退出 | 退出 ☁️ App |
 
 > 改「本地端口」或「接入模式」后，重新点一次「接入 Surge」同步。
-> 「本地多端口映射」模式下节点在 Surge 内选择，菜单不显示「自动选择 / 延迟测试 / 节点列表」。
+> 「本地多端口映射」模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」。
 
 ### 登录与配置
 
@@ -255,33 +259,37 @@ The ☁️ icon appears in the menu bar. Managed by launchd, so closing the term
 
 Click the ☁️ icon at the top-right, then:
 
-1. **Log in** — choose "Log in…", paste your **Access Token** (recommended); or leave it empty and use email + password.
-2. **Connect Surge** — choose "Connect Surge"; the **first time**, Surge opens so you can click "Install" to confirm, then turn on "Set as System Proxy". After that, switching nodes is transparent — no need to reconnect.
+1. **Log in** — choose "Account › Log in…" and paste your **Access Token** (recommended); or use email + password.
+2. **Connect Surge** — choose "Connection › Connect Surge"; the **first time**, Surge opens so you can click "Install" to confirm, then turn on "Set as System Proxy". After that, switching nodes is transparent — no need to reconnect.
 
-Done ✅ Day to day, pick a node in the ☁️ menu, or enable "Auto-select".
+Done ✅ Day to day, pick a node in the ☁️ menu's "Nodes" group, or enable "Auto-select".
 
 ### The ☁️ menu at a glance
 
-| Item | What it does |
-|---|---|
-| Log in… | Shown when logged out; popup for an Access Token or email + password |
-| Auto-select | Speed-tests and switches to the fastest node, re-checking periodically |
-| Latency test | Tests every node now; latency shown 🟢 green / 🟡 yellow / 🔴 red |
-| Node list | Click a node to switch |
-| SOCKS5 127.0.0.1:7100 | The local egress address Surge connects to |
-| Launch at login | Toggle auto-start of ☁️ at login |
-| Local Port… | Change the local SOCKS5 port (default `7100`) |
-| Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
-| Connection Mode… | Switch between "Single Port" and "Local Multi-Port Mapping" |
-| Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
-| Refresh | Re-fetch the node list |
-| Diagnostics… | One-click check of panel reachability, node connectivity, port listeners and Surge status; result is copyable |
-| Update to vX.Y… | Appears when a new release is available; downloads, verifies the signature, swaps atomically and restarts the tray |
-| Log out | Sign out and clear the local cache (☁️ stays; log in again anytime) |
-| Quit | Quit the ☁️ app |
+The menu is grouped into "Account / Nodes / Connection / Tools":
+
+| Group | Item | What it does |
+|---|---|---|
+| Account | Account info | Auto-refreshes when the menu opens: plan, expiry, today's/used/remaining traffic, balance, commission, points |
+| Account | Log in… / Log out | Popup for an Access Token or email + password; logging out clears the local cache (☁️ stays; log in again anytime) |
+| Account | User Center (+ backup) | Opens the oixCloud user center in your browser |
+| Nodes | Auto-select | Speed-tests and switches to the fastest node, re-checking periodically |
+| Nodes | Latency test | Tests every node now; latency shown 🟢 green / 🟡 yellow / 🔴 red |
+| Nodes | Node list | Click a node to switch |
+| Nodes | Refresh | Re-fetch the node list |
+| Connection | SOCKS5 127.0.0.1:7100 | The local egress address Surge connects to |
+| Connection | Launch at login | Toggle auto-start of ☁️ at login |
+| Connection | Local Port… | Change the local SOCKS5 port (default `7100`) |
+| Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
+| Connection | Connection Mode… | Switch between "Single Port" and "Local Multi-Port Mapping" |
+| Connection | Simple Rules | Keep only the basic routing rules for a leaner profile (click "Connect Surge" again after changing) |
+| Connection | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
+| Tools | Diagnostics… | One-click check of panel reachability, node connectivity, port listeners and Surge status; result is copyable |
+| Tools | Update to vX.Y… | Appears when a new release is available; downloads, verifies the signature, swaps atomically and restarts the tray |
+| — | Quit | Quit the ☁️ app |
 
 > After changing "Local Port" or "Connection Mode", click "Connect Surge" again.
-> In "Local Multi-Port Mapping" mode you pick nodes in Surge, so the menu hides "Auto-select / Latency test / node list".
+> In "Local Multi-Port Mapping" mode you pick nodes in Surge, so the "Nodes" group hides "Auto-select / Latency test / node list".
 
 ### Login & config
 
