@@ -140,6 +140,41 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 
 - `type`：`mixed`（默认，同端口 SOCKS5 + HTTP）/ `socks5` / `http`；`node`：要绑定的节点名；`listen`：默认 `127.0.0.1`。
 
+### 自定义规则、策略组与直连保障
+
+- 生成的 Surge 配置会自动在 `[Rule]` 最顶部加入 `PROCESS-NAME,<助手路径>,DIRECT`，让助手自身的流量（面板 API、节点信息、更新检查）永远直连——即使代理出口已失效，重启助手也能正常拉取节点，不再需要先退出 Surge。
+- 想保留自己写的 Surge 规则和策略组？写进 `~/.config/oixcloud-external-proxy-program/custom.conf`（`#` 开头为注释），每次「接入 Surge」或托管刷新时自动合并进生成的配置，不会被覆盖：
+  - 无段头的行（或 `[Rule]` 段内的行）插入 `[Rule]` 段顶部，优先于面板规则；
+  - 其它段（`[Proxy Group]`、`[Host]`、`[URL Rewrite]` 等）追加到对应段末尾，段不存在时自动创建。
+
+```
+# 「#」开头是注释。没写段头的行默认按 [Rule] 规则处理，
+# 比如让内网网段直连（no-resolve：纯 IP 规则不触发域名解析）：
+IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+
+[Proxy Group]
+# 自建一个可在 Surge 里手动切换的「流媒体」分组，成员依次是：
+# 自动测速组、两个具体节点、直连（节点名要与节点列表完全一致）
+流媒体 = select, Auto - UrlTest, 香港 01, 日本 01, Direct
+
+[Rule]
+# 规则自上而下匹配，先命中先生效；策略可写自建分组、节点名，
+# 或内置的 DIRECT（直连）、REJECT（拦截）。
+
+# netflix.com 及其所有子域名 → 上面自建的「流媒体」分组
+DOMAIN-SUFFIX,netflix.com,流媒体
+# youtube.com → 固定走「香港 01」这个节点
+DOMAIN-SUFFIX,youtube.com,香港 01
+# 公司域名 → 直连
+DOMAIN-SUFFIX,mycompany.com,DIRECT
+# 域名含 tracker 关键字 → 拦截
+DOMAIN-KEYWORD,tracker,REJECT
+```
+
+- 自定义策略组可直接引用节点名和内置组（`Auto - UrlTest`、`Auto - Smart`、`Proxy`、`Direct` 等）；更多规则类型与写法见 [Surge 官方手册](https://manual.nssurge.com/)。
+- 注意：直接在 Surge 里编辑 oixCloud 配置的改动会在下次刷新时被覆盖，请改用上面的 `custom.conf` 文件。
+
 ### 停止 / 卸载
 
 停止并取消开机自启：
@@ -331,6 +366,43 @@ In `map` mode you can also declare fixed ports with `listeners`, binding a named
 ```
 
 - `type`: `mixed` (default, SOCKS5 + HTTP on one port) / `socks5` / `http`; `node`: the node name to bind; `listen`: `127.0.0.1` by default.
+
+### Custom rules, proxy groups & self-preservation
+
+- Every generated Surge profile gets `PROCESS-NAME,<helper path>,DIRECT` injected at the very top of `[Rule]`, so the helper's own traffic (panel API, node info, update checks) always goes direct — even with a dead egress, relaunching the helper can still fetch nodes without quitting Surge first.
+- Want to keep your own Surge rules and proxy groups? Put them in `~/.config/oixcloud-external-proxy-program/custom.conf` (`#` starts a comment). They are merged into the generated profile on every "Apply in Surge" and managed refresh, so they survive overwrites:
+  - bare lines (or lines under a `[Rule]` header) are inserted at the top of the `[Rule]` section, ahead of panel rules;
+  - other sections (`[Proxy Group]`, `[Host]`, `[URL Rewrite]`, …) are appended to the matching section, created at the end when missing.
+
+```
+# Lines starting with "#" are comments. Bare lines without a section
+# header are treated as [Rule] lines, e.g. keep LAN ranges direct
+# (no-resolve: pure-IP rules never trigger DNS resolution):
+IP-CIDR,192.168.0.0/16,DIRECT,no-resolve
+IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
+
+[Proxy Group]
+# A "Streaming" group you can switch manually inside Surge; members are:
+# the auto speed-test group, two specific nodes, and direct
+# (node names must match the node list exactly)
+Streaming = select, Auto - UrlTest, 香港 01, 日本 01, Direct
+
+[Rule]
+# Rules match top-down, first hit wins; the policy can be a custom
+# group, a node name, or the built-in DIRECT / REJECT.
+
+# netflix.com and all subdomains → the "Streaming" group above
+DOMAIN-SUFFIX,netflix.com,Streaming
+# youtube.com → pinned to the "香港 01" node
+DOMAIN-SUFFIX,youtube.com,香港 01
+# company domain → direct
+DOMAIN-SUFFIX,mycompany.com,DIRECT
+# any domain containing "tracker" → blocked
+DOMAIN-KEYWORD,tracker,REJECT
+```
+
+- Custom groups can reference node names and built-in groups (`Auto - UrlTest`, `Auto - Smart`, `Proxy`, `Direct`, …) directly; see the [Surge manual](https://manual.nssurge.com/) for more rule types and syntax.
+- Note: edits made directly to the oixCloud profile inside Surge are overwritten on the next refresh — use the `custom.conf` file above instead.
 
 ### Stop / uninstall
 
