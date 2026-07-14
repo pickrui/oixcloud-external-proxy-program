@@ -104,6 +104,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 ### 登录与配置
 
 - **首选 Access Token**（菜单和配置文件都优先用它），也支持邮箱 + 密码。
+- 助手会读取账户的稳定套餐身份，自动匹配对应节点级别；套餐变更后刷新节点即可生效。
 - 用邮箱 + 密码登录时，本机会换取并保存长期 token，**不保存密码**。
 - 账号保存在 `~/.config/oixcloud-external-proxy-program/config.json`（权限 `600`）。
 - 也可手动填写该文件：
@@ -331,6 +332,7 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 ### Login & config
 
 - **Access Token is preferred** (used first by both the menu and the config file); email + password also works.
+- The helper reads the account's stable plan identity and selects the matching node tier automatically; refresh nodes after changing plans.
 - When you log in with email + password, the helper exchanges and stores a long-lived token, **not the password**.
 - Credentials are saved to `~/.config/oixcloud-external-proxy-program/config.json` (mode `600`).
 - You can also edit that file by hand:
