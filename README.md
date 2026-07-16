@@ -92,6 +92,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
 | 连接设置 | 接入模式… | 在「本地多端口映射」（默认）和「单端口」之间切换 |
 | 连接设置 | 精简规则 | 只保留基础分流规则，配置更精简（改后重新点「接入 Surge」生效）|
+| 连接设置 | 复制本机节点列表 URL | 复制 `http://127.0.0.1:6171/list`，供现有 Surge 配置的 `policy-path` 使用 |
 | 连接设置 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
 | 工具 | 诊断… | 一键检查面板连通、账户状态、节点连通、端口监听（含每个映射端口）与 Surge 状态，结果可拷贝 |
 | 工具 | 检查更新 | 立刻检查新版本（另每 24 小时自动检查一次）；发现新版后变为「更新到 vX.Y…」一键安装 |
@@ -140,6 +141,20 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 ```
 
 - `type`：`mixed`（默认，同端口 SOCKS5 + HTTP）/ `socks5` / `http`；`node`：要绑定的节点名；`listen`：默认 `127.0.0.1`。
+
+### 保留现有 Surge 配置，只替换节点列表 URL
+
+不想改动原来的 Surge conf 时，无需点「接入 Surge」。保持现有规则和策略组，只把组里的节点列表 URL 改成本地地址：
+
+```ini
+香港 = select, policy-path=http://127.0.0.1:6171/list, policy-regex-filter="香港|HK", update-interval=600
+Premium = select, policy-path=http://127.0.0.1:6171/list, policy-regex-filter="Premium", update-interval=600
+```
+
+- `/list` 返回 Surge `policy-path` 所需的裸策略定义，不带 `[Proxy]` 段头；节点名保持面板原名，因此原来的 `policy-regex-filter` 可继续按国家、地区或线路类型筛选。
+- ☁️ 菜单「连接设置 › 复制本机节点列表 URL」可直接复制本机地址。局域网设备使用 `http://本机IP:6171/list`，并先开启「允许局域网访问」。
+- 本机列表支持 TCP 和 UDP；局域网列表只声明 TCP，因为 SOCKS5 UDP relay 仅绑定本机回环地址。
+- 节点隧道始终校验 TLS 证书，即使上游配置请求跳过校验也不会关闭。
 
 ### 自定义规则、策略组与直连保障
 
@@ -211,7 +226,7 @@ rm ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 oixcloud-external-proxy-program                          # 终端文字菜单（一键接入 / 菜单栏切换器 / 节点列表 / 高级选项）
 oixcloud-external-proxy-program --serve --listen 6171    # 本地订阅服务：Surge 从 http://127.0.0.1:6171/ 取整份配置
 oixcloud-external-proxy-program --serve --mode map --listen 6171
-														 # 多端口映射模式（Surge: /map, Clash provider: /clash）
+                             # 多端口映射模式（Surge: /map, 节点列表: /list, Clash provider: /clash）
 oixcloud-external-proxy-program --help                  # 查看全部参数
 oixcloud-external-proxy-program --version               # 输出版本指纹
 ```
@@ -227,6 +242,7 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6171 --bind 
 
 - `--listen [host:]port`：本地订阅服务器的监听地址（默认 `127.0.0.1`）。
 - `--bind <host>`：各代理端口的监听地址；也可用配置项 `"listenAddress"`，`map` 模式下 `listeners` 内每条还能单独设 `listen`。
+- `/list`：供 Surge `policy-path` 使用的本地节点列表；局域网设备使用 `http://<本机IP>:6171/list`。
 - **生成配置里的节点 server 跟随请求来源地址**：设备从 `http://<本机IP>:6171/` 拉取配置时，Surge/Clash 里的节点会自动指向 `<本机IP>` 而非 `127.0.0.1`（本机访问仍为 `127.0.0.1`）。
 - ⚠️ 监听 `0.0.0.0` 的端口**没有鉴权**，请仅在可信网络中使用。
 
@@ -320,6 +336,7 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
 | Connection | Connection Mode… | Switch between "Local Multi-Port Mapping" (default) and "Single Port" |
 | Connection | Simple Rules | Keep only the basic routing rules for a leaner profile (click "Connect Surge" again after changing) |
+| Connection | Copy Local Node List URL | Copies `http://127.0.0.1:6171/list` for `policy-path` in an existing Surge profile |
 | Connection | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
 | Tools | Diagnostics… | One-click check of panel reachability, account status, node connectivity, port listeners (incl. every mapped port) and Surge status; result is copyable |
 | Tools | Check for Updates | Checks for a new release now (an automatic check also runs every 24h); when one is found it becomes "Update to vX.Y…" for one-click install |
@@ -368,6 +385,20 @@ In `map` mode you can also declare fixed ports with `listeners`, binding a named
 ```
 
 - `type`: `mixed` (default, SOCKS5 + HTTP on one port) / `socks5` / `http`; `node`: the node name to bind; `listen`: `127.0.0.1` by default.
+
+### Keep your existing Surge profile and replace only the node-list URL
+
+You do not need to use "Connect Surge" if you want to keep the current profile. Leave its rules and groups intact, and point each group's node list at the local URL:
+
+```ini
+Hong Kong = select, policy-path=http://127.0.0.1:6171/list, policy-regex-filter="香港|HK", update-interval=600
+Premium = select, policy-path=http://127.0.0.1:6171/list, policy-regex-filter="Premium", update-interval=600
+```
+
+- `/list` returns bare Surge policy definitions without a `[Proxy]` header. Original panel node names are preserved, so existing `policy-regex-filter` expressions can continue filtering by country, region, or service tier.
+- Use "Connection › Copy Local Node List URL" for the local address. LAN clients use `http://<mac-ip>:6171/list` after "Allow LAN Access" is enabled.
+- Local lists advertise TCP and UDP. LAN lists advertise TCP only because the SOCKS5 UDP relay is bound to loopback.
+- Node tunnels always verify TLS certificates, even if the upstream profile asks to skip verification.
 
 ### Custom rules, proxy groups & self-preservation
 
@@ -441,7 +472,7 @@ Running with no arguments opens a text menu that covers everything below; you wo
 oixcloud-external-proxy-program                          # text menu (one-click import / menu bar switcher / node list / advanced)
 oixcloud-external-proxy-program --serve --listen 6171    # serve mode: Surge pulls the whole profile from http://127.0.0.1:6171/
 oixcloud-external-proxy-program --serve --mode map --listen 6171
-														 # mapped mode (Surge: /map, Clash provider: /clash)
+                             # mapped mode (Surge: /map, node list: /list, Clash provider: /clash)
 oixcloud-external-proxy-program --help                  # show all options
 oixcloud-external-proxy-program --version               # print version fingerprint
 ```
@@ -457,6 +488,7 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6171 --bind 
 
 - `--listen [host:]port`: bind address of the local subscription server (default `127.0.0.1`).
 - `--bind <host>`: bind address for the proxy ports; you can also set `"listenAddress"` in the config, and in `map` mode each entry in `listeners` can set its own `listen`.
+- `/list`: local node list for Surge `policy-path`; LAN devices use `http://<this-Mac-IP>:6171/list`.
 - **Node servers follow the request address**: when a device fetches the config from `http://<this-Mac-IP>:6171/`, the nodes in Surge/Clash automatically point at `<this-Mac-IP>` instead of `127.0.0.1` (local access stays `127.0.0.1`).
 - ⚠️ A port bound to `0.0.0.0` has **no authentication** — use it only on trusted networks.
 
