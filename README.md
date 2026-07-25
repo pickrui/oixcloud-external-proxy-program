@@ -86,11 +86,14 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 节点 | 延迟测试 | 立刻给所有节点测速，延迟按 🟢 绿 / 🟡 黄 / 🔴 红 标注 |
 | 节点 | 节点列表 | 点一下即切换 |
 | 节点 | 更新节点 | 重新拉取节点列表 |
-| 连接设置 | SOCKS5 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
+| 连接设置 | SOCKS5 + HTTP 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
 | 连接设置 | 开机启动 | 开关登录时自动启动 ☁️ |
-| 连接设置 | 本地端口… | 修改本地 SOCKS5 端口，默认 `7100` |
+| 连接设置 | 本地端口… | 修改本地混合代理端口（SOCKS5 + HTTP），默认 `7100` |
 | 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6171/` 或 `/map` |
 | 连接设置 | 接入模式… | 在「本地多端口映射」（默认）和「单端口」之间切换 |
+| 连接设置 | 海外网络环境 | 当前位于中国大陆以外地区时切换海外节点级别，与应急模式互斥 |
+| 连接设置 | 应急模式 | 常规线路不可用时切换备用节点，仅对支持该功能的套餐显示，与海外网络环境互斥 |
+| 连接设置 | 可选项参数… | 编辑 `&area=hk` 这类订阅查询参数，支持恢复套餐默认；`tfo` 与 `simplerules` 不会被文本框覆盖 |
 | 连接设置 | 精简规则 | 只保留基础分流规则，配置更精简（改后重新点「接入 Surge」生效）|
 | 连接设置 | 复制本机节点列表 URL | 复制 `http://127.0.0.1:6171/list`，供现有 Surge 配置的 `policy-path` 使用 |
 | 连接设置 | 接入 Surge | 把配置装进 Surge（首次需在 Surge 点「安装」确认；之后自动同步）|
@@ -99,13 +102,14 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 工具 | 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
 | — | 退出 | 退出 ☁️ App |
 
-> 改「本地端口」或「接入模式」后，重新点一次「接入 Surge」同步。
+> 改「本地端口」「接入模式」「海外网络环境」「应急模式」或「可选项参数」后，重新点一次「接入 Surge」同步。
 > 「本地多端口映射」（默认）模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」。
 
 ### 登录与配置
 
 - **首选 Access Token**（菜单和配置文件都优先用它），也支持邮箱 + 密码。
 - 助手会读取账户的稳定套餐身份，自动匹配对应节点级别；套餐变更后刷新节点即可生效。
+- 海外网络环境、应急模式和可选项参数按账户保存在本机；套餐变化时自动迁移默认参数，注销时一并清除。
 - 用邮箱 + 密码登录时，本机会换取并保存长期 token，**不保存密码**。
 - 账号保存在 `~/.config/oixcloud-external-proxy-program/config.json`（权限 `600`）。
 - 也可手动填写该文件：
@@ -330,11 +334,14 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Nodes | Latency test | Tests every node now; latency shown 🟢 green / 🟡 yellow / 🔴 red |
 | Nodes | Node list | Click a node to switch |
 | Nodes | Refresh | Re-fetch the node list |
-| Connection | SOCKS5 127.0.0.1:7100 | The local egress address Surge connects to |
+| Connection | SOCKS5 + HTTP 127.0.0.1:7100 | The local egress address Surge connects to |
 | Connection | Launch at login | Toggle auto-start of ☁️ at login |
-| Connection | Local Port… | Change the local SOCKS5 port (default `7100`) |
+| Connection | Local Port… | Change the local mixed proxy port (SOCKS5 + HTTP, default `7100`) |
 | Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6171/` or `/map` |
 | Connection | Connection Mode… | Switch between "Local Multi-Port Mapping" (default) and "Single Port" |
+| Connection | Overseas Network Environment | Use the overseas node tier while outside mainland China; mutually exclusive with Emergency Mode |
+| Connection | Emergency Mode | Switch to backup nodes when regular routes are unavailable; shown only for supported plans and mutually exclusive with Overseas Network Environment |
+| Connection | Optional Parameters… | Edit subscription query parameters such as `&area=hk` or restore plan defaults; the text field cannot override `tfo` or `simplerules` |
 | Connection | Simple Rules | Keep only the basic routing rules for a leaner profile (click "Connect Surge" again after changing) |
 | Connection | Copy Local Node List URL | Copies `http://127.0.0.1:6171/list` for `policy-path` in an existing Surge profile |
 | Connection | Connect Surge | Installs the profile into Surge (first time: click "Install" to confirm; then it auto-syncs) |
@@ -343,13 +350,14 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Tools | Update to vX.Y… | Appears when a new release is available; downloads, verifies the signature, swaps atomically and restarts the tray |
 | — | Quit | Quit the ☁️ app |
 
-> After changing "Local Port" or "Connection Mode", click "Connect Surge" again.
+> After changing "Local Port", "Connection Mode", "Overseas Network Environment", "Emergency Mode", or "Optional Parameters", click "Connect Surge" again.
 > In "Local Multi-Port Mapping" mode (the default) you pick nodes in Surge, so the "Nodes" group hides "Auto-select / Latency test / node list".
 
 ### Login & config
 
 - **Access Token is preferred** (used first by both the menu and the config file); email + password also works.
 - The helper reads the account's stable plan identity and selects the matching node tier automatically; refresh nodes after changing plans.
+- Overseas Network Environment, Emergency Mode, and optional parameters are stored locally per account; plan defaults migrate automatically and are cleared on logout.
 - When you log in with email + password, the helper exchanges and stores a long-lived token, **not the password**.
 - Credentials are saved to `~/.config/oixcloud-external-proxy-program/config.json` (mode `600`).
 - You can also edit that file by hand:
