@@ -2,7 +2,7 @@ name: oixcloud
 
 services:
   helper:
-    image: ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22
+    image: ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.23
     container_name: oixcloud-helper
     restart: unless-stopped
     init: true
@@ -21,6 +21,7 @@ services:
       - "7200-7299:7200-7299/tcp"
     volumes:
       - ./config.json:/config/config.json:ro
+      - ./custom.conf:/config/custom.conf:ro
       - oixcloud-data:/data
     command:
       - --map

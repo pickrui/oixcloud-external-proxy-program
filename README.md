@@ -1,6 +1,6 @@
 # oixCloud Surge 助手 / oixCloud helper for Surge
 
-菜单栏 App，把 oixCloud 节点接入 Surge。登录、接入 Surge、切换节点都在菜单栏 ☁️ 完成；除账号外全部内置。
+菜单栏 App，把 oixCloud 节点接入 Surge。登录、接入 Surge、切换节点都在菜单栏 ☁️ 完成；除账号外全部内置
 
 A menu bar app that brings oixCloud nodes into Surge. Log in, connect Surge, and switch nodes from the ☁️ menu; everything but your login is built in.
 
@@ -19,7 +19,7 @@ MAJOR=$(sw_vers -productVersion | cut -d. -f1)
 if [ "$MAJOR" -ge 14 ]; then
   ASSET=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
 else
-  ASSET=legacy; echo "⚠️ macOS $MAJOR（低于 14）：使用 legacy 版，未经充分测试。"
+  ASSET=legacy; echo "⚠️ macOS $MAJOR（低于 14）：使用 legacy 版，未经充分测试"
 fi
 curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ASSET" -o oixcloud-external-proxy-program
 chmod +x oixcloud-external-proxy-program
@@ -28,11 +28,11 @@ sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-p
 sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
 ```
 
-> ⚠️ macOS 11 / 12 / 13（低于 14）会自动安装 legacy 通用版（由相同 Developer ID 签名），但该版**尚未经过实机测试**，可能不稳定，请自行评估风险；能升级到 macOS 14+ 的机型请用默认版。
+> ⚠️ macOS 11 / 12 / 13（低于 14）会自动安装 legacy 通用版（由相同 Developer ID 签名），但该版**尚未经过实机测试**，可能不稳定，请自行评估风险；能升级到 macOS 14+ 的机型请用默认版
 
-> 更新时不要直接 `cp` 覆盖 `/usr/local/bin/oixcloud-external-proxy-program`：正在运行的旧进程会因代码签名失效被系统终止（Surge 会提示客户端已终止）。按上面先 `cp` 到临时名再 `mv` 原子替换。
+> 更新时不要直接 `cp` 覆盖 `/usr/local/bin/oixcloud-external-proxy-program`：正在运行的旧进程会因代码签名失效被系统终止（Surge 会提示客户端已终止）。按上面先 `cp` 到临时名再 `mv` 原子替换
 
-也可以双击仓库里的 `启动 oixCloud.command`：脚本会检查最新发布版本、校验 Developer ID 签名后更新 `/usr/local/bin/oixcloud-external-proxy-program`，再让你选择临时启动、常驻启动，或卸载自动启动。
+也可以双击仓库里的 `启动 oixCloud.command`：脚本会检查最新发布版本、校验 Developer ID 签名后更新 `/usr/local/bin/oixcloud-external-proxy-program`，再让你选择临时启动、常驻启动，或卸载自动启动
 
 ### 第 2 步 · 启动菜单栏 App
 
@@ -60,18 +60,18 @@ launchctl bootout   "gui/$(id -u)/com.oixcloud.external-proxy-program.tray" 2>/d
 launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 ```
 
-菜单栏出现 ☁️ 图标即成功；由 launchd 托管，关终端、注销重登都不受影响。
+菜单栏出现 ☁️ 图标即成功；由 launchd 托管，关终端、注销重登都不受影响
 
-> 更新二进制或改了 plist 后，重启托盘到新版本：`launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"`。
+> 更新二进制或改了 plist 后，重启托盘到新版本：`launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"`
 
 ### 第 3 步 · 在 ☁️ 菜单里完成
 
 点屏幕右上角的 ☁️ 图标，依次：
 
-1. **登录** —— 选「账户 › 登录…」，粘贴 **Access Token**（推荐）；也可改填邮箱 + 密码。
-2. **接入 Surge** —— 选「连接设置 › 接入 Surge」；**首次**会打开 Surge，点「安装」确认后再开启「Set as System Proxy」。装好后换节点是透明的，无需再次接入。
+1. **登录** —— 选「账户 › 登录…」，粘贴 **Access Token**（推荐）；也可改填邮箱 + 密码
+2. **接入 Surge** —— 选「连接设置 › 接入 Surge」；**首次**会打开 Surge，点「安装」确认后再开启「Set as System Proxy」。装好后换节点是透明的，无需再次接入
 
-完成 ✅ 默认为「本地多端口映射」模式，日常直接在 Surge 的策略组里选节点；若在「连接设置 › 接入模式…」切到「单端口」，则改在 ☁️ 菜单「节点」分组里选，或开「自动选择」。
+完成 ✅ 默认为「本地多端口映射」模式，日常直接在 Surge 的策略组里选节点；若在「连接设置 › 接入模式…」切到「单端口」，则改在 ☁️ 菜单「节点」分组里选，或开「自动选择」
 
 ### ☁️ 菜单一览
 
@@ -89,7 +89,8 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 连接设置 | SOCKS5 + HTTP 127.0.0.1:7100 | 当前本地出站地址（供 Surge 连接）|
 | 连接设置 | 开机启动 | 开关登录时自动启动 ☁️ |
 | 连接设置 | 本地端口… | 修改本地混合代理端口（SOCKS5 + HTTP），默认 `7100` |
-| 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`，无认证，仅限可信网络）；其它设备订阅 `http://本机IP:6172/` 或 `/map` |
+| 连接设置 | 允许局域网访问 | 让同一网络的设备使用本机代理与配置（监听 `0.0.0.0`）；其它设备订阅 `http://本机IP:6172/` 或 `/map` |
+| 连接设置 | 局域网访问鉴权… | 可选用户名密码鉴权，同时保护配置订阅、SOCKS5 和 HTTP 代理；可随时修改或关闭 |
 | 连接设置 | 接入模式… | 在「本地多端口映射」（默认）和「单端口」之间切换 |
 | 连接设置 | 海外网络环境 | 当前位于中国大陆以外地区时切换海外节点级别，与应急模式互斥 |
 | 连接设置 | 应急模式 | 常规线路不可用时切换备用节点，仅对支持该功能的套餐显示，与海外网络环境互斥 |
@@ -102,16 +103,16 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 | 工具 | 更新到 vX.Y… | 检测到新版本时自动出现；点击后下载、校验签名并原子替换，再重启菜单栏应用 |
 | — | 退出 | 退出 ☁️ App |
 
-> 改「本地端口」「接入模式」「海外网络环境」「应急模式」或「可选项参数」后，重新点一次「接入 Surge」同步。
-> 「本地多端口映射」（默认）模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」。
+> 改「本地端口」「接入模式」「海外网络环境」「应急模式」或「可选项参数」后，重新点一次「接入 Surge」同步
+> 「本地多端口映射」（默认）模式下节点在 Surge 内选择，「节点」分组不显示「自动选择 / 延迟测试 / 节点列表」
 
 ### 登录与配置
 
-- **首选 Access Token**（菜单和配置文件都优先用它），也支持邮箱 + 密码。
-- 助手会读取账户的稳定套餐身份，自动匹配对应节点级别；套餐变更后刷新节点即可生效。
-- 海外网络环境、应急模式和可选项参数按账户保存在本机；套餐变化时自动迁移默认参数，注销时一并清除。
-- 用邮箱 + 密码登录时，本机会换取并保存长期 token，**不保存密码**。
-- 账号保存在 `~/.config/oixcloud-external-proxy-program/config.json`（权限 `600`）。
+- **首选 Access Token**（菜单和配置文件都优先用它），也支持邮箱 + 密码
+- 助手会读取账户的稳定套餐身份，自动匹配对应节点级别；套餐变更后刷新节点即可生效
+- 海外网络环境、应急模式和可选项参数按账户保存在本机；套餐变化时自动迁移默认参数，注销时一并清除
+- 用邮箱 + 密码登录时，本机会换取并保存长期 token，**不保存密码**
+- 账号保存在 `~/.config/oixcloud-external-proxy-program/config.json`（权限 `600`）
 - 也可手动填写该文件：
 
 ```json
@@ -129,8 +130,8 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 }
 ```
 
-- `proxyMode = "map"`（默认）：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制，每个端口同时支持 SOCKS5 与 HTTP），Surge 配置保留原有规则，只把节点替换为本地端口。
-- `proxyMode = "single"`：单本地端口（默认 `7100`），在 ☁️ 菜单选节点。
+- `proxyMode = "map"`（默认）：本地多端口映射（每个节点一个本地端口，起始端口由 `mapBasePort` 控制，每个端口同时支持 SOCKS5 与 HTTP），Surge 配置保留原有规则，只把节点替换为本地端口
+- `proxyMode = "single"`：单本地端口（默认 `7100`），在 ☁️ 菜单选节点
 - 配置与节点列表服务默认使用 `6172`；helper 管理的旧本机 `6171` 托管配置会自动迁移，显式 `servePort` 或 `--listen` 保持不变
 
 `map` 模式还可用 `listeners` 声明固定端口，把指定节点绑定到指定本地端口（端口不随节点增删漂移）；不填则自动分配：
@@ -145,7 +146,7 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 }
 ```
 
-- `type`：`mixed`（默认，同端口 SOCKS5 + HTTP）/ `socks5` / `http`；`node`：要绑定的节点名；`listen`：默认 `127.0.0.1`。
+- `type`：`mixed`（默认，同端口 SOCKS5 + HTTP）/ `socks5` / `http`；`node`：要绑定的节点名；`listen`：默认 `127.0.0.1`
 
 ### 保留现有 Surge 配置，只替换节点列表 URL
 
@@ -156,17 +157,17 @@ launchctl bootstrap "gui/$(id -u)" ~/Library/LaunchAgents/com.oixcloud.external-
 Premium = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter="Premium", update-interval=600
 ```
 
-- `/list` 返回 Surge `policy-path` 所需的裸策略定义，不带 `[Proxy]` 段头；节点名保持面板原名，因此原来的 `policy-regex-filter` 可继续按国家、地区或线路类型筛选。
-- ☁️ 菜单「连接设置 › 复制本机节点列表 URL」可直接复制本机地址。局域网设备使用 `http://本机IP:6172/list`，并先开启「允许局域网访问」。
-- 本机列表支持 TCP 和 UDP；局域网列表只声明 TCP，因为 SOCKS5 UDP relay 仅绑定本机回环地址。
-- 节点隧道始终校验 TLS 证书，即使上游配置请求跳过校验也不会关闭。
+- `/list` 返回 Surge `policy-path` 所需的裸策略定义，不带 `[Proxy]` 段头；节点名保持面板原名，因此原来的 `policy-regex-filter` 可继续按国家、地区或线路类型筛选
+- ☁️ 菜单「连接设置 › 复制本机节点列表 URL」可直接复制本机地址。局域网设备先开启「允许局域网访问」；开启鉴权后，复制的 URL 会自动包含凭据
+- 本机列表支持 TCP 和 UDP；局域网列表只声明 TCP，因为 SOCKS5 UDP relay 仅绑定本机回环地址
+- 节点隧道始终校验 TLS 证书，即使上游配置请求跳过校验也不会关闭
 
 ### 自定义规则、策略组与直连保障
 
-- 生成的 Surge 配置会自动在 `[Rule]` 最顶部加入 `PROCESS-NAME,<助手路径>,DIRECT`，让助手自身的流量（面板 API、节点信息、更新检查）永远直连——即使代理出口已失效，重启助手也能正常拉取节点，不再需要先退出 Surge。
+- 生成的 Surge 配置会自动在 `[Rule]` 最顶部加入 `PROCESS-NAME,<助手路径>,DIRECT`，让助手自身的流量（面板 API、节点信息、更新检查）永远直连——即使代理出口已失效，重启助手也能正常拉取节点，不再需要先退出 Surge
 - 想保留自己写的 Surge 规则和策略组？写进 `~/.config/oixcloud-external-proxy-program/custom.conf`（`#` 开头为注释），每次「接入 Surge」或托管刷新时自动合并进生成的配置，不会被覆盖：
   - 无段头的行（或 `[Rule]` 段内的行）插入 `[Rule]` 段顶部，优先于面板规则；
-  - 其它段（`[Proxy Group]`、`[Host]`、`[URL Rewrite]` 等）追加到对应段末尾，段不存在时自动创建。
+  - 其它段（`[Proxy Group]`、`[Host]`、`[URL Rewrite]` 等）追加到对应段末尾，段不存在时自动创建
 
 ```
 # 「#」开头是注释。没写段头的行默认按 [Rule] 规则处理，
@@ -181,7 +182,7 @@ IP-CIDR,10.0.0.0/8,DIRECT,no-resolve
 
 [Rule]
 # 规则自上而下匹配，先命中先生效；策略可写自建分组、节点名，
-# 或内置的 DIRECT（直连）、REJECT（拦截）。
+# 或内置的 DIRECT（直连）、REJECT（拦截）
 
 # netflix.com 及其所有子域名 → 上面自建的「流媒体」分组
 DOMAIN-SUFFIX,netflix.com,流媒体
@@ -193,8 +194,8 @@ DOMAIN-SUFFIX,mycompany.com,DIRECT
 DOMAIN-KEYWORD,tracker,REJECT
 ```
 
-- 自定义策略组可直接引用节点名和内置组（`Auto - UrlTest`、`Auto - Smart`、`Proxy`、`Direct` 等）；更多规则类型与写法见 [Surge 官方手册](https://manual.nssurge.com/)。
-- 注意：直接在 Surge 里编辑 oixCloud 配置的改动会在下次刷新时被覆盖，请改用上面的 `custom.conf` 文件。
+- 自定义策略组可直接引用节点名和内置组（`Auto - UrlTest`、`Auto - Smart`、`Proxy`、`Direct` 等）；更多规则类型与写法见 [Surge 官方手册](https://manual.nssurge.com/)
+- 注意：直接在 Surge 里编辑 oixCloud 配置的改动会在下次刷新时被覆盖，请改用上面的 `custom.conf` 文件
 
 ### 停止 / 卸载
 
@@ -205,14 +206,14 @@ launchctl bootout "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 rm ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 ```
 
-仅临时退出：点 ☁️ 菜单「退出」。
+仅临时退出：点 ☁️ 菜单「退出」
 
 ### 排错
 
-- **查日志**：托盘运行日志在 `~/Library/Logs/oixcloud/`；安装脚本日志在脚本同目录的 `oixcloud-external-proxy-program.log`；由 Surge 拉起的节点进程日志在 Surge 自己的日志里（搜 `oixcloud-external-proxy-program`）；若怀疑闪退，看 `~/Library/Logs/DiagnosticReports/` 下 `oixcloud-*` 开头的崩溃报告。反馈问题时请附 `oixcloud-external-proxy-program --version` 的输出。
-- **看不到 ☁️ 图标**：重新运行 `oixcloud-external-proxy-program --tray`；确认是在本机图形界面（非 SSH／远程会话）下运行；刘海屏若菜单栏图标太多，☁️ 可能被折叠，退掉一些其他菜单栏图标或用菜单栏管理工具查看。另注意：同一时间只允许一个客户端（托盘或 `--serve`）运行，后启动的会自动退出并在日志里说明。
-- **提示未登录**：点 ☁️ 里的「登录…」即可，无需删配置。
-- **Surge 里连不上**：确认 ☁️ 在、已选好节点（或开了「自动选择」），且 Surge 已开「Set as System Proxy」。
+- **查日志**：托盘运行日志在 `~/Library/Logs/oixcloud/`；安装脚本日志在脚本同目录的 `oixcloud-external-proxy-program.log`；由 Surge 拉起的节点进程日志在 Surge 自己的日志里（搜 `oixcloud-external-proxy-program`）；若怀疑闪退，看 `~/Library/Logs/DiagnosticReports/` 下 `oixcloud-*` 开头的崩溃报告。反馈问题时请附 `oixcloud-external-proxy-program --version` 的输出
+- **看不到 ☁️ 图标**：重新运行 `oixcloud-external-proxy-program --tray`；确认是在本机图形界面（非 SSH／远程会话）下运行；刘海屏若菜单栏图标太多，☁️ 可能被折叠，退掉一些其他菜单栏图标或用菜单栏管理工具查看。另注意：同一时间只允许一个客户端（托盘或 `--serve`）运行，后启动的会自动退出并在日志里说明
+- **提示未登录**：点 ☁️ 里的「登录…」即可，无需删配置
+- **Surge 里连不上**：确认 ☁️ 在、已选好节点（或开了「自动选择」），且 Surge 已开「Set as System Proxy」
 - **双击 `启动 oixCloud.command` 提示没有正确的访问权限**：这是 macOS 在运行脚本前发现文件没有执行权限，脚本本身还没启动，无法在脚本内部自动修复。请在脚本所在目录打开终端后运行：
 
   ```bash
@@ -220,8 +221,8 @@ rm ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
   xattr -d com.apple.quarantine "启动 oixCloud.command" 2>/dev/null || true
   ```
 
-  然后再双击脚本。
-- **完全打不开／闪退**：重新执行第 1 步（重新下载覆盖），并确认已运行 `xattr -dr com.apple.quarantine`。
+  然后再双击脚本
+- **完全打不开／闪退**：重新执行第 1 步（重新下载覆盖），并确认已运行 `xattr -dr com.apple.quarantine`
 
 ### 进阶（可选，命令行）
 
@@ -245,24 +246,31 @@ oixcloud-external-proxy-program --version               # 输出版本指纹
 oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6172 --bind 0.0.0.0
 ```
 
-- `--listen [host:]port`：本地订阅服务器的监听地址（默认 `127.0.0.1`）。
-- `--bind <host>`：各代理端口的监听地址；也可用配置项 `"listenAddress"`，`map` 模式下 `listeners` 内每条还能单独设 `listen`。
-- `/list`：供 Surge `policy-path` 使用的本地节点列表；局域网设备使用 `http://<本机IP>:6172/list`。
-- **生成配置里的节点 server 跟随请求来源地址**：设备从 `http://<本机IP>:6172/` 拉取配置时，Surge/Clash 里的节点会自动指向 `<本机IP>` 而非 `127.0.0.1`（本机访问仍为 `127.0.0.1`）。
-- ⚠️ 监听 `0.0.0.0` 的端口**没有鉴权**，请仅在可信网络中使用。
+- `--listen [host:]port`：本地订阅服务器的监听地址（默认 `127.0.0.1`）
+- `--bind <host>`：各代理端口的监听地址；也可用配置项 `"listenAddress"`，`map` 模式下 `listeners` 内每条还能单独设 `listen`
+- 可在托盘「连接设置 › 局域网访问鉴权…」开启鉴权，也可在 `config.json` 中设置 `"lanAuth":{"username":"home-user","password":"强密码"}`；删除 `lanAuth` 即关闭
+- 鉴权仅用于实际绑定到非回环地址的服务；只监听 `127.0.0.1` 的本机 helper 保持无鉴权
+- 用户名和密码须为 1–255 个无空格 ASCII 字符；用户名不能包含 `"`、`,`、`:`、`=`、`\`，密码不能包含 `"`、`,`、`=`、`\`
+- 开启后，`/`、`/map`、`/list`、`/clash` 使用 HTTP Basic 鉴权，SOCKS5 与 HTTP 代理端口使用同一组凭据；生成的 Surge/Clash 配置会自动携带凭据
+- `/list`：供 Surge `policy-path` 使用的本地节点列表；手动填写时使用 `http://用户名:密码@本机IP:6172/list`，特殊字符需按 URL 百分号编码
+- **生成配置里的节点 server 跟随请求来源地址**：设备从 `http://<本机IP>:6172/` 拉取配置时，Surge/Clash 里的节点会自动指向 `<本机IP>` 而非 `127.0.0.1`（本机访问仍为 `127.0.0.1`）
+- `/health` 不返回配置或节点信息，保持免鉴权供容器健康检查使用
+- 鉴权不等于加密：HTTP Basic 与 SOCKS5 用户名密码会在局域网链路上传输，请仅在可信 LAN 或受保护网络使用，禁止直接暴露公网
 
 ### Docker 部署（Linux amd64 / arm64）
 
-Docker 版把 helper 放进独立 Linux 容器，适合在 Surge 全局模式下使用，也可部署到局域网里的 Linux 主机、NAS 或家用服务器。容器生成的配置**有意不加入**宿主 macOS 的 `PROCESS-NAME,...,DIRECT` 规则：Surge 无法匹配容器内的 Linux 进程路径，容器网络命名空间本身已替代这条自直连规则；也不会自动直连 Docker Desktop 后端进程，以免连带绕过其他容器的流量。
+Docker 版把 helper 放进独立 Linux 容器，适合在 Surge 全局模式下使用，也可部署到局域网里的 Linux 主机、NAS 或家用服务器。容器生成的配置**有意不加入**宿主 macOS 的 `PROCESS-NAME,...,DIRECT` 规则：Surge 无法匹配容器内的 Linux 进程路径，容器网络命名空间本身已替代这条自直连规则；也不会自动直连 Docker Desktop 后端进程，以免连带绕过其他容器的流量
 
 1. 准备配置：
 
     ```bash
     cp config.example.json config.json
+    touch custom.conf
     chmod 600 config.json
+    chmod 644 custom.conf
     ```
 
-    编辑 `config.json`，把 `accessToken` 替换成自己的 Access Token。
+    编辑 `config.json`，替换 `accessToken`、`lanAuth.username` 与 `lanAuth.password`；不需要局域网鉴权时可删除整个 `lanAuth` 对象。需要自定义 Surge 规则或策略组时，按上文格式编辑 `custom.conf`，不需要则保持空文件
 
 2. 启动：
 
@@ -273,18 +281,20 @@ Docker 版把 helper 放进独立 Linux 容器，适合在 Surge 全局模式下
 
 3. 在同一局域网的 Surge 中订阅：
 
-    - 完整配置：`http://<Docker主机IP>:6172/`
-    - Surge 节点列表：`http://<Docker主机IP>:6172/list`
-    - Clash provider：`http://<Docker主机IP>:6172/clash`
+    - 完整配置：`http://<用户名>:<密码>@<Docker主机IP>:6172/`
+    - Surge 节点列表：`http://<用户名>:<密码>@<Docker主机IP>:6172/list`
+    - Clash provider：`http://<用户名>:<密码>@<Docker主机IP>:6172/clash`
 
-镜像：`ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22`，支持 `linux/amd64` 与 `linux/arm64`。随仓库提供的 [compose.yaml](compose.yaml) 使用非 root 用户、只读根文件系统、移除所有 Linux capabilities、启用 `no-new-privileges` 和内置健康检查。
+镜像：`ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.23`，支持 `linux/amd64` 与 `linux/arm64`。随仓库提供的 [compose.yaml](compose.yaml) 使用非 root 用户、只读根文件系统、移除所有 Linux capabilities、启用 `no-new-privileges` 和内置健康检查
 
 - `/config/config.json`：只读配置文件；不要提交包含 Token 的 `config.json`
+- `/config/custom.conf`：只读自定义 Surge 配置，每次生成或刷新完整配置时自动合并
 - `/data`：身份密钥与节点缓存持久卷
 - `6172/tcp`：配置与节点列表服务
 - `7200-7299/tcp`：默认 100 个本地节点映射端口；节点更多或使用范围外的固定 `listeners.port` 时，同步扩大 Compose 端口范围
 - 局域网配置仅宣告 TCP；SOCKS5 UDP relay 仍只供容器本机回环使用
-- `0.0.0.0` 监听**没有鉴权**，请仅在可信 LAN 或受防火墙保护的网络中使用，禁止直接暴露到公网
+- `lanAuth` 同时保护配置服务和映射代理端口；删除该对象会恢复无鉴权模式
+- 即使开启鉴权也只应在可信 LAN 或受防火墙保护的网络中使用，禁止直接暴露公网
 
 查看日志与更新：
 
@@ -296,7 +306,7 @@ docker compose up -d
 
 ### 许可
 
-专有软件，详见 [NOTICE](NOTICE)。第三方组件的许可证和归属见 [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)。
+专有软件，详见 [NOTICE](NOTICE)。第三方组件的许可证和归属见 [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)
 
 ---
 
@@ -381,7 +391,8 @@ The menu is grouped into "Account / Nodes / Connection / Tools":
 | Connection | SOCKS5 + HTTP 127.0.0.1:7100 | The local egress address Surge connects to |
 | Connection | Launch at login | Toggle auto-start of ☁️ at login |
 | Connection | Local Port… | Change the local mixed proxy port (SOCKS5 + HTTP, default `7100`) |
-| Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`, no auth, trusted networks only); other devices subscribe to `http://<mac-ip>:6172/` or `/map` |
+| Connection | Allow LAN Access | Let devices on the same network use this Mac's proxy and config (binds `0.0.0.0`); other devices subscribe to `http://<mac-ip>:6172/` or `/map` |
+| Connection | LAN Access Authentication… | Optional username/password authentication for config endpoints plus SOCKS5 and HTTP proxies; change or disable it at any time |
 | Connection | Connection Mode… | Switch between "Local Multi-Port Mapping" (default) and "Single Port" |
 | Connection | Overseas Network Environment | Use the overseas node tier while outside mainland China; mutually exclusive with Emergency Mode |
 | Connection | Emergency Mode | Switch to backup nodes when regular routes are unavailable; shown only for supported plans and mutually exclusive with Overseas Network Environment |
@@ -449,7 +460,7 @@ Premium = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter="P
 ```
 
 - `/list` returns bare Surge policy definitions without a `[Proxy]` header. Original panel node names are preserved, so existing `policy-regex-filter` expressions can continue filtering by country, region, or service tier.
-- Use "Connection › Copy Local Node List URL" for the local address. LAN clients use `http://<mac-ip>:6172/list` after "Allow LAN Access" is enabled.
+- Use "Connection › Copy Local Node List URL" for the local address. Enable "Allow LAN Access" first for LAN clients; when authentication is enabled, the copied URL includes its credentials automatically.
 - Local lists advertise TCP and UDP. LAN lists advertise TCP only because the SOCKS5 UDP relay is bound to loopback.
 - Node tunnels always verify TLS certificates, even if the upstream profile asks to skip verification.
 
@@ -541,9 +552,14 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6172 --bind 
 
 - `--listen [host:]port`: bind address of the local subscription server (default `127.0.0.1`).
 - `--bind <host>`: bind address for the proxy ports; you can also set `"listenAddress"` in the config, and in `map` mode each entry in `listeners` can set its own `listen`.
-- `/list`: local node list for Surge `policy-path`; LAN devices use `http://<this-Mac-IP>:6172/list`.
+- Enable authentication from "Connection › LAN Access Authentication…", or set `"lanAuth":{"username":"home-user","password":"strong-password"}` in `config.json`. Remove `lanAuth` to disable it.
+- Authentication applies only to services actually bound to a non-loopback address; helpers listening only on `127.0.0.1` remain unauthenticated.
+- Usernames and passwords must contain 1–255 non-space ASCII characters. Usernames cannot contain `"`, `,`, `:`, `=`, or `\`; passwords cannot contain `"`, `,`, `=`, or `\`.
+- When enabled, `/`, `/map`, `/list`, and `/clash` use HTTP Basic authentication. SOCKS5 and HTTP proxy ports use the same credentials, which generated Surge/Clash configs include automatically.
+- `/list`: local node list for Surge `policy-path`; when entering it manually, use `http://username:password@this-Mac-IP:6172/list` and percent-encode URL special characters.
 - **Node servers follow the request address**: when a device fetches the config from `http://<this-Mac-IP>:6172/`, the nodes in Surge/Clash automatically point at `<this-Mac-IP>` instead of `127.0.0.1` (local access stays `127.0.0.1`).
-- ⚠️ A port bound to `0.0.0.0` has **no authentication** — use it only on trusted networks.
+- `/health` exposes no config or node data and remains unauthenticated for container health checks.
+- Authentication is not encryption: HTTP Basic and SOCKS5 credentials travel across the LAN connection. Use this only on a trusted or otherwise protected network, never directly on the public Internet.
 
 ### Docker deployment (Linux amd64 / arm64)
 
@@ -553,10 +569,12 @@ The Docker build runs the helper in an isolated Linux container. It works with S
 
     ```bash
     cp config.example.json config.json
+    touch custom.conf
     chmod 600 config.json
+    chmod 644 custom.conf
     ```
 
-    Edit `config.json` and replace `accessToken` with your own Access Token.
+    Edit `config.json` and replace `accessToken`, `lanAuth.username`, and `lanAuth.password`. Remove the entire `lanAuth` object if you do not want LAN authentication. To add custom Surge rules or proxy groups, edit `custom.conf` using the format described above; otherwise leave it empty.
 
 2. Start the service:
 
@@ -567,18 +585,20 @@ The Docker build runs the helper in an isolated Linux container. It works with S
 
 3. Subscribe from Surge on the same LAN:
 
-    - Full profile: `http://<Docker-host-IP>:6172/`
-    - Surge node list: `http://<Docker-host-IP>:6172/list`
-    - Clash provider: `http://<Docker-host-IP>:6172/clash`
+    - Full profile: `http://<username>:<password>@<Docker-host-IP>:6172/`
+    - Surge node list: `http://<username>:<password>@<Docker-host-IP>:6172/list`
+    - Clash provider: `http://<username>:<password>@<Docker-host-IP>:6172/clash`
 
-The image is `ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22` and supports `linux/amd64` and `linux/arm64`. The supplied [compose.yaml](compose.yaml) runs as a non-root user with a read-only root filesystem, drops every Linux capability, enables `no-new-privileges`, and uses the built-in health check.
+The image is `ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.23` and supports `linux/amd64` and `linux/arm64`. The supplied [compose.yaml](compose.yaml) runs as a non-root user with a read-only root filesystem, drops every Linux capability, enables `no-new-privileges`, and uses the built-in health check.
 
 - `/config/config.json`: read-only config; never commit a `config.json` containing your token
+- `/config/custom.conf`: read-only custom Surge config, merged whenever a full profile is generated or refreshed
 - `/data`: persistent identity key and node cache
 - `6172/tcp`: profile and node-list service
 - `7200-7299/tcp`: the default range for 100 mapped nodes; expand the Compose range when you have more nodes or fixed `listeners.port` values outside it
 - LAN profiles advertise TCP only; SOCKS5 UDP relay remains loopback-only inside the container
-- Binding `0.0.0.0` has **no authentication**. Use it only on a trusted LAN or behind a firewall, never directly on the public Internet
+- `lanAuth` protects both config endpoints and mapped proxy ports; removing it restores unauthenticated mode
+- Even with authentication enabled, use the service only on a trusted LAN or behind a firewall, never directly on the public Internet
 
 Logs and updates:
 

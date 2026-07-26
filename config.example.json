@@ -4,5 +4,9 @@
   "servePort": 6172,
   "mapBasePort": 7200,
   "listenAddress": "0.0.0.0",
+  "lanAuth": {
+    "username": "home-user",
+    "password": "replace-with-a-strong-password"
+  },
   "simpleRules": false
 }
