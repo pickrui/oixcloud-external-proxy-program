@@ -1,0 +1,8 @@
+{
+  "accessToken": "replace-with-your-access-token",
+  "proxyMode": "map",
+  "servePort": 6172,
+  "mapBasePort": 7200,
+  "listenAddress": "0.0.0.0",
+  "simpleRules": false
+}

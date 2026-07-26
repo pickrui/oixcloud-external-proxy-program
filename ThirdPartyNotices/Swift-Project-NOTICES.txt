@@ -1,0 +1,52 @@
+The SwiftCrypto Project
+=======================
+
+Please visit the SwiftCrypto web site for more information:
+https://github.com/apple/swift-crypto
+
+Copyright 2019 The SwiftCrypto Project
+
+The SwiftCrypto Project licenses this file to you under the Apache License,
+version 2.0. You may obtain a copy at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+This product contains test vectors from Google's Wycheproof project and
+derivations of various files from SwiftNIO. See the upstream SwiftCrypto
+NOTICE.txt for full component-level details.
+
+-------------------------------------------------------------------------------
+
+The SwiftCertificates Project
+=============================
+
+Please visit the SwiftCertificates web site for more information:
+https://github.com/apple/swift-certificates
+
+Copyright 2022 The SwiftCertificates Project
+
+The SwiftCertificates Project licenses this file to you under the Apache
+License, version 2.0. You may obtain a copy at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+This product contains derivations or test data from SwiftNIO, WebPKI,
+SwiftASN1, pyca/cryptography, musl libc, SwiftNIO SSH, and the Swift OpenAPI
+Generator. See the upstream SwiftCertificates NOTICE.txt for full
+component-level details.
+
+-------------------------------------------------------------------------------
+
+The SwiftASN1 Project
+=====================
+
+Please visit the SwiftASN1 web site for more information:
+https://github.com/apple/swift-asn1
+
+Copyright 2022 The SwiftASN1 Project
+
+The SwiftASN1 Project licenses this file to you under the Apache License,
+version 2.0. You may obtain a copy at:
+https://www.apache.org/licenses/LICENSE-2.0
+
+This product contains derivations of various scripts from SwiftNIO and the
+Swift OpenAPI Generator. See the upstream SwiftASN1 NOTICE.txt for full
+component-level details.

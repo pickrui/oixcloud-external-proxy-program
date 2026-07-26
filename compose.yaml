@@ -1,0 +1,35 @@
+name: oixcloud
+
+services:
+  helper:
+    image: ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22
+    container_name: oixcloud-helper
+    restart: unless-stopped
+    init: true
+    read_only: true
+    user: "10001:10001"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    environment:
+      OIXCLOUD_SERVE_PORT: "6172"
+    ports:
+      - "6172:6172/tcp"
+      - "7200-7299:7200-7299/tcp"
+    volumes:
+      - ./config.json:/config/config.json:ro
+      - oixcloud-data:/data
+    command:
+      - --map
+      - --listen
+      - 0.0.0.0:6172
+      - --bind
+      - 0.0.0.0
+      - --config
+      - /config/config.json
+
+volumes:
+  oixcloud-data:

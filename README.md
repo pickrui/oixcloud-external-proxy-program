@@ -251,9 +251,52 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6172 --bind 
 - **生成配置里的节点 server 跟随请求来源地址**：设备从 `http://<本机IP>:6172/` 拉取配置时，Surge/Clash 里的节点会自动指向 `<本机IP>` 而非 `127.0.0.1`（本机访问仍为 `127.0.0.1`）。
 - ⚠️ 监听 `0.0.0.0` 的端口**没有鉴权**，请仅在可信网络中使用。
 
+### Docker 部署（Linux amd64 / arm64）
+
+Docker 版把 helper 放进独立 Linux 容器，适合在 Surge 全局模式下使用，也可部署到局域网里的 Linux 主机、NAS 或家用服务器。容器生成的配置**有意不加入**宿主 macOS 的 `PROCESS-NAME,...,DIRECT` 规则：Surge 无法匹配容器内的 Linux 进程路径，容器网络命名空间本身已替代这条自直连规则；也不会自动直连 Docker Desktop 后端进程，以免连带绕过其他容器的流量。
+
+1. 准备配置：
+
+    ```bash
+    cp config.example.json config.json
+    chmod 600 config.json
+    ```
+
+    编辑 `config.json`，把 `accessToken` 替换成自己的 Access Token。
+
+2. 启动：
+
+    ```bash
+    docker compose up -d
+    docker compose ps
+    ```
+
+3. 在同一局域网的 Surge 中订阅：
+
+    - 完整配置：`http://<Docker主机IP>:6172/`
+    - Surge 节点列表：`http://<Docker主机IP>:6172/list`
+    - Clash provider：`http://<Docker主机IP>:6172/clash`
+
+镜像：`ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22`，支持 `linux/amd64` 与 `linux/arm64`。随仓库提供的 [compose.yaml](compose.yaml) 使用非 root 用户、只读根文件系统、移除所有 Linux capabilities、启用 `no-new-privileges` 和内置健康检查。
+
+- `/config/config.json`：只读配置文件；不要提交包含 Token 的 `config.json`
+- `/data`：身份密钥与节点缓存持久卷
+- `6172/tcp`：配置与节点列表服务
+- `7200-7299/tcp`：默认 100 个本地节点映射端口；节点更多或使用范围外的固定 `listeners.port` 时，同步扩大 Compose 端口范围
+- 局域网配置仅宣告 TCP；SOCKS5 UDP relay 仍只供容器本机回环使用
+- `0.0.0.0` 监听**没有鉴权**，请仅在可信 LAN 或受防火墙保护的网络中使用，禁止直接暴露到公网
+
+查看日志与更新：
+
+```bash
+docker compose logs -f
+docker compose pull
+docker compose up -d
+```
+
 ### 许可
 
-专有软件，详见 [NOTICE](NOTICE)。
+专有软件，详见 [NOTICE](NOTICE)。第三方组件的许可证和归属见 [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)。
 
 ---
 
@@ -502,6 +545,49 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6172 --bind 
 - **Node servers follow the request address**: when a device fetches the config from `http://<this-Mac-IP>:6172/`, the nodes in Surge/Clash automatically point at `<this-Mac-IP>` instead of `127.0.0.1` (local access stays `127.0.0.1`).
 - ⚠️ A port bound to `0.0.0.0` has **no authentication** — use it only on trusted networks.
 
+### Docker deployment (Linux amd64 / arm64)
+
+The Docker build runs the helper in an isolated Linux container. It works with Surge global mode and can also run on a Linux host, NAS, or home server on your LAN. Container-generated profiles **intentionally omit** the host macOS `PROCESS-NAME,...,DIRECT` rule: Surge cannot match a Linux process path inside the container, and the container network namespace replaces that self-bypass rule. The helper also avoids broadly bypassing the Docker Desktop backend process, which could unintentionally route traffic from unrelated containers directly.
+
+1. Prepare the config:
+
+    ```bash
+    cp config.example.json config.json
+    chmod 600 config.json
+    ```
+
+    Edit `config.json` and replace `accessToken` with your own Access Token.
+
+2. Start the service:
+
+    ```bash
+    docker compose up -d
+    docker compose ps
+    ```
+
+3. Subscribe from Surge on the same LAN:
+
+    - Full profile: `http://<Docker-host-IP>:6172/`
+    - Surge node list: `http://<Docker-host-IP>:6172/list`
+    - Clash provider: `http://<Docker-host-IP>:6172/clash`
+
+The image is `ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.22` and supports `linux/amd64` and `linux/arm64`. The supplied [compose.yaml](compose.yaml) runs as a non-root user with a read-only root filesystem, drops every Linux capability, enables `no-new-privileges`, and uses the built-in health check.
+
+- `/config/config.json`: read-only config; never commit a `config.json` containing your token
+- `/data`: persistent identity key and node cache
+- `6172/tcp`: profile and node-list service
+- `7200-7299/tcp`: the default range for 100 mapped nodes; expand the Compose range when you have more nodes or fixed `listeners.port` values outside it
+- LAN profiles advertise TCP only; SOCKS5 UDP relay remains loopback-only inside the container
+- Binding `0.0.0.0` has **no authentication**. Use it only on a trusted LAN or behind a firewall, never directly on the public Internet
+
+Logs and updates:
+
+```bash
+docker compose logs -f
+docker compose pull
+docker compose up -d
+```
+
 ### License
 
-Proprietary software; see [NOTICE](NOTICE).
+Proprietary software; see [NOTICE](NOTICE). Third-party licenses and attributions are in [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt).
