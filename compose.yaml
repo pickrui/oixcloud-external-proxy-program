@@ -2,7 +2,7 @@ name: oixcloud
 
 services:
   helper:
-    image: ghcr.io/pickrui/oixcloud-external-proxy-program:v0.0.23
+    image: ghcr.io/pickrui/oixcloud-external-proxy-program:latest
     container_name: oixcloud-helper
     restart: unless-stopped
     init: true
@@ -14,8 +14,6 @@ services:
       - no-new-privileges:true
     tmpfs:
       - /tmp:rw,noexec,nosuid,size=16m
-    environment:
-      OIXCLOUD_SERVE_PORT: "6172"
     ports:
       - "6172:6172/tcp"
       - "7200-7299:7200-7299/tcp"
