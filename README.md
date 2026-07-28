@@ -1,8 +1,8 @@
-# oixCloud Surge 助手 / oixCloud helper for Surge
+# oixCloud Surge / OpenSurge 助手 / helper
 
-把 oixCloud 节点接入 Surge，可运行在 Mac 菜单栏或 Docker
+把 oixCloud 节点接入 Surge，或使用 OpenSurge GUI 构建 DHCP/DNS 全屋网关
 
-Connect oixCloud nodes to Surge from the macOS menu bar or Docker
+Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge GUI
 
 **[中文](#中文) · [English](#english)**
 
@@ -15,6 +15,7 @@ Connect oixCloud nodes to Surge from the macOS menu bar or Docker
 | 场景 | 文档 |
 |---|---|
 | 在当前 Mac 使用 Surge | 继续阅读本页 |
+| 使用 OpenSurge GUI 与 DHCP/DNS 接管 | [OpenSurge 接入指南](docs/opensurge.md) |
 | 部署到 Linux、NAS 或家用服务器 | [Docker 部署](docs/docker.md) |
 | 保留现有 Surge 配置或自定义规则 | [配置参考](docs/configuration.md) |
 | 安装或连接失败 | [排错](docs/troubleshooting.md) |
@@ -53,6 +54,18 @@ Connect oixCloud nodes to Surge from the macOS menu bar or Docker
 
 macOS 11、12、13 自动使用 legacy 通用版，该版本尚未经过充分实机测试
 
+### OpenSurge 全屋网关
+
+OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观察，本助手继续负责 oixCloud 账户、节点与本地出站
+
+1. 在菜单栏打开「连接设置 › 导出 OpenSurge 配置」
+2. 在 OpenSurge 的「来源」页面导入 Finder 中选中的 `OpenSurge.yaml`
+3. 在 OpenSurge 的「网络设置」中选择局域网 DHCP 接管、旁路由或独立下游 LAN
+
+局域网 DHCP 接管不会自动修改路由器，必须按 OpenSurge 恢复状态机人工关闭和恢复路由器 DHCP，禁止同时运行两个 DHCP 服务器
+
+详细步骤、运行边界与排错见 [OpenSurge 接入与 DHCP/DNS 接管](docs/opensurge.md)
+
 ### 更新
 
 菜单栏「工具 › 检查更新」可直接更新
@@ -70,6 +83,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 查看账户与流量 | 账户 |
 | 切换接入模式 | 连接设置 › 接入模式… |
 | 修改规则后同步 | 连接设置 › 接入 Surge |
+| 导出 OpenSurge profile | 连接设置 › 导出 OpenSurge 配置 |
 | 检查运行状态 | 工具 › 诊断… |
 | 更新程序 | 工具 › 检查更新 |
 | 停止自动启动 | 重新运行 `启动 oixCloud.command`，选择「卸载自动启动」 |
@@ -77,6 +91,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 ### 更多
 
 - [配置、接入模式、现有 Surge 配置和局域网访问](docs/configuration.md)
+- [OpenSurge GUI 与 DHCP/DNS 接管](docs/opensurge.md)
 - [Docker 部署与更新](docs/docker.md)
 - [常见问题与日志](docs/troubleshooting.md)
 - [Surge 官方手册](https://manual.nssurge.com/)
@@ -96,6 +111,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | Scenario | Guide |
 |---|---|
 | Use Surge on this Mac | Continue on this page |
+| Use the OpenSurge GUI and DHCP/DNS takeover | [OpenSurge integration](docs/opensurge.md#english) |
 | Run on Linux, a NAS, or a home server | [Docker deployment](docs/docker.md#english) |
 | Keep an existing Surge profile or add custom rules | [Configuration](docs/configuration.md#english) |
 | Fix installation or connection problems | [Troubleshooting](docs/troubleshooting.md#english) |
@@ -134,6 +150,18 @@ The setup is complete when:
 
 macOS 11, 12, and 13 use the universal legacy build, which has not been fully tested on physical hardware
 
+### OpenSurge whole-home gateway
+
+OpenSurge provides the Web GUI, mihomo TUN, DHCP/DNS, device policies, and traffic visibility. This helper continues to own the oixCloud account, nodes, and local egress
+
+1. Open "Connection > Export OpenSurge Config" from the menu bar
+2. Import the selected `OpenSurge.yaml` from OpenSurge's Sources page
+3. Choose DHCP takeover, manual same-LAN gateway, or an isolated downstream LAN in OpenSurge Network Settings
+
+DHCP takeover never changes the router automatically. Follow the OpenSurge recovery state machine to disable and restore router DHCP manually, and never run two DHCP servers on one LAN
+
+See [OpenSurge integration and DHCP/DNS takeover](docs/opensurge.md#english) for setup, operating boundaries, and troubleshooting
+
 ### Updates
 
 Use "Tools > Check for Updates" from the menu bar
@@ -151,6 +179,7 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | View account and traffic | Account |
 | Change connection mode | Connection > Connection Mode... |
 | Apply changed settings | Connection > Connect Surge |
+| Export an OpenSurge profile | Connection > Export OpenSurge Config |
 | Check runtime status | Tools > Diagnostics... |
 | Update the helper | Tools > Check for Updates |
 | Disable automatic startup | Run `启动 oixCloud.command` and choose Remove Autostart |
@@ -158,6 +187,7 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 ### More
 
 - [Configuration, connection modes, existing Surge profiles, and LAN access](docs/configuration.md#english)
+- [OpenSurge GUI and DHCP/DNS takeover](docs/opensurge.md#english)
 - [Docker deployment and updates](docs/docker.md#english)
 - [Common issues and logs](docs/troubleshooting.md#english)
 - [Surge manual](https://manual.nssurge.com/)
