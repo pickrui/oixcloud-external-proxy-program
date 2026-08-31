@@ -90,7 +90,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 
 ### 更多
 
-- [配置、接入模式、现有 Surge 配置和局域网访问](docs/configuration.md)
+- [Homebrew、配置、接入模式和局域网访问](docs/configuration.md)
 - [OpenSurge GUI 与 DHCP/DNS 接管](docs/opensurge.md)
 - [Docker 部署与更新](docs/docker.md)
 - [常见问题与日志](docs/troubleshooting.md)
@@ -186,7 +186,7 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 
 ### More
 
-- [Configuration, connection modes, existing Surge profiles, and LAN access](docs/configuration.md#english)
+- [Homebrew, configuration, connection modes, and LAN access](docs/configuration.md#english)
 - [OpenSurge GUI and DHCP/DNS takeover](docs/opensurge.md#english)
 - [Docker deployment and updates](docs/docker.md#english)
 - [Common issues and logs](docs/troubleshooting.md#english)
