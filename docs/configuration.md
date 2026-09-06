@@ -4,6 +4,29 @@
 
 ## 中文
 
+### Homebrew 安装
+
+通过 Homebrew tap 安装：
+
+```bash
+brew tap pickrui/oixcloud-external-proxy-program https://github.com/pickrui/oixcloud-external-proxy-program
+brew install oixcloud-external-proxy-program
+```
+
+安装后也可使用命令别名 `oixcloud-helper`
+
+使用 Homebrew 服务在后台运行菜单栏程序：
+
+```bash
+brew services start oixcloud-external-proxy-program
+```
+
+停止后台服务：
+
+```bash
+brew services stop oixcloud-external-proxy-program
+```
+
 ### 手动安装
 
 `启动 oixCloud.command` 已包含下载、签名校验、安装和启动流程，通常无需手动安装
@@ -166,6 +189,29 @@ rm -f ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 ```
 
 ## English
+
+### Homebrew installation
+
+Install via Homebrew tap:
+
+```bash
+brew tap pickrui/oixcloud-external-proxy-program https://github.com/pickrui/oixcloud-external-proxy-program
+brew install oixcloud-external-proxy-program
+```
+
+You can also use the shorthand command alias `oixcloud-helper`
+
+Run the menu bar app as a background service:
+
+```bash
+brew services start oixcloud-external-proxy-program
+```
+
+Stop the background service:
+
+```bash
+brew services stop oixcloud-external-proxy-program
+```
 
 ### Manual installation
 
