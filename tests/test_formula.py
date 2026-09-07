@@ -35,8 +35,10 @@ class FormulaTest(unittest.TestCase):
         self.assertIn("class OixcloudExternalProxyProgram < Formula", text)
         self.assertIn('homepage "https://github.com/pickrui/oixcloud-external-proxy-program"', text)
         self.assertIn("on_macos do", text)
+        self.assertIn("if MacOS.version >= :sonoma", text)
         self.assertIn("on_arm do", text)
         self.assertIn("on_intel do", text)
+        self.assertIn("oixcloud-external-proxy-program-legacy", text)
         self.assertIn('bin.install_symlink bin/"oixcloud-external-proxy-program" => "oixcloud-helper"', text)
         self.assertIn("service do", text)
         self.assertIn('run [opt_bin/"oixcloud-external-proxy-program", "--tray"]', text)
@@ -51,7 +53,7 @@ class FormulaTest(unittest.TestCase):
         self.assertIsNotNone(version_match, "Valid version string not found in formula")
 
         sha256_matches = re.findall(r'sha256 "([0-9a-fA-F]{64})"', text)
-        self.assertEqual(len(sha256_matches), 2, "Expected 2 sha256 checksums (arm64 and intel)")
+        self.assertEqual(len(sha256_matches), 3, "Expected 3 sha256 checksums (arm64, intel, and legacy)")
 
 
 if __name__ == "__main__":
