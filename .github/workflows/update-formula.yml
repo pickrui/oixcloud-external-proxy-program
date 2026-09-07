@@ -1,0 +1,62 @@
+name: Update Homebrew Formula
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # Run daily at 02:00 UTC
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Specific release tag to update to (e.g. v0.0.31, leave blank for latest)'
+        required: false
+        default: ''
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Check and update formula
+        id: update
+        run: |
+          TAG_ARG=""
+          if [ -n "${{ github.event.inputs.tag }}" ]; then
+            TAG_ARG="--tag ${{ github.event.inputs.tag }}"
+          fi
+          python3 scripts/update_formula.py $TAG_ARG
+
+      - name: Run verification tests
+        run: |
+          python3 -m unittest discover tests
+
+      - name: Determine formula version
+        id: version
+        run: |
+          VERSION=$(python3 -c 'from pathlib import Path; import re; print(re.search(r"version \"([^\"]+)\"", Path("Formula/oixcloud-external-proxy-program.rb").read_text()).group(1))')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "feat(homebrew): bump formula to v${{ steps.version.outputs.version }}"
+          title: "feat(homebrew): bump formula to v${{ steps.version.outputs.version }}"
+          body: |
+            ### Summary
+
+            Automated update of Homebrew formula for release `v${{ steps.version.outputs.version }}`.
+          branch: "feat/bump-formula-v${{ steps.version.outputs.version }}"
+          base: main
+          delete-branch: true
