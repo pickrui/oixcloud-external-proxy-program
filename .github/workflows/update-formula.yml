@@ -1,0 +1,75 @@
+name: Update Homebrew Formula
+
+on:
+  schedule:
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Stable release tag (leave blank for latest)'
+        required: false
+        default: ''
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: homebrew-formula-update
+  cancel-in-progress: false
+
+jobs:
+  update-formula:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout current formula
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: '3.12'
+
+      - name: Check and update formula
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          args=()
+          if [[ -n "$RELEASE_TAG" ]]; then
+            args+=(--tag "$RELEASE_TAG")
+          fi
+          python3 scripts/update_formula.py "${args[@]}"
+
+      - name: Run verification tests
+        run: python3 -m unittest discover tests -p 'test*formula.py'
+
+      - name: Determine formula version
+        id: version
+        run: |
+          python3 - <<'PY'
+          import os
+          from scripts.update_formula import DEFAULT_FORMULA_PATH, get_current_formula_version
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write(f'version={get_current_formula_version(DEFAULT_FORMULA_PATH)}\n')
+          PY
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
+        with:
+          token: ${{ github.token }}
+          add-paths: Formula/oixcloud-external-proxy-program.rb
+          commit-message: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
+          title: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
+          body: 'Updates the Homebrew formula to verified release v${{ steps.version.outputs.version }}. Manual review and merge are required.'
+          branch: codex/update-homebrew-formula
+          base: main
+          delete-branch: true
