@@ -8,5 +8,9 @@
     "username": "home-user",
     "password": "replace-with-a-strong-password"
   },
-  "simpleRules": false
+  "simpleRules": false,
+  "udpPortRange": {
+    "start": 10000,
+    "end": 10099
+  }
 }
