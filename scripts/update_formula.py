@@ -1,41 +1,70 @@
 #!/usr/bin/env python3
-"""Automatically check and update the Homebrew formula for oixcloud-external-proxy-program."""
+"""Update the Homebrew formula from a verified stable GitHub release."""
 
 import argparse
+import hashlib
 import json
+import os
 from pathlib import Path
 import re
 import sys
+import tempfile
 import urllib.request
 
 REPO = "pickrui/oixcloud-external-proxy-program"
 DEFAULT_FORMULA_PATH = Path(__file__).resolve().parents[1] / "Formula" / "oixcloud-external-proxy-program.rb"
+ASSETS = tuple(f"oixcloud-external-proxy-program-{arch}" for arch in ("arm64", "amd64", "legacy"))
+VERSION_PATTERN = r"(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){1,2}"
+
+
+def normalize_tag(tag: str) -> str:
+    if not isinstance(tag, str) or not re.fullmatch(rf"v?{VERSION_PATTERN}", tag):
+        raise ValueError("Expected a stable numeric release tag, for example v0.0.31")
+    return tag if tag.startswith("v") else f"v{tag}"
+
+
+def validate_repo(repo: str) -> None:
+    if not re.fullmatch(r"[A-Za-z0-9_-]+/[A-Za-z0-9_.-]+", repo) or repo.split("/")[1] in (".", ".."):
+        raise ValueError("Expected a GitHub owner/repository")
+
+
+def validate_sha256(value: str) -> str:
+    if not isinstance(value, str) or not re.fullmatch(r"[0-9a-fA-F]{64}", value):
+        raise ValueError("Invalid SHA-256 digest")
+    return value.lower()
 
 
 def get_current_formula_version(formula_path: Path) -> str:
-    content = formula_path.read_text(encoding="utf-8")
-    match = re.search(r'version "([0-9]+(?:\.[0-9]+)+)"', content)
-    if not match:
-        raise ValueError(f"Could not find version string in {formula_path}")
-    return match.group(1)
+    matches = re.findall(r'^\s*version "([^"\n]+)"\s*$', formula_path.read_text(encoding="utf-8"), re.MULTILINE)
+    if len(matches) != 1:
+        raise ValueError("Expected exactly one formula version")
+    return normalize_tag(matches[0])[1:]
+
+
+def download(url: str, *, limit: int, authenticated: bool = False) -> bytes:
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "oixcloud-formula-updater"}
+    token = os.environ.get("GH_TOKEN") or os.environ.get("GITHUB_TOKEN")
+    if authenticated and token:
+        headers["Authorization"] = f"Bearer {token}"
+    request = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(request, timeout=30) as response:
+        body = response.read(limit + 1)
+    if len(body) > limit:
+        raise ValueError("Release response exceeds the size limit")
+    return body
 
 
 def fetch_release_metadata(repo: str, tag: str | None = None) -> dict:
-    if tag:
-        tag_name = tag if tag.startswith("v") else f"v{tag}"
-        url = f"https://api.github.com/repos/{repo}/releases/tags/{tag_name}"
-    else:
-        url = f"https://api.github.com/repos/{repo}/releases/latest"
-
-    req = urllib.request.Request(
-        url,
-        headers={
-            "Accept": "application/vnd.github+json",
-            "User-Agent": "oixcloud-formula-updater",
-        },
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return json.loads(resp.read().decode("utf-8"))
+    validate_repo(repo)
+    suffix = f"tags/{normalize_tag(tag)}" if tag else "latest"
+    release = json.loads(download(f"https://api.github.com/repos/{repo}/releases/{suffix}",
+                                  limit=1024 * 1024, authenticated=True))
+    if not isinstance(release, dict) or release.get("draft") or release.get("prerelease"):
+        raise ValueError("Only published stable releases are supported")
+    actual = normalize_tag(release.get("tag_name", ""))
+    if not release["tag_name"].startswith("v") or (tag and actual != normalize_tag(tag)):
+        raise ValueError("Release tag does not match the request")
+    return release
 
 
 def parse_sha256sums_content(text: str) -> dict[str, str]:
@@ -45,144 +74,124 @@ def parse_sha256sums_content(text: str) -> dict[str, str]:
         if not line or line.startswith("#"):
             continue
         parts = line.split()
-        if len(parts) >= 2 and len(parts[0]) == 64:
-            sha, filename = parts[0], parts[1].lstrip("*")
-            result[filename] = sha.lower()
+        if len(parts) != 2:
+            raise ValueError("Malformed SHA256SUMS line")
+        sha, filename = parts[0], parts[1].removeprefix("*")
+        if not filename or filename in result:
+            raise ValueError(f"Duplicate or empty checksum filename: {filename}")
+        result[filename] = validate_sha256(sha)
     return result
 
 
+def release_assets(release_data: dict, repo: str) -> dict[str, dict]:
+    validate_repo(repo)
+    tag = normalize_tag(release_data.get("tag_name", ""))
+    assets = {}
+    entries = release_data.get("assets", [])
+    if not isinstance(entries, list):
+        raise ValueError("Expected release assets to be a list")
+    for asset in entries:
+        if not isinstance(asset, dict):
+            raise ValueError("Invalid release asset metadata")
+        name = asset.get("name")
+        if name not in (*ASSETS, "SHA256SUMS"):
+            continue
+        expected = f"https://github.com/{repo}/releases/download/{tag}/{name}"
+        if name in assets or asset.get("browser_download_url") != expected:
+            raise ValueError(f"Duplicate asset or unexpected download URL: {name}")
+        assets[name] = asset
+    missing = set((*ASSETS, "SHA256SUMS")) - assets.keys()
+    if missing:
+        raise ValueError(f"Missing release assets: {', '.join(sorted(missing))}")
+    return assets
+
+
+def check_asset_digest(asset: dict, sha256: str) -> None:
+    digest = asset.get("digest")
+    if digest is None:
+        return  # Older GitHub releases may not expose asset digests.
+    if not isinstance(digest, str) or not digest.startswith("sha256:"):
+        raise ValueError(f"Invalid GitHub asset digest: {asset['name']}")
+    if validate_sha256(digest[7:]) != sha256:
+        raise ValueError(f"GitHub asset digest disagrees with SHA256SUMS: {asset['name']}")
+
+
 def fetch_sha256sums_from_release(release_data: dict, repo: str) -> dict[str, str]:
-    tag_name = release_data.get("tag_name", "")
-    sha256sums_url = None
-    for asset in release_data.get("assets", []):
-        if asset.get("name") == "SHA256SUMS":
-            sha256sums_url = asset.get("browser_download_url")
-            break
-
-    if not sha256sums_url and tag_name:
-        sha256sums_url = f"https://github.com/{repo}/releases/download/{tag_name}/SHA256SUMS"
-
-    if not sha256sums_url:
-        raise ValueError(f"Could not find SHA256SUMS asset in release {tag_name}")
-
-    req = urllib.request.Request(
-        sha256sums_url,
-        headers={"User-Agent": "oixcloud-formula-updater"},
-    )
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        return parse_sha256sums_content(resp.read().decode("utf-8"))
+    assets = release_assets(release_data, repo)
+    body = download(assets["SHA256SUMS"]["browser_download_url"], limit=64 * 1024)
+    check_asset_digest(assets["SHA256SUMS"], hashlib.sha256(body).hexdigest())
+    checksums = parse_sha256sums_content(body.decode("utf-8"))
+    for name in ASSETS:
+        if name not in checksums:
+            raise ValueError(f"Missing checksum: {name}")
+        check_asset_digest(assets[name], checksums[name])
+    return checksums
 
 
-def update_formula_text(
-    content: str,
-    new_version: str,
-    arm64_sha: str,
-    amd64_sha: str,
-    legacy_sha: str,
-) -> str:
-    # 1. Update version
-    content, n_ver = re.subn(r'version "[^"]+"', f'version "{new_version}"', content, count=1)
-    if n_ver != 1:
-        raise ValueError("Failed to replace version in formula")
-
-    # 2. Update arm64 sha256
-    content, n_arm = re.subn(
-        r'(on_arm do\s+url [^\n]+\n\s+sha256 )"[^"]+"',
-        rf'\1"{arm64_sha}"',
-        content,
-        count=1,
-    )
-    if n_arm != 1:
-        raise ValueError("Failed to replace arm64 sha256 in formula")
-
-    # 3. Update amd64/intel sha256
-    content, n_amd = re.subn(
-        r'(on_intel do\s+url [^\n]+\n\s+sha256 )"[^"]+"',
-        rf'\1"{amd64_sha}"',
-        content,
-        count=1,
-    )
-    if n_amd != 1:
-        raise ValueError("Failed to replace amd64 sha256 in formula")
-
-    # 4. Update legacy sha256
-    content, n_leg = re.subn(
-        r'(oixcloud-external-proxy-program-legacy"\n\s+sha256 )"[^"]+"',
-        rf'\1"{legacy_sha}"',
-        content,
-        count=1,
-    )
-    if n_leg != 1:
-        raise ValueError("Failed to replace legacy sha256 in formula")
-
+def update_formula_text(content: str, new_version: str, arm64_sha: str,
+                        amd64_sha: str, legacy_sha: str) -> str:
+    version = normalize_tag(new_version)[1:]
+    digests = [validate_sha256(value) for value in (arm64_sha, amd64_sha, legacy_sha)]
+    content, count = re.subn(r'(^\s*version )"[^"\n]+"', lambda m: f'{m[1]}"{version}"',
+                             content, flags=re.MULTILINE)
+    if count != 1:
+        raise ValueError("Expected exactly one formula version")
+    for asset, sha256 in zip(ASSETS, digests):
+        pattern = rf'(^[ \t]*url "[^"\n]*/{re.escape(asset)}"\n[ \t]*sha256 )"[^"\n]+"'
+        content, count = re.subn(pattern, lambda m: f'{m[1]}"{sha256}"', content, flags=re.MULTILINE)
+        if count != 1:
+            raise ValueError(f"Expected exactly one formula URL/checksum for {asset}")
     return content
 
 
-def main() -> int:
-    parser = argparse.ArgumentParser(description="Update Homebrew formula for oixcloud-external-proxy-program")
-    parser.add_argument("--repo", default=REPO, help="GitHub repository (owner/repo)")
-    parser.add_argument("--tag", help="Specific release tag to update to (e.g. v0.0.30)")
-    parser.add_argument("--formula", type=Path, default=DEFAULT_FORMULA_PATH, help="Path to formula file")
-    parser.add_argument("--check", action="store_true", help="Only check for updates, do not write changes")
-    args = parser.parse_args()
+def version_tuple(version: str) -> tuple[int, ...]:
+    parts = tuple(int(value) for value in normalize_tag(version)[1:].split("."))
+    return parts + (0,) * (3 - len(parts))
 
-    formula_path = args.formula
-    if not formula_path.exists():
-        print(f"Error: Formula file not found: {formula_path}", file=sys.stderr)
-        return 1
 
-    current_version = get_current_formula_version(formula_path)
-    print(f"Current formula version: {current_version}")
-
-    print(f"Fetching latest release from {args.repo}...")
+def write_atomically(path: Path, text: str) -> None:
+    temporary = None
     try:
-        release_data = fetch_release_metadata(args.repo, args.tag)
-    except Exception as e:
-        print(f"Error fetching release metadata: {e}", file=sys.stderr)
-        return 1
+        with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as handle:
+            temporary = Path(handle.name)
+            handle.write(text)
+        temporary.chmod(path.stat().st_mode & 0o777)
+        temporary.replace(path)
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
 
-    tag_name = release_data.get("tag_name", "")
-    target_version = tag_name.lstrip("v")
-    if not target_version:
-        print("Error: Could not determine release version from tag", file=sys.stderr)
-        return 1
 
-    print(f"Target release version: {target_version} ({tag_name})")
-
-    checksums = fetch_sha256sums_from_release(release_data, args.repo)
-    arm64_sha = checksums.get("oixcloud-external-proxy-program-arm64")
-    amd64_sha = checksums.get("oixcloud-external-proxy-program-amd64")
-    legacy_sha = checksums.get("oixcloud-external-proxy-program-legacy")
-
-    if not (arm64_sha and amd64_sha and legacy_sha):
-        print(
-            f"Error: Missing required asset checksums in release {tag_name}.\nFound: {checksums}",
-            file=sys.stderr,
-        )
-        return 1
-
-    print(f"Found checksums:\n  arm64:  {arm64_sha}\n  amd64:  {amd64_sha}\n  legacy: {legacy_sha}")
-
-    content = formula_path.read_text(encoding="utf-8")
-    updated_content = update_formula_text(
-        content,
-        target_version,
-        arm64_sha,
-        amd64_sha,
-        legacy_sha,
-    )
-
-    if content == updated_content:
-        print(f"Formula {formula_path.name} is already up to date with {target_version}.")
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--repo", default=REPO)
+    parser.add_argument("--tag", help="Specific stable release tag, or latest when omitted")
+    parser.add_argument("--formula", type=Path, default=DEFAULT_FORMULA_PATH)
+    parser.add_argument("--check", action="store_true", help="Check without changing the formula")
+    args = parser.parse_args()
+    try:
+        validate_repo(args.repo)
+        if args.tag:
+            normalize_tag(args.tag)
+        current_version = get_current_formula_version(args.formula)
+        release = fetch_release_metadata(args.repo, args.tag)
+        target_version = normalize_tag(release["tag_name"])[1:]
+        if version_tuple(target_version) < version_tuple(current_version):
+            raise ValueError(f"Refusing to downgrade {current_version} to {target_version}")
+        checksums = fetch_sha256sums_from_release(release, args.repo)
+        content = args.formula.read_text(encoding="utf-8")
+        updated = update_formula_text(content, target_version, *(checksums[name] for name in ASSETS))
+        if content == updated:
+            print(f"Formula is already up to date: {target_version}")
+        elif args.check:
+            print(f"Update available: {current_version} -> {target_version}")
+        else:
+            write_atomically(args.formula, updated)
+            print(f"Updated formula: {current_version} -> {target_version}")
         return 0
-
-    if args.check:
-        print(f"Update available: {current_version} -> {target_version}")
-        return 0
-
-    formula_path.write_text(updated_content, encoding="utf-8")
-    print(f"Successfully updated {formula_path} to {target_version}.")
-    return 0
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":
