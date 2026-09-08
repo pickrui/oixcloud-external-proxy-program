@@ -368,22 +368,45 @@ update_if_needed() {
   ensure_installed_command "$expected_digest" "$latest_tag"
 }
 
+escape_plist_text() {
+  local value="$1"
+  value="${value//&/&amp;}"
+  value="${value//</&lt;}"
+  value="${value//>/&gt;}"
+  printf '%s' "$value"
+}
+
 write_launch_agent() {
-  /bin/mkdir -p "$HOME/Library/LaunchAgents"
-  /bin/mkdir -p "$TRAY_LOG_DIR"
-  /bin/cat > "$PLIST_PATH" <<EOF
+  local plist_dir="${PLIST_PATH:h}" plist_tmp
+  /bin/mkdir -p "$plist_dir" "$TRAY_LOG_DIR" || return 1
+  if [[ -L "$PLIST_PATH" || -d "$PLIST_PATH" ]]; then
+    log "自动启动配置路径不是普通文件：${PLIST_PATH}"
+    return 1
+  fi
+  plist_tmp="$(/usr/bin/mktemp "${plist_dir}/.${PLIST_LABEL}.XXXXXX")" || return 1
+  {
+  /bin/cat > "$plist_tmp" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
-<key>Label</key><string>${PLIST_LABEL}</string>
+<key>Label</key><string>$(escape_plist_text "$PLIST_LABEL")</string>
 <key>ProgramArguments</key><array>
-<string>${INSTALL_PATH}</string><string>--tray</string></array>
+<string>$(escape_plist_text "$INSTALL_PATH")</string><string>--tray</string></array>
 <key>RunAtLoad</key><true/>
 <key>KeepAlive</key><true/>
-<key>StandardOutPath</key><string>${TRAY_LOG_FILE}</string>
-<key>StandardErrorPath</key><string>${TRAY_LOG_FILE}</string>
+<key>StandardOutPath</key><string>$(escape_plist_text "$TRAY_LOG_FILE")</string>
+<key>StandardErrorPath</key><string>$(escape_plist_text "$TRAY_LOG_FILE")</string>
 </dict></plist>
 EOF
+  [[ $? -eq 0 ]] || return 1
+  /usr/bin/plutil -lint "$plist_tmp" >/dev/null || return 1
+  /bin/chmod 644 "$plist_tmp" || return 1
+  # Rename uses directory permissions, so a read-only/root-owned old plist
+  # can be replaced without opening it or changing unrelated startup items.
+  /bin/mv -f -- "$plist_tmp" "$PLIST_PATH"
+  } always {
+    /bin/rm -f -- "$plist_tmp"
+  }
 }
 
 choose_launch_mode() {
@@ -488,7 +511,11 @@ uninstall_launch_agent() {
 }
 
 start_with_launch_agent() {
-  write_launch_agent
+  if ! write_launch_agent; then
+    log "无法写入自动启动配置：${PLIST_PATH}，请检查 LaunchAgents 目录所有者和写权限"
+    alert "无法写入自动启动配置，请检查 LaunchAgents 目录权限后重试"
+    return 1
+  fi
 
   log "正在通过系统自动启动项启动 oixCloud 菜单栏程序..."
   /bin/launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || \

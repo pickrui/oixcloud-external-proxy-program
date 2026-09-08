@@ -33,6 +33,20 @@ xattr -d com.apple.quarantine "启动 oixCloud.command" 2>/dev/null || true
 
 然后重新双击脚本
 
+### 常驻启动提示添加启动项失败
+
+重新下载仓库中的 `启动 oixCloud.command` 再选择常驻启动，仅更新程序二进制不会更新这个脚本
+
+新版脚本会先生成并校验临时 plist，再原子替换本程序的启动项，避免直接覆盖只读旧文件导致权限错误；写入失败时保留原配置和正在运行的服务
+
+如果仍提示 `permission denied`，请检查目录权限并反馈以下输出，可先隐藏用户名：
+
+```bash
+ls -ldOe "$HOME/Library/LaunchAgents" "$HOME/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist"
+```
+
+不要通过 `sudo` 运行整个启动脚本，也不要递归修改 `Library` 下其他文件的权限
+
 ### 更新失败
 
 更新器会校验 SHA-256、Developer ID 和版本号
@@ -100,6 +114,20 @@ xattr -d com.apple.quarantine "启动 oixCloud.command" 2>/dev/null || true
 ```
 
 Then double-click the launcher again
+
+### Persistent startup cannot add the login item
+
+Download the current `启动 oixCloud.command` from this repository and select persistent startup again; updating the binary alone does not update this launcher
+
+The launcher validates a temporary plist and atomically replaces its own launch agent, including a read-only old plist. A failed write preserves the existing configuration and running service
+
+If `permission denied` remains, inspect the directory permissions and include this output in the issue, with your username redacted if preferred:
+
+```bash
+ls -ldOe "$HOME/Library/LaunchAgents" "$HOME/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist"
+```
+
+Do not run the entire launcher with `sudo` or recursively change permissions on unrelated files in `Library`
 
 ### Update failure
 
