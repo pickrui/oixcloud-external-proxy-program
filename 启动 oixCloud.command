@@ -52,10 +52,51 @@ log() {
 fetch_latest_release() {
   local release_json="$1"
   /usr/bin/curl --http1.1 -4 -L --fail --silent \
-    --retry 3 --connect-timeout 20 \
+    --retry 1 --retry-max-time 40 --connect-timeout 10 --max-time 30 \
+    --max-filesize 1048576 \
     --header "Accept: application/vnd.github+json" \
     --output "$release_json" \
     "$API_URL"
+}
+
+fetch_release_asset_info_without_api() {
+  local release_url release_prefix latest_tag checksum_file expected_digest
+  release_prefix="https://github.com/${REPO}/releases/tag/"
+  release_url="$(/usr/bin/curl --http1.1 -4 -L --fail --silent --head \
+    --proto '=https' --proto-redir '=https' --max-redirs 5 \
+    --retry 1 --retry-max-time 40 --connect-timeout 10 --max-time 30 \
+    --output /dev/null --write-out '%{url_effective}' \
+    "https://github.com/${REPO}/releases/latest")" || return 1
+  [[ "$release_url" == "${release_prefix}"* ]] || return 1
+  latest_tag="${release_url#${release_prefix}}"
+  is_valid_release_tag "$latest_tag" || return 1
+
+  checksum_file="$(/usr/bin/mktemp "${TMPDIR:-/tmp}/oixcloud-checksums.XXXXXX")" || return 1
+  {
+    /usr/bin/curl --http1.1 -4 -L --fail --silent \
+      --proto '=https' --proto-redir '=https' --max-redirs 5 \
+      --retry 1 --retry-max-time 40 --connect-timeout 10 --max-time 30 \
+      --max-filesize 1048576 --output "$checksum_file" \
+      "https://github.com/${REPO}/releases/download/${latest_tag}/SHA256SUMS" || return 1
+    # Exactly one checksum for this asset is required. Keep the tag pinned
+    # for both the manifest and binary even if a new latest release appears.
+    expected_digest="$(/usr/bin/awk -v asset="$ASSET_NAME" '
+      $2 == asset || $2 == "*" asset {
+        count++
+        if (NF != 2 || length($1) != 64 || $1 ~ /[^0-9a-fA-F]/) invalid = 1
+        digest = tolower($1)
+      }
+      END {
+        if (count != 1 || invalid) exit 1
+        print "sha256:" digest
+      }
+    ' "$checksum_file")" || return 1
+    printf '%s\n' "$latest_tag" \
+      "https://github.com/${REPO}/releases/download/${latest_tag}/${ASSET_NAME}" \
+      "$expected_digest"
+  } always {
+    /bin/rm -f -- "$checksum_file"
+  }
 }
 
 extract_asset_info() {
@@ -326,15 +367,19 @@ update_if_needed() {
   release_json="$(/usr/bin/mktemp "${TMPDIR:-/tmp}/oixcloud-release.XXXXXX")" || return 2
 
   log "正在检查最新发布版本..."
-  if ! fetch_latest_release "$release_json"; then
-    log "无法获取最新发布版本元数据"
-    rm -f "$release_json"
-    return 2
-  fi
-  if ! asset_info="$(extract_asset_info "$release_json")"; then
-    log "无法解析最新发布版本元数据"
-    rm -f "$release_json"
-    return 2
+  if fetch_latest_release "$release_json"; then
+    if ! asset_info="$(extract_asset_info "$release_json")"; then
+      log "无法解析最新发布版本元数据"
+      rm -f "$release_json"
+      return 2
+    fi
+  else
+    log "GitHub API 暂不可用，正在通过官方发布页获取版本和校验清单"
+    if ! asset_info="$(fetch_release_asset_info_without_api)"; then
+      log "无法获取有效的发布版本和校验清单"
+      rm -f "$release_json"
+      return 2
+    fi
   fi
   rm -f "$release_json"
 
@@ -381,6 +426,10 @@ write_launch_agent() {
   /bin/mkdir -p "$plist_dir" "$TRAY_LOG_DIR" || return 1
   if [[ -L "$PLIST_PATH" || -d "$PLIST_PATH" ]]; then
     log "自动启动配置路径不是普通文件：${PLIST_PATH}"
+    return 1
+  fi
+  if ! ( : >> "$TRAY_LOG_FILE" ); then
+    log "无法写入菜单栏日志：${TRAY_LOG_FILE}，请检查日志路径和写权限"
     return 1
   fi
   plist_tmp="$(/usr/bin/mktemp "${plist_dir}/.${PLIST_LABEL}.XXXXXX")" || return 1
@@ -510,37 +559,73 @@ uninstall_launch_agent() {
   fi
 }
 
+launch_agent_pid() {
+  local service_info service_pid
+  service_info="$(/bin/launchctl print "$LAUNCHD_SERVICE" 2>/dev/null)" || return 1
+  service_pid="$(printf '%s\n' "$service_info" | /usr/bin/awk '
+    /^[[:space:]]*state = running$/ { running = 1 }
+    /^[[:space:]]*pid = [1-9][0-9]*$/ { pid = $3 }
+    END { if (running && pid != "") print pid }
+  ')"
+  [[ -n "$service_pid" ]] && kill -0 "$service_pid" 2>/dev/null || return 1
+  printf '%s\n' "$service_pid"
+}
+
+report_launch_agent_failure() {
+  local service_info summary
+  log "$1"
+  if service_info="$(/bin/launchctl print "$LAUNCHD_SERVICE" 2>/dev/null)"; then
+    summary="$(printf '%s\n' "$service_info" | /usr/bin/awk '
+      /^[[:space:]]*(state|pid|last exit code|last terminating signal) = / { print }
+    ')"
+    [[ -z "$summary" ]] || log "$summary"
+  fi
+  log "请检查启动脚本日志：${LOG_FILE}，以及菜单栏日志：${TRAY_LOG_FILE}"
+  alert "oixCloud 常驻启动失败，请检查启动脚本和菜单栏日志"
+  return 1
+}
+
 start_with_launch_agent() {
+  local attempt service_pid previous_pid=""
   if ! write_launch_agent; then
-    log "无法写入自动启动配置：${PLIST_PATH}，请检查 LaunchAgents 目录所有者和写权限"
-    alert "无法写入自动启动配置，请检查 LaunchAgents 目录权限后重试"
+    log "无法准备自动启动配置或日志，请检查 LaunchAgents 和菜单栏日志路径的写权限"
+    alert "无法准备自动启动配置或日志，请检查路径权限后重试"
     return 1
   fi
 
   log "正在通过系统自动启动项启动 oixCloud 菜单栏程序..."
+  # unload -w persists a disabled override across reboots. Re-enable before
+  # bootstrap, and do not stop an existing service if this step fails.
+  if ! /bin/launchctl enable "$LAUNCHD_SERVICE" >> "$LOG_FILE" 2>&1; then
+    report_launch_agent_failure "无法启用 oixCloud 自动启动项"
+    return 1
+  fi
   /bin/launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || \
     /bin/launchctl unload "$PLIST_PATH" >/dev/null 2>&1 || true
 
   if ! /bin/launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" >> "$LOG_FILE" 2>&1; then
-    if ! /bin/launchctl load -w "$PLIST_PATH" >> "$LOG_FILE" 2>&1; then
-      alert "无法启动 oixCloud 自动启动项，请查看 ${LOG_FILE}"
-      log "无法启动 oixCloud 自动启动项"
-      exit 1
+    report_launch_agent_failure "无法加载 oixCloud 自动启动项"
+    return 1
+  fi
+  if ! /bin/launchctl kickstart "$LAUNCHD_SERVICE" >> "$LOG_FILE" 2>&1; then
+    report_launch_agent_failure "无法启动 oixCloud 自动启动项"
+    return 1
+  fi
+
+  # A registered job can be waiting or repeatedly exiting. Require the same
+  # live PID in two samples before reporting that the process has started.
+  for attempt in {1..10}; do
+    sleep 1
+    service_pid="$(launch_agent_pid)" || service_pid=""
+    if [[ -n "$service_pid" && "$service_pid" == "$previous_pid" ]]; then
+      log "oixCloud 自动启动项正在运行：${PLIST_LABEL} (PID ${service_pid})"
+      notify "oixCloud 已启动"
+      return 0
     fi
-  fi
-
-  /bin/launchctl enable "$LAUNCHD_SERVICE" >/dev/null 2>&1 || true
-  /bin/launchctl kickstart -k "$LAUNCHD_SERVICE" >/dev/null 2>&1 || true
-
-  sleep 2
-  if /bin/launchctl print "$LAUNCHD_SERVICE" >/dev/null 2>&1; then
-    log "oixCloud 自动启动项已加载：${PLIST_LABEL}"
-    notify "oixCloud 已启动"
-  else
-    alert "oixCloud 自动启动项未能加载，请查看 ${LOG_FILE}"
-    log "oixCloud 自动启动项未能加载"
-    exit 1
-  fi
+    previous_pid="$service_pid"
+  done
+  report_launch_agent_failure "oixCloud 自动启动项已加载，但进程未能持续运行"
+  return 1
 }
 
 start_temporarily() {

@@ -47,6 +47,20 @@ ls -ldOe "$HOME/Library/LaunchAgents" "$HOME/Library/LaunchAgents/com.oixcloud.e
 
 不要通过 `sudo` 运行整个启动脚本，也不要递归修改 `Library` 下其他文件的权限
 
+### 启动项存在，但常驻程序没有运行
+
+新版脚本会在加载前重新启用本程序的启动项，检查菜单栏日志是否可写，并检查加载、启动命令的返回值；只有连续两次检测到同一个存活进程才提示启动成功
+
+如果进程启动后立即退出，脚本会记录运行状态和最近退出码，而不是仅凭启动项存在就提示成功；这项检查不代表账号登录或代理连接已经就绪
+
+重新下载当前启动脚本后复测，如仍失败，请提供以下状态输出，以及启动脚本日志和菜单栏日志中对应时间的错误行，先隐藏账号、凭据与用户名：
+
+```bash
+launchctl print "gui/$(id -u)/com.oixcloud.external-proxy-program.tray" | awk '/^[[:space:]]*(state|pid|last exit code|last terminating signal) = /'
+```
+
+如果日志显示路径不可写，检查 `~/Library/Logs/oixcloud/` 及其中 `com.oixcloud.external-proxy-program.tray.log` 的权限；不要通过 `sudo` 运行整个启动脚本
+
 ### 更新失败
 
 更新器会校验 SHA-256、Developer ID 和版本号
@@ -54,6 +68,10 @@ ls -ldOe "$HOME/Library/LaunchAgents" "$HOME/Library/LaunchAgents/com.oixcloud.e
 安装复验失败时会自动恢复旧版本
 
 可重新运行 `启动 oixCloud.command`，或在菜单栏选择「工具 › 检查更新」
+
+若 GitHub API 匿名配额耗尽或 API 暂不可用，当前启动脚本会改从官方发布页读取稳定版本，并下载同一版本的 `SHA256SUMS`；二进制仍需通过摘要、Developer ID 和版本号校验，不需要在脚本中填写 GitHub Token
+
+发布页或校验清单也无法获取时，脚本保留原有本地缓存/已安装命令的回退行为；首次安装且没有本地程序时会明确失败
 
 ### 日志
 
@@ -129,6 +147,20 @@ ls -ldOe "$HOME/Library/LaunchAgents" "$HOME/Library/LaunchAgents/com.oixcloud.e
 
 Do not run the entire launcher with `sudo` or recursively change permissions on unrelated files in `Library`
 
+### Login item exists but the persistent process is not running
+
+The current launcher re-enables its own service before loading it, checks that the tray log is writable, and checks load/start command results. Startup is reported only after two samples show the same live process
+
+A process that exits immediately produces a service state and last exit code instead of a success notification. A running process does not imply that account login or upstream connectivity is ready
+
+Download the current launcher and retry. If it still fails, include this output and the relevant error lines at that time from the launcher and tray logs, with account data, credentials, and usernames redacted:
+
+```bash
+launchctl print "gui/$(id -u)/com.oixcloud.external-proxy-program.tray" | awk '/^[[:space:]]*(state|pid|last exit code|last terminating signal) = /'
+```
+
+For an unwritable log, inspect `~/Library/Logs/oixcloud/` and its `com.oixcloud.external-proxy-program.tray.log`. Do not run the entire launcher with `sudo`
+
 ### Update failure
 
 The updater verifies SHA-256, the Developer ID, and the exact version
@@ -136,6 +168,10 @@ The updater verifies SHA-256, the Developer ID, and the exact version
 A failed post-install check automatically restores the previous version
 
 Run `启动 oixCloud.command` again or choose "Tools > Check for Updates" from the menu bar
+
+If the GitHub API is rate-limited or unavailable, the current launcher reads the stable tag from the official release page and downloads that tag's `SHA256SUMS`. The binary must still pass checksum, Developer ID, and exact-version verification; no GitHub token is needed in the launcher
+
+If the release page or checksum manifest is also unavailable, the existing local-cache/installed-command fallback remains. A first installation without a local binary fails explicitly
 
 ### Logs
 
