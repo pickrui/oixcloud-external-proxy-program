@@ -52,6 +52,12 @@ Clash       http://用户名:密码@Docker主机IP:6172/clash
 
 仅映射 SOCKS5 的 TCP 端口还不够，UDP 需要单独的端口范围和客户端可达的地址
 
+TCP 用于 SOCKS5 握手和保持 UDP ASSOCIATE 关联，客户端把 UDP 数据发到服务端在握手回复中返回的地址与端口，见 [RFC 1928](https://www.rfc-editor.org/rfc/rfc1928#section-6)
+
+协议不要求 TCP 与 UDP 使用不同数字端口；本程序当前为每个关联分配独立 UDP 端口，以区分并发客户端和关联生命周期，因此不能只把 TCP 映射后缀改成 `/udp`
+
+`udpPortRange` 管理这些关联端口，不是远端网站或 DNS 的目标端口；同一监听地址的可用范围耗尽时，新关联会失败
+
 在现有 `config.json` 中加入以下字段，将示例 IP 改为 Docker 主机的局域网 IPv4 地址：
 
 ```json
@@ -175,6 +181,10 @@ Clash         http://username:password@Docker-host-IP:6172/clash
 Remove `username:password@` when `lanAuth` is not configured
 
 ### Clash / Mihomo UDP relay
+
+The TCP connection negotiates SOCKS5 UDP ASSOCIATE and keeps the association alive; the client sends UDP packets to the address and port returned by the server, as described in [RFC 1928](https://www.rfc-editor.org/rfc/rfc1928#section-6)
+
+The protocol permits the same numeric port for TCP and UDP. This helper currently allocates a separate UDP port per association to distinguish concurrent clients and association lifetimes, so copying the TCP mappings with a `/udp` suffix is insufficient. `udpPortRange` covers relay associations, not destination ports such as DNS; new associations fail when the range is exhausted on that listening address
 
 Publishing a SOCKS5 TCP port does not publish its UDP relay. Add these fields to the existing `config.json`, replacing the address with the Docker host's reachable LAN IPv4 address:
 
