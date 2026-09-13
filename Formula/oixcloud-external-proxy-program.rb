@@ -4,6 +4,9 @@ class OixcloudExternalProxyProgram < Formula
   version "0.0.31"
   license :cannot_represent
 
+  url "https://github.com/pickrui/oixcloud-external-proxy-program/releases/download/v#{version}/oixcloud-external-proxy-program-legacy"
+  sha256 "9e1a1b5d1bb1d3c5da87e26ad3dbe4c2869907214dbae4f4c63009787b0764ba"
+
   depends_on macos: :big_sur
 
   on_macos do
@@ -30,9 +33,6 @@ class OixcloudExternalProxyProgram < Formula
     end
 
     on_ventura :or_older do
-      url "https://github.com/pickrui/oixcloud-external-proxy-program/releases/download/v#{version}/oixcloud-external-proxy-program-legacy"
-      sha256 "9e1a1b5d1bb1d3c5da87e26ad3dbe4c2869907214dbae4f4c63009787b0764ba"
-
       def install
         bin.install "oixcloud-external-proxy-program-legacy" => "oixcloud-external-proxy-program"
         bin.install_symlink bin/"oixcloud-external-proxy-program" => "oixcloud-helper"
