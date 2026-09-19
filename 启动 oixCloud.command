@@ -18,6 +18,11 @@ case "$ARCH" in
 esac
 
 MAJOR="$(/usr/bin/sw_vers -productVersion | /usr/bin/cut -d. -f1)"
+if [[ "$MAJOR" -lt 12 ]]; then
+  /usr/bin/osascript -e 'display alert "oixCloud" message "需要 macOS 12 或更高版本" as critical' >/dev/null 2>&1 || true
+  echo "需要 macOS 12 或更高版本，当前为 $(/usr/bin/sw_vers -productVersion)"
+  exit 1
+fi
 if [[ "$MAJOR" -ge 14 ]]; then
   ASSET_NAME="oixcloud-external-proxy-program-${ASSET_ARCH}"
 else
