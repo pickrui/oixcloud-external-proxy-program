@@ -26,7 +26,7 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 
 - Surge for Mac
 - oixCloud 账户和 Access Token
-- macOS 11 或更高版本
+- macOS 12 或更高版本
 
 1. 下载并解压仓库
 
@@ -52,7 +52,7 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 - Surge 出现 oixCloud 配置和节点策略组
 - 切换节点后可以正常访问网络
 
-macOS 11、12、13 自动使用 legacy 通用版，该版本尚未经过充分实机测试
+macOS 12、13 自动使用 legacy 通用版，该版本尚未经过充分实机测试；macOS 11 不再受支持，构建工具链已不支持该部署目标
 
 ### OpenSurge 全屋网关
 
@@ -122,7 +122,7 @@ Requirements:
 
 - Surge for Mac
 - An oixCloud account and Access Token
-- macOS 11 or later
+- macOS 12 or later
 
 1. Download and extract the repository
 
@@ -148,7 +148,7 @@ The setup is complete when:
 - Surge shows the oixCloud profile and node policy groups
 - Network access works after selecting a node
 
-macOS 11, 12, and 13 use the universal legacy build, which has not been fully tested on physical hardware
+macOS 12 and 13 use the universal legacy build, which has not been fully tested on physical hardware. macOS 11 is no longer supported: the build toolchain no longer targets it
 
 ### OpenSurge whole-home gateway
 

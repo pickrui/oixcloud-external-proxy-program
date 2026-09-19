@@ -100,7 +100,7 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 
 重新运行 `启动 oixCloud.command` 即可覆盖安装
 
-macOS 11、12、13 使用 legacy 通用版，该版本尚未经过充分实机测试
+macOS 12、13 使用 legacy 通用版，该版本尚未经过充分实机测试；macOS 11 不再受支持
 
 ## English
 
@@ -200,4 +200,4 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 
 Run `启动 oixCloud.command` again to replace the current installation
 
-macOS 11, 12, and 13 use the universal legacy build, which has not been fully tested on physical hardware
+macOS 12 and 13 use the universal legacy build, which has not been fully tested on physical hardware. macOS 11 is no longer supported
