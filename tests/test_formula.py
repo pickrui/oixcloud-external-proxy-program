@@ -37,7 +37,7 @@ class FormulaTest(unittest.TestCase):
         self.assertIn("on_macos do", text)
         self.assertIn("on_sonoma :or_newer do", text)
         self.assertIn("on_ventura :or_older do", text)
-        self.assertIn("depends_on macos: :big_sur", text)
+        self.assertIn("depends_on macos: :monterey", text)
         self.assertIn("on_arm do", text)
         self.assertIn("on_intel do", text)
         self.assertIn("oixcloud-external-proxy-program-legacy", text)

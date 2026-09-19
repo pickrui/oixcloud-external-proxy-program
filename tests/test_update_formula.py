@@ -105,7 +105,7 @@ end
 
 
 class ReleaseValidationTest(unittest.TestCase):
-    def release(self, tag="v0.0.32"):
+    def release(self, tag="v0.0.33"):
         assets = []
         for index, name in enumerate(update_formula.ASSETS):
             assets.append({"name": name, "digest": "sha256:" + str(index + 1) * 64,
@@ -123,12 +123,12 @@ class ReleaseValidationTest(unittest.TestCase):
                 network.assert_not_called()
 
     def test_rejects_draft_prerelease_and_mismatched_metadata(self):
-        for edit in [{"draft": True}, {"prerelease": True}, {"tag_name": "v0.0.33"}]:
+        for edit in [{"draft": True}, {"prerelease": True}, {"tag_name": "v0.0.34"}]:
             release, _ = self.release()
             release.update(edit)
             with self.subTest(edit=edit), patch.object(update_formula, "download", return_value=json.dumps(release).encode()):
                 with self.assertRaises(ValueError):
-                    update_formula.fetch_release_metadata(update_formula.REPO, "v0.0.32")
+                    update_formula.fetch_release_metadata(update_formula.REPO, "v0.0.33")
 
     def test_checksums_reject_nonhex_duplicates_and_malformed_lines(self):
         for body in ["z" * 64 + "  binary", "a" * 64 + "  binary\n" + "b" * 64 + "  binary",
