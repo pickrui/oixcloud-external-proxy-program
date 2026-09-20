@@ -6,8 +6,6 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 
 **[中文](#中文) · [English](#english)**
 
----
-
 ## 中文
 
 ### 选择部署方式
@@ -81,6 +79,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 需求 | 入口 |
 |---|---|
 | 查看账户与流量 | 账户 |
+| 切换中文或英文 | 工具 › 语言 |
 | 切换接入模式 | 连接设置 › 接入模式… |
 | 修改规则后同步 | 连接设置 › 接入 Surge |
 | 导出 OpenSurge profile | 连接设置 › 导出 OpenSurge 配置 |
@@ -132,11 +131,11 @@ Requirements:
 
    Choose persistent startup on first use
 
-3. Click the cloud icon in the menu bar and open "Account > Log in..."
+3. Click the cloud icon in the menu bar and open "Account > Sign in…"
 
    Paste the Access Token, or use email and password
 
-4. Open "Connection > Connect Surge"
+4. Open "Connection > Apply in Surge"
 
    Confirm installation if Surge asks, then enable `Set as System Proxy`
 
@@ -177,8 +176,9 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | Task | Menu |
 |---|---|
 | View account and traffic | Account |
-| Change connection mode | Connection > Connection Mode... |
-| Apply changed settings | Connection > Connect Surge |
+| Change the UI language | Tools > Language |
+| Change connection mode | Connection > Mode… |
+| Apply changed settings | Connection > Apply in Surge |
 | Export an OpenSurge profile | Connection > Export OpenSurge Config |
 | Check runtime status | Tools > Diagnostics... |
 | Update the helper | Tools > Check for Updates |

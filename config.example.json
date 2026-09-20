@@ -1,4 +1,5 @@
 {
+  "language": "auto",
   "accessToken": "replace-with-your-access-token",
   "proxyMode": "map",
   "servePort": 6172,

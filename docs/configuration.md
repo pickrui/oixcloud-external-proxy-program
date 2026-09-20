@@ -71,6 +71,14 @@ oixcloud-external-proxy-program --tray
 
 用邮箱密码登录时，助手换取并保存 Token，不保存密码
 
+### 界面语言
+
+默认跟随系统，菜单栏「工具 › 语言」可选中文、English 或跟随系统，选择会保存并立即生效
+
+配置文件的 `"language": "zh"` 或 `"language": "en"` 可固定语言，`"auto"` 或省略该字段则跟随系统
+
+环境变量 `OIXCLOUD_LANG=zh` 或 `OIXCLOUD_LANG=en` 优先于配置，适用于命令行与 Docker；修改容器环境后需重建容器
+
 ### 接入模式
 
 | 模式 | 节点选择位置 | 本地端口 |
@@ -241,7 +249,7 @@ oixcloud-external-proxy-program --tray
 
 ### Account configuration
 
-Use "Account > Log in..." in the menu bar and enter an Access Token
+Use "Account > Sign in…" in the menu bar and enter an Access Token
 
 The configuration file is:
 
@@ -256,6 +264,14 @@ Minimal configuration:
 ```
 
 Email and password login exchanges them for a stored token; the password is not saved
+
+### Interface language
+
+The interface follows the system by default. Choose 中文, English, or Follow system under Tools > Language; the selection is saved and takes effect immediately
+
+Set `"language": "zh"` or `"language": "en"` in the config to pin a language; use `"auto"` or omit the field to follow the system
+
+`OIXCLOUD_LANG=zh` or `OIXCLOUD_LANG=en` overrides the config for CLI and Docker use; recreate a container after changing its environment
 
 ### Connection modes
 

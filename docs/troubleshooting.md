@@ -10,6 +10,12 @@
 
 诊断会检查账户、节点、监听端口和 Surge 状态
 
+菜单顶部会显示最近操作的进度或结果；失败提示说明出错阶段、原因和处理建议
+
+HTTP 407 表示网络代理要求鉴权，请检查系统代理凭据；HTTP 403 也可能是网络拦截，先尝试备用网络；仅在提示登录失效时重新登录
+
+提示「配置已写入，Surge 未自动切换」时，在 Surge 手动选择 oixCloud 配置并重载
+
 ### 常见问题
 
 | 现象 | 处理 |
@@ -109,6 +115,12 @@ macOS 12、13 使用 legacy 通用版，该版本尚未经过充分实机测试�
 Open "Tools > Diagnostics..." from the menu bar first
 
 Diagnostics checks the account, nodes, listeners, and Surge status
+
+The top of the menu shows the latest action's progress or result; failures explain the step, cause, and suggested next action
+
+HTTP 407 means the network proxy requires authentication: check its credentials. HTTP 403 can also come from network filtering, so try another network first; sign in again when the helper reports an expired sign-in
+
+If the helper says the config was written but Surge did not switch, select the oixCloud profile in Surge and reload it
 
 ### Common issues
 
