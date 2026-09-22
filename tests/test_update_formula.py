@@ -105,6 +105,19 @@ end
 
 
 class ReleaseValidationTest(unittest.TestCase):
+    def upgrade_tag(self):
+        """A tag one patch above whatever the checked-in formula carries.
+
+        Tests that feed the real formula in as their fixture cannot also pin a
+        release tag: the moment the formula is bumped past it the fixture turns
+        into a downgrade, which update_formula rightly refuses, and the test
+        starts failing for a reason that has nothing to do with what it covers.
+        """
+        current = get_current_formula_version(update_formula.DEFAULT_FORMULA_PATH)
+        parts = [int(part) for part in current.split(".")]
+        parts[-1] += 1
+        return "v" + ".".join(str(part) for part in parts)
+
     def release(self, tag="v0.0.35"):
         assets = []
         for index, name in enumerate(update_formula.ASSETS):
@@ -173,7 +186,7 @@ class ReleaseValidationTest(unittest.TestCase):
             formula = Path(directory) / "formula.rb"
             original = update_formula.DEFAULT_FORMULA_PATH.read_text()
             formula.write_text(original)
-            release, body = self.release()
+            release, body = self.release(self.upgrade_tag())
             for check, fail in [(True, False), (False, True)]:
                 argv = ["update_formula.py", "--formula", str(formula)] + (["--check"] if check else [])
                 with patch.object(sys, "argv", argv), patch.object(update_formula, "fetch_release_metadata", return_value=release), \
