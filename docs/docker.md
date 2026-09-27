@@ -90,7 +90,7 @@ proxy-providers:
 
 ### 节点筛选
 
-容器没有菜单栏界面，拉取节点时只请求 `nodes=auto`，由面板按节点筛选或套餐默认线路下发节点
+容器没有菜单栏界面，拉取节点时只请求 `nodes=auto`，由面板按节点筛选或「智能优选」下发节点
 
 筛选跟随登录令牌：在 macOS 菜单栏「连接设置 › 节点筛选…」或网页用户中心修改后，使用同一账号或同一 Access Token 的容器会在客户端下次更新配置或节点列表时下发新的节点，无需重启容器
 
@@ -234,7 +234,7 @@ Recreate the container and refresh the provider after changing the configuration
 
 ### Node Filter
 
-The container has no menu bar UI. It requests nodes with `nodes=auto`, and the panel sends nodes according to the node filter or your plan's default lines
+The container has no menu bar UI. It requests nodes with `nodes=auto`, and the panel sends nodes according to the node filter or Smart Selection
 
 The filter follows the sign-in token. After it is changed from "Connection > Node Filter…" in the macOS menu bar or in the web user center, a container using the same account or Access Token serves the new nodes the next time a client updates its config or node list; no restart is needed
 
