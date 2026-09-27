@@ -88,6 +88,14 @@ proxy-providers:
 
 更新配置后重新创建容器并刷新 provider；修改端口范围时须同时修改配置、Compose 和防火墙，NAT 需要保持 TCP 与 UDP 来源地址一致
 
+### 节点筛选
+
+容器没有菜单栏界面，拉取节点时只请求 `nodes=auto`，由面板按节点筛选或套餐默认线路下发节点
+
+筛选跟随登录令牌：在 macOS 菜单栏「连接设置 › 节点筛选…」或网页用户中心修改后，使用同一账号或同一 Access Token 的容器会在客户端下次更新配置或节点列表时下发新的节点，无需重启容器
+
+旧配置中的 `oixParams` 不再生效，`--check-config` 会提示该字段已停用
+
 ### 订阅流量与到期信息
 
 v0.0.32 起，`/clash` 的成功 GET / HEAD 响应通过 `Subscription-Userinfo` 提供账户上传、下载、总流量和到期时间，保持节点 provider YAML 兼容
@@ -223,6 +231,14 @@ proxy-providers:
 See the [official Mihomo provider documentation](https://wiki.metacubex.one/en/config/proxy-providers/). Replace the credentials and use SOCKS5 / mixed listeners; HTTP proxies cannot relay UDP this way
 
 Recreate the container and refresh the provider after changing the configuration. Keep the configured range, published ports, and firewall in sync; NAT must preserve matching TCP and UDP client source addresses
+
+### Node Filter
+
+The container has no menu bar UI. It requests nodes with `nodes=auto`, and the panel sends nodes according to the node filter or your plan's default lines
+
+The filter follows the sign-in token. After it is changed from "Connection > Node Filter…" in the macOS menu bar or in the web user center, a container using the same account or Access Token serves the new nodes the next time a client updates its config or node list; no restart is needed
+
+`oixParams` in older configs no longer has any effect, and `--check-config` reports it as retired
 
 ### Subscription usage and expiry
 
