@@ -114,13 +114,28 @@ oixcloud-external-proxy-program --tray
 | 设置 | 用途 |
 |---|---|
 | 接入模式 | 切换 `map` 与 `single` |
+| 节点筛选… | 按线路、地区和名称选择下发的节点，套餐等级 20 及以上显示 |
 | 精简规则 | 仅保留基础规则 |
-| 海外网络环境 | 使用海外节点级别 |
-| 应急模式 | 使用套餐支持的备用节点 |
-| 可选项参数 | 编辑 `&area=hk` 等订阅参数 |
 | 允许局域网访问 | 让同一网络设备访问本机服务 |
 
 上述设置变更后重新接入 Surge
+
+### 节点筛选
+
+程序拉取节点时只请求 `nodes=auto`，由面板决定下发哪些节点：
+
+- 未设置筛选时按套餐默认线路：有 GIA 时为 Fusion + GIA，有 Fusion 时为 Fusion，有 CIA / IXP 时为 CIA + IXP，其余为全部节点
+- 设置筛选后按筛选下发
+
+在「连接设置 › 节点筛选…」中点按线路或地区，可在「不筛选 → 仅保留 → 排除」之间切换，也可填写名称包含 / 名称排除，例如 `香港|日本`、`测试|维护`
+
+窗口会预览保留的节点数量和列表，保留 0 个节点时无法保存；「恢复默认」清空筛选，保存后回到套餐默认线路
+
+保存后程序自动刷新节点和本地映射端口，重新接入 Surge 即可使用新的节点
+
+筛选保存在账户上并跟随登录令牌：使用同一账号或同一 Access Token 登录本程序的设备共用一份筛选，包括 Docker 部署；也可在网页用户中心修改
+
+旧版的「海外网络环境」「应急模式」「可选项参数」及配置项 `oixParams` 已移除，旧配置中的该字段会被忽略
 
 ### 保留现有 Surge 配置
 
@@ -308,13 +323,28 @@ Fixed node ports:
 | Setting | Purpose |
 |---|---|
 | Connection Mode | Switch between `map` and `single` |
+| Node Filter… | Choose the nodes you get by line, region, and name; shown on plans ranked 20 and up |
 | Simple Rules | Keep only basic rules |
-| Overseas Network Environment | Use the overseas node tier |
-| Emergency Mode | Use backup nodes supported by the plan |
-| Optional Parameters | Edit subscription parameters such as `&area=hk` |
 | Allow LAN Access | Serve other devices on the same network |
 
 Reconnect Surge after changing these settings
+
+### Node Filter
+
+The helper requests nodes with `nodes=auto` and lets the panel decide which nodes to send:
+
+- Without a filter, lines follow your plan: Fusion + GIA with GIA access, Fusion with Fusion access, CIA + IXP with CIA or IXP access, otherwise every node
+- With a filter, the panel sends the nodes the filter keeps
+
+In "Connection > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes, such as `HK|JP` or `test|maintenance`
+
+The window previews how many nodes are kept and which ones, and it cannot save a filter that keeps no node. Restore Default clears the filter so that saving returns to your plan's default lines
+
+After saving, the helper refreshes its nodes and local mapped ports; reconnect Surge to use the new nodes
+
+The filter is saved to your account and follows the sign-in token: every device signed in to this app with the same account or Access Token shares it, Docker deployments included. It can also be edited in the web user center
+
+The older Overseas Network Environment, Emergency Mode, and Optional Parameters settings and the `oixParams` config field have been removed; existing configs keep working and the field is ignored
 
 ### Keep an existing Surge profile
 

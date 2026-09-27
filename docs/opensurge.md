@@ -109,7 +109,7 @@ Mac 的下游接口与上游接口分离，由 OpenSurge 为独立网络提供 D
 
 节点健康检测从网关 Mac 发起，不能替代某台下游设备的 DHCP、DNS 与 TUN 验收
 
-oixCloud 登录、套餐、流量、海外网络环境、应急模式和可选参数仍在云朵菜单中管理
+oixCloud 登录、套餐、流量、节点筛选和精简规则仍在云朵菜单中管理
 
 ## 安全与故障恢复
 
@@ -262,7 +262,7 @@ After import and startup, the OpenSurge GUI can:
 
 Health tests originate from the gateway Mac and do not replace DHCP, DNS, and TUN validation from a downstream device
 
-Continue to manage oixCloud login, plan details, traffic, overseas mode, emergency mode, and optional parameters from the cloud menu
+Continue to manage oixCloud login, plan details, traffic, the node filter, and simple rules from the cloud menu
 
 ### Security and recovery
 
