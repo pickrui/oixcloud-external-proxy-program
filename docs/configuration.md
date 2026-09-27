@@ -124,7 +124,7 @@ oixcloud-external-proxy-program --tray
 
 程序拉取节点时只请求 `nodes=auto`，由面板决定下发哪些节点：
 
-- 未设置筛选时为「智能优选」，按套餐选择线路：有 GIA 时为 Fusion + GIA，有 Fusion 时为 Fusion，有 CIA / IXP 时为 CIA + IXP，其余为全部节点
+- 未设置筛选时节点来自「智能优选」
 - 设置筛选后按筛选下发
 
 在「连接设置 › 节点筛选…」中点按线路或地区，可在「不筛选 → 仅保留 → 排除」之间切换，也可填写名称包含 / 名称排除，例如 `香港|日本`、`测试|维护`
@@ -333,7 +333,7 @@ Reconnect Surge after changing these settings
 
 The helper requests nodes with `nodes=auto` and lets the panel decide which nodes to send:
 
-- Without a filter, Smart Selection picks lines from your plan: Fusion + GIA with GIA access, Fusion with Fusion access, CIA + IXP with CIA or IXP access, otherwise every node
+- Without a filter, nodes come from Smart Selection
 - With a filter, the panel sends the nodes the filter keeps
 
 In "Connection > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes, such as `HK|JP` or `test|maintenance`
