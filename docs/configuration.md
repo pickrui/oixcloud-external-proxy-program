@@ -129,6 +129,8 @@ oixcloud-external-proxy-program --tray
 
 在「连接设置 › 节点筛选…」中点按线路或地区，可在「不筛选 → 仅保留 → 排除」之间切换，也可填写名称包含 / 名称排除，例如 `香港|日本`、`测试|维护`
 
+读取过筛选后，菜单项显示「节点筛选 · 智能优选」或「节点筛选 · 已自定义 · 保留 N / M 个节点」
+
 窗口会预览保留的节点数量和列表，保留 0 个节点时无法保存；「恢复默认」清空筛选，保存后回到「智能优选」
 
 保存后程序自动刷新节点和本地映射端口，重新接入 Surge 即可使用新的节点
@@ -336,7 +338,9 @@ The helper requests nodes with `nodes=auto` and lets the panel decide which node
 - Without a filter, nodes come from Smart Selection
 - With a filter, the panel sends the nodes the filter keeps
 
-In "Connection > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes, such as `HK|JP` or `test|maintenance`
+In "Connection > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes. Node names are in Chinese, so use patterns such as `香港|日本` or `测试|维护`
+
+Once the filter has been read, the menu item shows "Node Filter · Smart Selection" or "Node Filter · Customized · N of M nodes kept"
 
 The window previews how many nodes are kept and which ones, and it cannot save a filter that keeps no node. Restore Default clears the filter so that saving returns to Smart Selection
 
