@@ -70,6 +70,6 @@ jobs:
           commit-message: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
           title: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
           body: 'Updates the Homebrew formula to verified release v${{ steps.version.outputs.version }}. Manual review and merge are required.'
-          branch: codex/update-homebrew-formula
+          branch: update-homebrew-formula
           base: main
           delete-branch: true
