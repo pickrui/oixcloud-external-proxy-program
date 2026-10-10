@@ -132,10 +132,13 @@ def update_formula_text(content: str, new_version: str, arm64_sha: str,
                         amd64_sha: str, legacy_sha: str) -> str:
     version = normalize_tag(new_version)[1:]
     digests = [validate_sha256(value) for value in (arm64_sha, amd64_sha, legacy_sha)]
-    content, count = re.subn(r'(^\s*version )"[^"\n]+"', lambda m: f'{m[1]}"{version}"',
-                             content, flags=re.MULTILINE)
-    if count != 1:
+    versions = re.findall(r'^[ \t]*version "([^"\n]+)"', content, flags=re.MULTILINE)
+    if len(versions) != 1:
         raise ValueError("Expected exactly one formula version")
+    if normalize_tag(versions[0])[1:] != version:
+        content = re.sub(r'^[ \t]*revision [0-9]+[ \t]*\n', '', content, flags=re.MULTILINE)
+    content = re.sub(r'(^[ \t]*version )"[^"\n]+"', lambda m: f'{m[1]}"{version}"',
+                     content, flags=re.MULTILINE)
     for asset, sha256 in zip(ASSETS, digests):
         pattern = rf'(^[ \t]*url "[^"\n]*/{re.escape(asset)}"\n[ \t]*sha256 )"[^"\n]+"'
         content, count = re.subn(pattern, lambda m: f'{m[1]}"{sha256}"', content, flags=re.MULTILINE)

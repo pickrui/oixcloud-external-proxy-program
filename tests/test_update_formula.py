@@ -53,6 +53,7 @@ afd585202b9e55ce361774c66e267e15c2d9f447767c7fa34f262655b8129269  oixcloud-exter
   desc "Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with OpenSurge"
   homepage "https://github.com/pickrui/oixcloud-external-proxy-program"
   version "0.0.30"
+  revision 1
   license :cannot_represent
 
   on_macos do
@@ -96,6 +97,9 @@ end
             "3333333333333333333333333333333333333333333333333333333333333333",
         )
         self.assertIn('version "0.0.31"', updated)
+        self.assertNotIn('revision 1', updated)
+        same_version = update_formula_text(sample_formula, "v0.0.30", "1" * 64, "2" * 64, "3" * 64)
+        self.assertIn('revision 1', same_version)
         self.assertIn('sha256 "1111111111111111111111111111111111111111111111111111111111111111"', updated)
         self.assertIn('sha256 "2222222222222222222222222222222222222222222222222222222222222222"', updated)
         self.assertIn('sha256 "3333333333333333333333333333333333333333333333333333333333333333"', updated)
