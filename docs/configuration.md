@@ -221,6 +221,12 @@ rm -f ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 
 ## English
 
+### Snell v6 and transport selection
+
+Snell v6 + ECH is supported from v0.0.43. Update the server before refreshing the helper subscription; existing ECH keys and certificates remain usable.
+
+The default transport is TCP. `auto` races HTTP/3 with TCP, while `h3` uses HTTP/3 only. v6 requires Identity v2, ECH and certificate verification; older identity versions and legacy fallback are rejected.
+
 ### Homebrew installation
 
 Install via Homebrew tap:
