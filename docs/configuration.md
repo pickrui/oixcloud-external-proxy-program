@@ -4,6 +4,12 @@
 
 ## 中文
 
+### Snell v6 与传输选择
+
+v0.0.43 起支持 Snell v6 + ECH；请先更新服务端，再刷新助手订阅，原有 ECH 密钥和证书可继续使用
+
+传输省略时使用 TCP，`auto` 允许 HTTP/3 与 TCP 竞速，`h3` 仅使用 HTTP/3；v6 要求 Identity v2、ECH 和证书验证，不接受旧身份版本或 Legacy 回退
+
 ### Homebrew 安装
 
 通过 Homebrew tap 安装：

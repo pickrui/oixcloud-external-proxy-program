@@ -33,8 +33,8 @@ https://github.com/apple/swift-asn1
 Licensed under Apache License 2.0. The project includes derivations from
 SwiftNIO and the Swift OpenAPI Generator.
 
-libyaml (MIT)
--------------
+libyaml
+=======
 Copyright (c) 2017-2020 Ingy dot Net
 Copyright (c) 2006-2016 Kirill Simonov
 
@@ -55,3 +55,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+ngtcp2 1.25.0
+=============
+Copyright notices are retained in the source headers and ngtcp2-MIT.txt.
+https://github.com/ngtcp2/ngtcp2
+Licensed under MIT; see ngtcp2-MIT.txt and the retained source headers.
+The local Swift bridge, TLS/ECH adapter and framing code are maintained with
+our native client. Linux uses the already-declared Swift Crypto dependency.
+
+Snell v6 default shaping
+========================
+SnellV6Profile.swift is a Swift port of the default shaping profile in SagerNet/sing-snell, commit bc5a12ac736f235b2de2926ecd2791cc925e6b8c, under GPL-3.0-or-later. Upstream: https://github.com/SagerNet/sing-snell
+
+Local adaptations expose salt, prefix, padding, mixing and chunk sizing for the existing ECH stream codec. See SnellV6-GPL-3.0.txt. Third-party licensing rights are unaffected by repository notices.
