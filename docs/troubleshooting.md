@@ -96,6 +96,20 @@ oixcloud-external-proxy-program --version
 
 不要公开 Access Token、邮箱密码或局域网鉴权密码
 
+### 网络与 DNS 诊断
+
+从 v0.0.46 开始，main 和 Legacy 会将网络失败写入 `[Network]` 日志
+
+- `stage=select`：出口选择失败，查看 `reason` 和 `route`
+- `stage=bind`：网卡查询或绑定失败，查看 `operation`、`errno` 和 `route`
+- `stage=query`：DNS 查询失败，查看 `operation`、错误码及 `elapsed_ms`；认证 DNS 的 UDP / TCP 回退可用相同的 `query` 标识关联
+
+保持出现问题时的 Surge 系统代理、增强模式与配置，复现一次失败，并附上版本、失败时间及附近完整的 `[Network]` 和 DNS 错误日志
+
+菜单栏日志通常为 `~/Library/Logs/oixcloud/com.oixcloud.external-proxy-program.tray.log`，Homebrew 服务日志为 `$(brew --prefix)/var/log/oixcloud-external-proxy-program.log`；Docker 使用 `docker compose logs --tail=200`，由 Surge 拉起时查看对应进程日志
+
+新增诊断省略签名查询名、凭据和实际节点地址；分享其他日志时仍需检查并遮盖 Access Token、密码和私人节点信息，保留阶段、错误码及路由状态
+
 ### 重启菜单栏程序
 
 ```bash
@@ -201,6 +215,20 @@ oixcloud-external-proxy-program --version
 ```
 
 Never publish an Access Token, email password, or LAN authentication password
+
+### Network and DNS diagnostics
+
+Starting with v0.0.46, both main and Legacy emit network failures with a `[Network]` prefix
+
+- `stage=select`: egress selection failed; inspect `reason` and `route`
+- `stage=bind`: interface lookup or binding failed; inspect `operation`, `errno`, and `route`
+- `stage=query`: DNS query failed; inspect `operation`, the error code, and `elapsed_ms`; authentication DNS UDP / TCP fallback shares the same `query` identifier
+
+Keep the Surge system proxy, enhanced mode, and configuration that reproduce the issue. Reproduce one failure and include the application, macOS, and Surge versions, the failure time, and surrounding `[Network]` and DNS error lines
+
+The menu bar log is normally `~/Library/Logs/oixcloud/com.oixcloud.external-proxy-program.tray.log`. Homebrew services log to `$(brew --prefix)/var/log/oixcloud-external-proxy-program.log`. For Docker, run `docker compose logs --tail=200`; for processes started by Surge, check the corresponding process log
+
+New diagnostics omit signed query names, credentials, and actual node addresses. Before sharing other logs, redact Access Tokens, passwords, and private node details while preserving stages, error codes, and route state
 
 ### Restart the menu bar app
 
