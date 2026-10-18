@@ -137,7 +137,7 @@ oixcloud-external-proxy-program --tray
 
 读取过筛选后，菜单项显示「节点筛选 · 智能优选」或「节点筛选 · 已自定义 · 保留 N / M 个节点」
 
-窗口会预览保留的节点数量和列表，保留 0 个节点时无法保存；「恢复默认」清空筛选，保存后回到「智能优选」
+窗口会预览保留的节点数量和列表，预览未完成、失败或自定义筛选保留 0 个节点时无法保存；「恢复默认」先清空草稿，点击保存后回到「智能优选」，当前没有节点也可清除旧筛选
 
 保存后程序自动刷新节点和本地映射端口，重新接入 Surge 即可使用新的节点
 
@@ -354,7 +354,7 @@ In "Connection > Node Filter…", click a line or region to cycle Any → Only �
 
 Once the filter has been read, the menu item shows "Node Filter · Smart Selection" or "Node Filter · Customized · N of M nodes kept"
 
-The window previews how many nodes are kept and which ones, and it cannot save a filter that keeps no node. Restore Default clears the filter so that saving returns to Smart Selection
+The window previews how many nodes are kept and which ones. Saving is unavailable while the preview is pending or failed, or when a custom filter keeps no nodes. Restore Default clears the draft; click Save to return to Smart Selection, even when no nodes are currently available
 
 After saving, the helper refreshes its nodes and local mapped ports; reconnect Surge to use the new nodes
 
