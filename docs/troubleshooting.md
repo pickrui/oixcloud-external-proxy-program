@@ -110,6 +110,14 @@ oixcloud-external-proxy-program --version
 
 新增诊断省略签名查询名、凭据和实际节点地址；分享其他日志时仍需检查并遮盖 Access Token、密码和私人节点信息，保留阶段、错误码及路由状态
 
+### 订阅响应格式异常
+
+v0.0.47 会自动尝试备用域名，并在每次请求结束后释放会话；格式异常本身不能证明网络被劫持
+
+若持续失败，请提供发生时间与附近的 `[Panel] endpoint=managed_config` 日志，日志使用固定原因码、域名序号、网络路径、HTTP 状态、响应类型、字节数和耗时，不包含 token、URL、正文或节点信息
+
+默认域名序号 1 为 `oix-api.dler.io`、2 为 `oics.net`；自定义域名以配置顺序为准，0 表示整条直连或代理路径超时
+
 ### 重启菜单栏程序
 
 ```bash
@@ -229,6 +237,14 @@ Keep the Surge system proxy, enhanced mode, and configuration that reproduce the
 The menu bar log is normally `~/Library/Logs/oixcloud/com.oixcloud.external-proxy-program.tray.log`. Homebrew services log to `$(brew --prefix)/var/log/oixcloud-external-proxy-program.log`. For Docker, run `docker compose logs --tail=200`; for processes started by Surge, check the corresponding process log
 
 New diagnostics omit signed query names, credentials, and actual node addresses. Before sharing other logs, redact Access Tokens, passwords, and private node details while preserving stages, error codes, and route state
+
+### Unexpected subscription response format
+
+v0.0.47 automatically tries the backup domain and releases each request session when finished. An unexpected format alone does not establish network interception.
+
+If failures persist, provide the time and nearby `[Panel] endpoint=managed_config` logs. They contain fixed reason codes, domain indexes, network routes, HTTP status, content type, byte counts and timing, without tokens, URLs, response bodies or node details.
+
+Default domain index 1 is `oix-api.dler.io` and index 2 is `oics.net`. Custom domains follow their configured order; index 0 identifies a whole-route timeout.
 
 ### Restart the menu bar app
 
