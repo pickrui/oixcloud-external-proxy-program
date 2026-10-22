@@ -28,6 +28,12 @@ HTTP 407 表示网络代理要求鉴权，请检查系统代理凭据；HTTP 403
 | Docker 返回 `401` | 检查 URL 和 `config.json` 中的 `lanAuth` 是否一致 |
 | Docker 状态不健康 | 运行 `docker compose logs -f`，再检查 `curl http://127.0.0.1:6172/health` |
 
+### 手动创建的 Access Token 无法保存节点筛选
+
+到网页「Access Token 管理」，将当前 Token 的「订阅配置」设为非主订阅地址，再返回 Helper 保存节点筛选
+
+未绑定非主地址的 Token 不能自动创建客户端订阅；已绑定的 Token 可直接编辑对应地址，无需退出登录；若提示套餐不支持，请先在用户中心确认套餐
+
 ### 启动脚本没有权限
 
 在脚本所在目录运行：
@@ -155,6 +161,12 @@ If the helper says the config was written but Surge did not switch, select the o
 | Another instance is running | The tray and `--serve` cannot run together; stop one of them |
 | Docker returns `401` | Match the URL credentials with `lanAuth` in `config.json` |
 | Docker is unhealthy | Run `docker compose logs -f`, then check `curl http://127.0.0.1:6172/health` |
+
+### Cannot save node filters with a manually created Access Token
+
+On the website, open Access Token Management and set the current token's Subscription Configuration to a non-primary subscription URL, then return to the Helper and save the node filter
+
+An unbound token cannot automatically create a client subscription. A bound token can edit its subscription without signing out. If the message says your plan does not support node filters, check your plan in the user center
 
 ### Launcher permission error
 
