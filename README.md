@@ -197,3 +197,10 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 Proprietary software; see [NOTICE](NOTICE)
 
 Third-party licenses are in [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)
+
+
+## macOS 连接诊断
+
+macOS「诊断…」还会显示 IPv4 / IPv6 出口选择、面板取节点耗时和本机服务状态，并检测运行中的节点连接。单节点模式检测当前节点，逐节点模式按端口顺序抽检最多 5 个映射，最多同时检测 3 个；不需要先选中「当前节点」。报告分别记录新 DNS 查询、隧道建立（含 TLS/ECH）、首次 HTTP 往返的耗时和失败类别，再通过映射实际使用的 SOCKS5 或 HTTP 端口完成一次代理请求，区分端口未监听、代理协商失败、超时及 HTTP 错误响应。窗口会显示检查进度，完成后可拷贝报告
+
+连接测试使用 `http://cp.cloudflare.com/generate_204`，仅完整的 HTTP 204 响应视为成功。节点检测使用独立 DNS 缓存和新的代理流，TCP 不复用旧隧道，HTTP/3 可能复用既有 QUIC 会话；不切换节点或修改 Surge 配置。本机代理测试沿用当前监听协议和鉴权设置。面板取节点可能使用缓存，报告中的耗时不等同于实时网络延迟。HTTP 抽检不覆盖 UDP、所有节点或所有网站；测试目标失败本身不能确认节点全部故障。若节点检测成功而本机代理失败，应检查监听与映射；两者成功但 Surge 仍全红，应核对 Surge 当前配置、端口和测试 URL，并提供发生时间及同期 `[Network]` 日志
