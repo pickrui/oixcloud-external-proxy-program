@@ -25,13 +25,12 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
-      pull-requests: write
     steps:
       - name: Checkout current formula
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           ref: main
-          persist-credentials: false
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -62,14 +61,18 @@ jobs:
               output.write(f'version={get_current_formula_version(DEFAULT_FORMULA_PATH)}\n')
           PY
 
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@22a9089034f40e5a961c8808d113e2c98fb63676 # v7
-        with:
-          token: ${{ github.token }}
-          add-paths: Formula/oixcloud-external-proxy-program.rb
-          commit-message: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
-          title: 'feat(homebrew): bump formula to v${{ steps.version.outputs.version }}'
-          body: 'Updates the Homebrew formula to verified release v${{ steps.version.outputs.version }}. Manual review and merge are required.'
-          branch: update-homebrew-formula
-          base: main
-          delete-branch: true
+      - name: Commit and push formula
+        env:
+          FORMULA_VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          formula=Formula/oixcloud-external-proxy-program.rb
+          if git diff --quiet -- "$formula"; then
+            echo "Formula is already current; no commit required."
+            exit 0
+          fi
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$formula"
+          git commit -m "feat(homebrew): bump formula to v$FORMULA_VERSION"
+          # A concurrent main update rejects this push; never overwrite it.
+          git push origin HEAD:main
