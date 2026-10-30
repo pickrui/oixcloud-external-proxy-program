@@ -70,7 +70,7 @@ OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观�
 
 `启动 oixCloud.command` 每次运行也会检查更新
 
-更新器会校验 SHA-256、Developer ID 和版本号，安装失败时自动恢复旧版本
+更新器会校验 SHA-256、Developer ID 和版本号，安装失败时自动恢复旧版本；自 v0.0.51 起，macOS 保存的访问令牌与节点缓存密钥使用登录钥匙串；降级到 v0.0.50 或更早版本需要重新登录；旧版本保存配置后再升级，也需要重新登录
 
 Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 
@@ -167,7 +167,7 @@ Use "Tools > Check for Updates" from the menu bar
 
 `启动 oixCloud.command` also checks for updates whenever it runs
 
-The updater verifies SHA-256, the Developer ID, and the exact version; failed installation checks restore the previous version
+The updater verifies SHA-256, the Developer ID, and the exact version; failed installation checks restore the previous version. Starting with v0.0.51, macOS stores saved access tokens and node-cache keys in the login keychain. Downgrading to v0.0.50 or earlier requires signing in again. If the older version saves the configuration, signing in is also required after upgrading again
 
 Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update commands
 

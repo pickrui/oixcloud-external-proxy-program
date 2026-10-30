@@ -77,6 +77,8 @@ oixcloud-external-proxy-program --tray
 
 用邮箱密码登录时，助手换取并保存 Token，不保存密码
 
+macOS 保存配置时会把访问令牌移入登录钥匙串，配置文件仅保留 `accessTokenInKeychain` 标记；节点缓存密钥也使用登录钥匙串；手写在配置文件中的 `accessToken` 仍然有效并优先使用；Linux 容器的存储方式不变
+
 ### 界面语言
 
 默认跟随系统，菜单栏「工具 › 语言」可选中文、English 或跟随系统，选择会保存并立即生效
@@ -293,6 +295,8 @@ Minimal configuration:
 ```
 
 Email and password login exchanges them for a stored token; the password is not saved
+
+On macOS, saving the configuration moves the access token into the login keychain and leaves an `accessTokenInKeychain` marker in the file. Node-cache keys also use the login keychain. An `accessToken` written manually in the config remains supported and takes precedence. Linux container storage is unchanged
 
 ### Interface language
 
