@@ -158,6 +158,8 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 
 macOS 12、13 使用 legacy 通用版，该版本尚未经过充分实机测试；macOS 11 不再受支持
 
+legacy 版 v0.0.31–v0.0.52 启动时可能弹出「需要代理认证」，指向 127.0.0.1 的随机端口。该端口是 Helper 内部的直连服务，点「以后」不影响使用；v0.0.53 起不再弹出
+
 ## English
 
 ### Quick check
@@ -291,3 +293,5 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 Run `启动 oixCloud.command` again to replace the current installation
 
 macOS 12 and 13 use the universal legacy build, which has not been fully tested on physical hardware. macOS 11 is no longer supported
+
+Legacy v0.0.31–v0.0.52 may show "Proxy Authentication Required" for a random 127.0.0.1 port at launch. The port is Helper's internal direct service; choosing "Not Now" does not affect anything. The prompt no longer appears from v0.0.53
