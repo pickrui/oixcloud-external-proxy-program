@@ -4,13 +4,13 @@
 
 ## 中文
 
-### Snell v6 与传输选择
+### 协议版本与传输选择
 
-v0.0.43 起支持 Snell v6 + ECH；请先更新服务端，再刷新助手订阅，原有 ECH 密钥和证书可继续使用
+v0.0.43 起支持新版加密传输协议；请先更新服务端，再刷新助手订阅，原有 ECH 密钥和证书可继续使用
 
 传输省略时使用 TCP，`auto` 允许 HTTP/3 与 TCP 竞速，`h3` 仅使用 HTTP/3；v6 要求 Identity v2、ECH 和证书验证，不接受旧身份版本或 Legacy 回退
 
-TCP TLS 握手被对端重置或关闭时，约 300 毫秒后换新连接重试一次；重试发生在 Snell 鉴权和业务数据发送前，计入原有拨号时限，不重放已发送的请求，证书错误、TLS 告警、超时和取消不触发此重试，HTTP/3 保持原有行为
+TCP TLS 握手被对端重置或关闭时，约 300 毫秒后换新连接重试一次；重试发生在代理鉴权和业务数据发送前，计入原有拨号时限，不重放已发送的请求，证书错误、TLS 告警、超时和取消不触发此重试，HTTP/3 保持原有行为
 
 ### Homebrew 安装
 
@@ -225,13 +225,13 @@ rm -f ~/Library/LaunchAgents/com.oixcloud.external-proxy-program.tray.plist
 
 ## English
 
-### Snell v6 and transport selection
+### Protocol version and transport selection
 
-Snell v6 + ECH is supported from v0.0.43. Update the server before refreshing the helper subscription; existing ECH keys and certificates remain usable.
+The newer encrypted transport protocol is supported from v0.0.43. Update the server before refreshing the helper subscription; existing ECH keys and certificates remain usable.
 
 The default transport is TCP. `auto` races HTTP/3 with TCP, while `h3` uses HTTP/3 only. v6 requires Identity v2, ECH and certificate verification; older identity versions and legacy fallback are rejected.
 
-If the peer resets or closes a TCP connection during the TLS handshake, Helper retries once on a new connection after about 300 ms. The retry happens before Snell authentication or application data is sent and remains within the original dial deadline. Sent requests are never replayed. Certificate errors, TLS alerts, timeouts and cancellation do not trigger this retry; HTTP/3 behavior is unchanged.
+If the peer resets or closes a TCP connection during the TLS handshake, Helper retries once on a new connection after about 300 ms. The retry happens before proxy authentication or application data is sent and remains within the original dial deadline. Sent requests are never replayed. Certificate errors, TLS alerts, timeouts and cancellation do not trigger this retry; HTTP/3 behavior is unchanged.
 
 ### Homebrew installation
 
