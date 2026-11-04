@@ -6,9 +6,11 @@
 - OpenSurge 管理 Web GUI、mihomo TUN、DHCP/DNS、PF、IPv4 forwarding 和设备策略
 - 两者通过 `127.0.0.1` 上的 HTTP proxy provider 与本地代理端口通信
 
-既有集成验证记录使用 OpenSurge v0.1.21 与 mihomo 1.19.27，覆盖配置 overlay、provider 加载和真实本地代理出口
+2026-11-04 已使用 OpenSurge v0.3.2 官方 arm64 安装包内的 `omg` 和 mihomo `1.19.30-opensurge.1`，配合 Helper v0.0.56 Linux arm64 容器完成实际集成验证；测试配置已加入下文的 provider 直连修正
 
-以下操作说明已对照 [OpenSurge v0.3.2 用户指南](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md)修订；这不代表已对 v0.3.2 完成同等集成实测
+覆盖导入配置的合成与校验、带鉴权 provider 加载、节点切换、HTTP/HTTPS 204 请求、连接出口链、provider 刷新及刷新后保留节点选择；provider 加载 34 个节点，出口仅抽检其中 1 个，不代表全部节点可用
+
+运行测试时只绑定回环地址，并使用独立 DNS 端口；TUN、DHCP、PF、系统 DNS 和系统代理切换不在本轮验证范围；操作步骤依据 [OpenSurge v0.3.2 用户指南](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md)
 
 ## 准备
 
@@ -39,6 +41,24 @@
 OpenSurge 会拒绝 loopback HTTP URL 导入，这是其 SSRF 安全边界
 
 `/opensurge` 仅用于检查生成结果，正式接入使用本地导出的 YAML
+
+## v0.0.56 配置的 provider 刷新修正
+
+实测发现，选中真实节点后，默认 provider 下载请求也会进入 `oixCloud` 策略组，把本机 `/clash` 请求送到远端节点，导致刷新报 `503` / `EOF`
+
+在导出的 YAML 中找到 `proxy-providers` 下的 `oixcloud-nodes`，新增与 `type` 同级的 `proxy: DIRECT`，保留原有 URL、鉴权、路径及其他字段，然后在 OpenSurge 中重新导入并应用：
+
+```yaml
+proxy-providers:
+  oixcloud-nodes:
+    type: http
+    proxy: DIRECT
+    # 保留原有 url、path、interval、health-check 等字段
+```
+
+这是 [mihomo 的 provider 下载策略](https://wiki.metacubex.one/en/config/proxy-providers/#proxy)，只指定订阅下载与刷新直连；节点选择和业务流量仍由 `oixCloud` 策略组控制
+
+源码生成器已加入该字段，现有 v0.0.56 安装仍需手动修正已导出的文件；再次从旧版本导出时也需补上该字段
 
 ## Profile 内容
 
@@ -165,9 +185,11 @@ This integration runs the oixCloud helper as an unprivileged local egress for Op
 - OpenSurge owns the Web GUI, mihomo TUN, DHCP/DNS, PF, IPv4 forwarding, and device policies
 - They communicate through a loopback HTTP proxy provider and local proxy ports
 
-The recorded integration validation used OpenSurge v0.1.21 and mihomo 1.19.27, covering config overlay, provider loading, and a real local proxy egress check
+On 2026-11-04, the `omg` executable and mihomo `1.19.30-opensurge.1` from the official OpenSurge v0.3.2 arm64 installer were tested with the Helper v0.0.56 Linux arm64 container, using the provider DIRECT correction below
 
-These instructions have been checked against the [OpenSurge v0.3.2 user guide](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md); equivalent integration testing with v0.3.2 has not been repeated
+Validation covered imported-profile rendering and validation, authenticated provider loading, node selection, HTTP/HTTPS 204 requests, the connection egress chain, provider refresh and selection retention after refresh. The provider loaded 34 nodes; egress was sampled on one node, not every node
+
+Runtime tests used loopback listeners and a separate DNS port. TUN, DHCP, PF, and changes to system DNS or proxy settings were outside this validation scope. UI steps follow the [OpenSurge v0.3.2 user guide](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md)
 
 ### Requirements
 
@@ -198,6 +220,24 @@ Do not paste `http://127.0.0.1:6172/opensurge` into the HTTPS subscription field
 OpenSurge intentionally rejects loopback HTTP source imports as an SSRF boundary
 
 The endpoint is for inspection; local YAML import is the supported setup path
+
+### Provider refresh correction for v0.0.56 profiles
+
+Testing reproduced a refresh failure after selecting a real node: the provider download followed the `oixCloud` group and sent its local `/clash` request through the remote node, returning `503` / `EOF`
+
+In the exported YAML, find `proxy-providers` → `oixcloud-nodes` and add `proxy: DIRECT` at the same indentation as `type`. Keep the existing URL, authentication, path and other fields, then import and apply the file again in OpenSurge:
+
+```yaml
+proxy-providers:
+  oixcloud-nodes:
+    type: http
+    proxy: DIRECT
+    # Keep the existing url, path, interval, health-check and other fields
+```
+
+This is [mihomo's provider download policy](https://wiki.metacubex.one/en/config/proxy-providers/#proxy): it sends subscription downloads and refreshes directly while node selection and application traffic still use the `oixCloud` group
+
+The source generator now includes this field. Existing v0.0.56 installations still need the exported file corrected manually, including after exporting it again from an older binary
 
 ### Generated profile
 
