@@ -35,6 +35,22 @@ brew services start oixcloud-external-proxy-program
 brew services stop oixcloud-external-proxy-program
 ```
 
+更新并重启 Homebrew 服务：
+
+```bash
+brew update
+brew upgrade oixcloud-external-proxy-program
+brew services restart oixcloud-external-proxy-program
+```
+
+命令是 `brew services`（复数）；它只管理 Homebrew 服务，不能重启手动运行或启动器安装的另一份程序
+
+v0.0.56 起，Homebrew 版本的更新与开机启动均由 Homebrew 管理，菜单栏会显示对应命令；不再通过内置更新器替换 Cellar 中的程序，也不再创建第二份独立启动项
+
+首次改用 Homebrew 服务前，先退出手动启动的 Helper；如果曾用启动器安装常驻启动，先运行启动器并选择「卸载自动启动」，再运行 `brew services start`。已有冲突的排查步骤见 [Homebrew 重启没有生效](troubleshooting.md#homebrew-重启没有生效)
+
+Homebrew 服务使用默认配置路径；自定义配置请使用 `oixcloud-external-proxy-program --tray --config /绝对路径/config.json` 手动启动，并在升级后退出再按原方式打开
+
 ### 手动安装
 
 `启动 oixCloud.command` 已包含下载、签名校验、安装和启动流程，通常无需手动安装
@@ -255,6 +271,22 @@ Stop the background service:
 ```bash
 brew services stop oixcloud-external-proxy-program
 ```
+
+Update and restart the Homebrew service:
+
+```bash
+brew update
+brew upgrade oixcloud-external-proxy-program
+brew services restart oixcloud-external-proxy-program
+```
+
+The command is `brew services` (plural). It manages the Homebrew service only, not another copy started manually or installed by the launcher
+
+Starting with v0.0.56, Homebrew owns updates and login startup for Homebrew installations. The menu shows the appropriate commands instead of replacing the binary in the Cellar or creating a second independent login item
+
+Before switching to the Homebrew service, quit any manually started Helper. If the launcher previously installed persistent startup, run it and choose Remove Autostart before `brew services start`. See [Homebrew restart has no effect](troubleshooting.md#homebrew-restart-has-no-effect) for existing conflicts
+
+The Homebrew service uses the default config path. For a custom config, launch `oixcloud-external-proxy-program --tray --config /absolute/path/config.json` manually, then quit and relaunch the same way after upgrading
 
 ### Manual installation
 
