@@ -55,23 +55,15 @@ Homebrew 服务使用默认配置路径；自定义配置请使用 `oixcloud-ext
 
 `启动 oixCloud.command` 已包含下载、签名校验、安装和启动流程，通常无需手动安装
 
-需要纯命令行安装时运行：
+在下载并解压的仓库目录中，通过命令行安装并临时启动：
 
 ```bash
-MAJOR=$(sw_vers -productVersion | cut -d. -f1)
-if [ "$MAJOR" -ge 14 ]; then
-  ASSET=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
-else
-  ASSET=legacy
-fi
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ASSET" -o oixcloud-external-proxy-program
-chmod +x oixcloud-external-proxy-program
-xattr -dr com.apple.quarantine oixcloud-external-proxy-program
-sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
-sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
+OIX_LAUNCH_MODE=temporary zsh "./启动 oixCloud.command"
 ```
 
-临时启动菜单栏程序：
+启动器会选择匹配系统与架构的产物并执行校验；macOS 12、13 使用 legacy 通用版，macOS 14 及以上按架构选择，macOS 11 不受支持
+
+已安装命令时，也可临时启动菜单栏程序：
 
 ```bash
 oixcloud-external-proxy-program --tray
@@ -95,7 +87,9 @@ oixcloud-external-proxy-program --tray
 
 用邮箱密码登录时，助手换取并保存 Token，不保存密码
 
-macOS 保存配置时会把访问令牌移入登录钥匙串，配置文件仅保留 `accessTokenInKeychain` 标记；节点缓存密钥也使用登录钥匙串；手写在配置文件中的 `accessToken` 仍然有效并优先使用；Linux 容器的存储方式不变
+macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件中保留 `accessTokenInKeychain` 标记；若钥匙串写入或读回失败，令牌仍保存在权限为 `0600` 的配置文件中；手写的 `accessToken` 优先使用
+
+节点缓存密钥同样优先使用登录钥匙串，不可用时回退到权限为 `0600` 的本地密钥文件；Linux 容器继续使用配置文件保存令牌，身份密钥与节点缓存保存在持久卷
 
 ### 界面语言
 
@@ -140,7 +134,7 @@ macOS 保存配置时会把访问令牌移入登录钥匙串，配置文件仅�
 | 设置 | 用途 |
 |---|---|
 | 接入模式 | 切换 `map` 与 `single` |
-| 节点筛选… | 按线路、地区和名称选择下发的节点，套餐等级 20 及以上显示 |
+| 节点筛选… | 按线路、地区和名称选择下发的节点，有套餐且面板允许时显示 |
 | 精简规则 | 仅保留基础规则 |
 | 允许局域网访问 | 让同一网络设备访问本机服务 |
 
@@ -224,6 +218,8 @@ oixcloud-external-proxy-program --serve --mode map --listen 0.0.0.0:6172 --bind 
 ```bash
 oixcloud-external-proxy-program --help
 oixcloud-external-proxy-program --version
+oixcloud-external-proxy-program --check-config
+oixcloud-external-proxy-program --diagnose-config
 oixcloud-external-proxy-program --serve --listen 6172
 oixcloud-external-proxy-program --serve --mode map --listen 6172
 ```
@@ -294,23 +290,15 @@ The Homebrew service uses the default config path. For a custom config, launch `
 
 `启动 oixCloud.command` already handles download, signature verification, installation, and startup
 
-For a command-line-only installation:
+From the downloaded and extracted repository directory, install and start temporarily from the command line:
 
 ```bash
-MAJOR=$(sw_vers -productVersion | cut -d. -f1)
-if [ "$MAJOR" -ge 14 ]; then
-  ASSET=$([ "$(uname -m)" = arm64 ] && echo arm64 || echo amd64)
-else
-  ASSET=legacy
-fi
-curl -fL "https://dl.dler.io/oixcloud-external-proxy-program-$ASSET" -o oixcloud-external-proxy-program
-chmod +x oixcloud-external-proxy-program
-xattr -dr com.apple.quarantine oixcloud-external-proxy-program
-sudo cp oixcloud-external-proxy-program /usr/local/bin/oixcloud-external-proxy-program.new
-sudo mv -f /usr/local/bin/oixcloud-external-proxy-program.new /usr/local/bin/oixcloud-external-proxy-program
+OIX_LAUNCH_MODE=temporary zsh "./启动 oixCloud.command"
 ```
 
-Start the menu bar app temporarily:
+The launcher selects and verifies the build for the OS and architecture: universal legacy on macOS 12/13, architecture-specific on macOS 14 or later; macOS 11 is unsupported
+
+If the command is already installed, start the menu bar app temporarily:
 
 ```bash
 oixcloud-external-proxy-program --tray
@@ -334,7 +322,9 @@ Minimal configuration:
 
 Email and password login exchanges them for a stored token; the password is not saved
 
-On macOS, saving the configuration moves the access token into the login keychain and leaves an `accessTokenInKeychain` marker in the file. Node-cache keys also use the login keychain. An `accessToken` written manually in the config remains supported and takes precedence. Linux container storage is unchanged
+On macOS, saving the configuration prefers the login keychain and leaves an `accessTokenInKeychain` marker in the file. If writing or reading back the keychain token fails, the token stays in the `0600` configuration file. A manually supplied `accessToken` takes precedence
+
+Node-cache keys also prefer the login keychain, falling back to a `0600` local key file when unavailable. Linux containers keep the token in the configuration file and identity keys and node cache in the persistent volume
 
 ### Interface language
 
@@ -379,9 +369,9 @@ Fixed node ports:
 | Setting | Purpose |
 |---|---|
 | Connection Mode | Switch between `map` and `single` |
-| Node Filter… | Choose the nodes you get by line, region, and name; shown on plans ranked 20 and up |
-| Simple Rules | Keep only basic rules |
-| Allow LAN Access | Serve other devices on the same network |
+| Node Filter… | Choose nodes by line, region, and name; shown for accounts with a plan when allowed by the panel |
+| Lean rules | Keep only basic rules |
+| Allow LAN access | Serve other devices on the same network |
 
 Reconnect Surge after changing these settings
 
@@ -413,7 +403,7 @@ Hong Kong = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter=
 Premium = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter="Premium", update-interval=600
 ```
 
-"Connection > Copy Local Node List URL" copies this address
+"Connection > Copy local node list URL" copies this address
 
 ### Custom Surge configuration
 
@@ -443,7 +433,7 @@ Direct edits to the managed oixCloud profile in Surge are overwritten on refresh
 
 The default bind address is `127.0.0.1`
 
-After enabling "Allow LAN Access" and "LAN Access Authentication...", other devices can use:
+After enabling "Allow LAN access" and "LAN authentication…", other devices can use:
 
 ```text
 http://username:password@this-Mac-IP:6172/
@@ -463,6 +453,8 @@ These URLs use HTTP, so authentication credentials are Base64-encoded rather tha
 ```bash
 oixcloud-external-proxy-program --help
 oixcloud-external-proxy-program --version
+oixcloud-external-proxy-program --check-config
+oixcloud-external-proxy-program --diagnose-config
 oixcloud-external-proxy-program --serve --listen 6172
 oixcloud-external-proxy-program --serve --mode map --listen 6172
 ```

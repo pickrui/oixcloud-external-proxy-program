@@ -27,14 +27,24 @@ chmod 644 custom.conf
 - 替换 `lanAuth.username` 和 `lanAuth.password`
 - 不需要鉴权时删除整个 `lanAuth`
 
+Compose 使用 UID/GID `10001:10001`；原生 Linux 上，配置文件设为 `600` 且属于当前宿主用户时，容器通常无法读取；编辑完成后保留宿主所有者，允许容器组读取：
+
+```bash
+sudo chgrp 10001 config.json
+chmod 640 config.json
+```
+
+NAS ACL、rootless Docker 或用户命名空间映射可能使用不同的权限规则，以下离线校验必须能读取配置
+
 ### 启动
 
 ```bash
+docker compose run --rm --no-deps helper --config /config/config.json --check-config
 docker compose up -d
 docker compose ps
 ```
 
-健康状态应显示 `healthy`
+健康状态应显示 `healthy`；它只证明本地 HTTP 健康端点可响应，不验证账户登录、节点或远端代理出口
 
 ### 接入 Surge
 
@@ -69,22 +79,7 @@ TCP 用于 SOCKS5 握手和保持 UDP ASSOCIATE 关联，客户端把 UDP 数据
 
 新版 `compose.yaml` 已映射 `10000-10099:10000-10099/udp`，自定义部署也需按相同端口号映射，并允许客户端通过防火墙访问
 
-v0.0.32 起，配置上述地址与端口范围后，远程 `/clash` 自动为 SOCKS5 / mixed 节点声明 `udp: true`，无需额外设置 override；HTTP 节点不会声明 UDP
-
-v0.0.31 及更早版本未自动声明 UDP，Mihomo 可在现有 provider 中添加 `override`：
-
-```yaml
-proxy-providers:
-  oixcloud:
-    type: http
-    url: "http://用户名:密码@192.168.1.10:6172/clash"
-    path: ./providers/oixcloud.yaml
-    interval: 3600
-    override:
-      udp: true
-```
-
-`override.udp` 见 [Mihomo 官方文档](https://wiki.metacubex.one/config/proxy-providers/)，请替换鉴权信息，仅对 SOCKS5 / mixed 监听使用；HTTP 代理不支持此 UDP 转发
+配置上述地址与端口范围后，远程 `/clash` 自动为 SOCKS5 / mixed 节点声明 `udp: true`，无需额外设置 override；HTTP 节点不会声明 UDP
 
 更新配置后重新创建容器并刷新 provider；修改端口范围时须同时修改配置、Compose 和防火墙，NAT 需要保持 TCP 与 UDP 来源地址一致
 
@@ -98,7 +93,7 @@ proxy-providers:
 
 ### 订阅流量与到期信息
 
-v0.0.32 起，`/clash` 的成功 GET / HEAD 响应通过 `Subscription-Userinfo` 提供账户上传、下载、总流量和到期时间，保持节点 provider YAML 兼容
+`/clash` 的成功 GET / HEAD 响应通过 `Subscription-Userinfo` 提供账户上传、下载、总流量和到期时间，保持节点 provider YAML 兼容
 
 更新后在 Clash / Mihomo 客户端刷新 provider，支持该信息的客户端可读取并展示用量与到期时间；缺失、无效或过期的数据不会伪造为零值，账户切换与退出后不会继续返回旧账户信息
 
@@ -119,7 +114,7 @@ docker compose ps
 curl http://127.0.0.1:6172/health
 ```
 
-`/health` 不返回账户、节点或配置内容
+`/health` 不要求鉴权，也不返回账户、节点或配置内容
 
 ### 文件与端口
 
@@ -175,14 +170,24 @@ Edit `config.json`:
 - Replace `lanAuth.username` and `lanAuth.password`
 - Remove the entire `lanAuth` object when authentication is not needed
 
+Compose runs as UID/GID `10001:10001`. On native Linux, a `600` file owned by the host user will normally be unreadable to the container. After editing, keep the host owner and grant the container group read access:
+
+```bash
+sudo chgrp 10001 config.json
+chmod 640 config.json
+```
+
+NAS ACLs, rootless Docker, or user-namespace mappings can require different permissions; the offline check below must be able to read the configuration
+
 ### Start
 
 ```bash
+docker compose run --rm --no-deps helper --config /config/config.json --check-config
 docker compose up -d
 docker compose ps
 ```
 
-The health status should become `healthy`
+The health status should become `healthy`; this checks the local HTTP health endpoint, not account sign-in, nodes, or upstream proxy connectivity
 
 ### Connect Surge
 
@@ -213,22 +218,7 @@ Publishing a SOCKS5 TCP port does not publish its UDP relay. Add these fields to
 
 The current Compose file maps `10000-10099:10000-10099/udp`. Custom deployments must publish the same port numbers and allow client access through the firewall
 
-Starting with v0.0.32, remote `/clash` output automatically advertises `udp: true` for SOCKS5 / mixed nodes when the address and port range above are configured. No provider override is needed; HTTP nodes do not advertise UDP
-
-For v0.0.31 and earlier, Mihomo can enable UDP on an existing SOCKS5 provider:
-
-```yaml
-proxy-providers:
-  oixcloud:
-    type: http
-    url: "http://username:password@192.168.1.10:6172/clash"
-    path: ./providers/oixcloud.yaml
-    interval: 3600
-    override:
-      udp: true
-```
-
-See the [official Mihomo provider documentation](https://wiki.metacubex.one/en/config/proxy-providers/). Replace the credentials and use SOCKS5 / mixed listeners; HTTP proxies cannot relay UDP this way
+Remote `/clash` output automatically advertises `udp: true` for SOCKS5 / mixed nodes when the address and port range above are configured. No provider override is needed; HTTP nodes do not advertise UDP
 
 Recreate the container and refresh the provider after changing the configuration. Keep the configured range, published ports, and firewall in sync; NAT must preserve matching TCP and UDP client source addresses
 
@@ -242,7 +232,7 @@ The filter follows the sign-in token. After it is changed from "Connection > Nod
 
 ### Subscription usage and expiry
 
-Starting with v0.0.32, successful `/clash` GET / HEAD responses include `Subscription-Userinfo` with account upload, download, total quota, and expiry, while preserving the proxy provider YAML
+Successful `/clash` GET / HEAD responses include `Subscription-Userinfo` with account upload, download, total quota, and expiry, while preserving the proxy provider YAML
 
 Refresh the provider after updating the helper. Compatible Clash / Mihomo clients can read and display this metadata. Missing, invalid, or expired values are omitted rather than replaced with zeros, and account switches or logout prevent old account metadata from being returned
 
@@ -263,7 +253,7 @@ docker compose ps
 curl http://127.0.0.1:6172/health
 ```
 
-`/health` exposes no account, node, or profile data
+`/health` requires no authentication and exposes no account, node, or profile data
 
 ### Files and ports
 
