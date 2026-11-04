@@ -6,7 +6,7 @@
 - OpenSurge 管理 Web GUI、mihomo TUN、DHCP/DNS、PF、IPv4 forwarding 和设备策略
 - 两者通过 `127.0.0.1` 上的 HTTP proxy provider 与本地代理端口通信
 
-2026-11-04 已使用 OpenSurge v0.3.2 官方 arm64 安装包内的 `omg` 和 mihomo `1.19.30-opensurge.1`，配合 Helper v0.0.56 Linux arm64 容器完成实际集成验证；测试配置已加入下文的 provider 直连修正
+2026-11-04 已使用 OpenSurge v0.3.2 官方 arm64 安装包内的 `omg` 和 mihomo `1.19.30-opensurge.1`，配合 Helper v0.0.57 Linux arm64 镜像完成实际集成验证，使用新版直接生成的配置
 
 覆盖导入配置的合成与校验、带鉴权 provider 加载、节点切换、HTTP/HTTPS 204 请求、连接出口链、provider 刷新及刷新后保留节点选择；provider 加载 34 个节点，出口仅抽检其中 1 个，不代表全部节点可用
 
@@ -42,7 +42,7 @@ OpenSurge 会拒绝 loopback HTTP URL 导入，这是其 SSRF 安全边界
 
 `/opensurge` 仅用于检查生成结果，正式接入使用本地导出的 YAML
 
-## v0.0.56 配置的 provider 刷新修正
+## 升级到 v0.0.57 与 provider 刷新修正
 
 实测发现，选中真实节点后，默认 provider 下载请求也会进入 `oixCloud` 策略组，把本机 `/clash` 请求送到远端节点，导致刷新报 `503` / `EOF`
 
@@ -58,7 +58,9 @@ proxy-providers:
 
 这是 [mihomo 的 provider 下载策略](https://wiki.metacubex.one/en/config/proxy-providers/#proxy)，只指定订阅下载与刷新直连；节点选择和业务流量仍由 `oixCloud` 策略组控制
 
-源码生成器已加入该字段，现有 v0.0.56 安装仍需手动修正已导出的文件；再次从旧版本导出时也需补上该字段
+v0.0.57 起自动生成该字段；升级后请重新执行「连接设置 › 导出 OpenSurge 配置」，再在 OpenSurge 中导入并应用；旧 YAML 不会因程序升级而自动更新
+
+尚未升级的 v0.0.56 及更早版本可按上面的步骤手动补上该字段，再次从旧版本导出时也需补上
 
 ## Profile 内容
 
@@ -185,7 +187,7 @@ This integration runs the oixCloud helper as an unprivileged local egress for Op
 - OpenSurge owns the Web GUI, mihomo TUN, DHCP/DNS, PF, IPv4 forwarding, and device policies
 - They communicate through a loopback HTTP proxy provider and local proxy ports
 
-On 2026-11-04, the `omg` executable and mihomo `1.19.30-opensurge.1` from the official OpenSurge v0.3.2 arm64 installer were tested with the Helper v0.0.56 Linux arm64 container, using the provider DIRECT correction below
+On 2026-11-04, the `omg` executable and mihomo `1.19.30-opensurge.1` from the official OpenSurge v0.3.2 arm64 installer were tested with the Helper v0.0.57 Linux arm64 image and its automatically generated profile
 
 Validation covered imported-profile rendering and validation, authenticated provider loading, node selection, HTTP/HTTPS 204 requests, the connection egress chain, provider refresh and selection retention after refresh. The provider loaded 34 nodes; egress was sampled on one node, not every node
 
@@ -221,7 +223,7 @@ OpenSurge intentionally rejects loopback HTTP source imports as an SSRF boundary
 
 The endpoint is for inspection; local YAML import is the supported setup path
 
-### Provider refresh correction for v0.0.56 profiles
+### Upgrading to v0.0.57 and correcting provider refresh
 
 Testing reproduced a refresh failure after selecting a real node: the provider download followed the `oixCloud` group and sent its local `/clash` request through the remote node, returning `503` / `EOF`
 
@@ -237,7 +239,9 @@ proxy-providers:
 
 This is [mihomo's provider download policy](https://wiki.metacubex.one/en/config/proxy-providers/#proxy): it sends subscription downloads and refreshes directly while node selection and application traffic still use the `oixCloud` group
 
-The source generator now includes this field. Existing v0.0.56 installations still need the exported file corrected manually, including after exporting it again from an older binary
+Starting with v0.0.57, generated profiles include this field. After upgrading, use "Connection > Export OpenSurge config", then import and apply the file in OpenSurge again; upgrading the helper does not automatically update an existing YAML file
+
+Users staying on v0.0.56 or earlier can add the field manually as shown above, including after exporting the file again from an older binary
 
 ### Generated profile
 
