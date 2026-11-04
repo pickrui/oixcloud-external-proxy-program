@@ -9,6 +9,7 @@ DOCS = [
     ROOT / "README.md",
     ROOT / "docs" / "configuration.md",
     ROOT / "docs" / "docker.md",
+    ROOT / "docs" / "opensurge.md",
     ROOT / "docs" / "troubleshooting.md",
 ]
 LINK_PATTERN = re.compile(r"\[[^]]+\]\(([^)]+)\)")

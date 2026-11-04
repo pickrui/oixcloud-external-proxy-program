@@ -21,7 +21,7 @@ HTTP 407 表示网络代理要求鉴权，请检查系统代理凭据；HTTP 403
 | 现象 | 处理 |
 |---|---|
 | 看不到菜单栏图标 | 在本机图形会话运行 `oixcloud-external-proxy-program --tray`，并检查菜单栏是否隐藏了图标 |
-| 提示未登录 | 打开「账户 › 登录…」重新填写 Access Token |
+| 提示未登录 | 打开「账户 › 登录…」，使用 Access Token、邮箱密码或窗口提供的 Google 登录 |
 | Surge 没有流量 | 确认已接入 Surge、已选择节点，并开启 `Set as System Proxy` |
 | 修改设置后没有变化 | 重新点「连接设置 › 接入 Surge」 |
 | 提示已有实例 | 托盘和 `--serve` 不能同时运行，停止其中一个 |
@@ -79,7 +79,7 @@ launchctl print "gui/$(id -u)/com.oixcloud.external-proxy-program.tray" | awk '/
 
 安装复验失败时会自动恢复旧版本
 
-可重新运行 `启动 oixCloud.command`，或在菜单栏选择「工具 › 检查更新」
+启动器或手动安装的版本可重新运行 `启动 oixCloud.command`，或选择菜单栏「工具 › 检查更新」；Homebrew 安装请使用「工具 › 通过 Homebrew 更新…」中的命令，详见 [Homebrew 安装](configuration.md#homebrew-安装)
 
 若 GitHub API 匿名配额耗尽或 API 暂不可用，当前启动脚本会改从官方发布页读取稳定版本，并下载同一版本的 `SHA256SUMS`；二进制仍需通过摘要、Developer ID 和版本号校验，不需要在脚本中填写 GitHub Token
 
@@ -89,7 +89,9 @@ launchctl print "gui/$(id -u)/com.oixcloud.external-proxy-program.tray" | awk '/
 
 | 日志 | 路径 |
 |---|---|
-| 菜单栏程序 | `~/Library/Logs/oixcloud/` |
+| 启动器或助手启动项 | `~/Library/Logs/oixcloud/com.oixcloud.external-proxy-program.tray.log` |
+| Homebrew 服务 | `$(brew --prefix)/var/log/oixcloud-external-proxy-program.log` |
+| 手动命令行启动 | 当前终端的标准输出与错误输出 |
 | 启动脚本 | 脚本同目录的 `oixcloud-external-proxy-program.log` |
 | Surge 拉起的节点进程 | Surge 日志中搜索 `oixcloud-external-proxy-program` |
 | macOS 崩溃报告 | `~/Library/Logs/DiagnosticReports/` |
@@ -140,7 +142,7 @@ HTTP 抽检不覆盖 UDP、所有节点或所有网站；测试目标失败本�
 
 ### 订阅响应格式异常
 
-v0.0.47 会自动尝试备用域名，并在每次请求结束后释放会话；格式异常本身不能证明网络被劫持
+当前版本会自动尝试备用域名，并在每次请求结束后释放会话；格式异常本身不能证明网络被劫持
 
 若持续失败，请提供发生时间与附近的 `[Panel] endpoint=managed_config` 日志，日志使用固定原因码、域名序号、网络路径、HTTP 状态、响应类型、字节数和耗时，不包含 token、URL、正文或节点信息
 
@@ -186,7 +188,9 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 
 ### 重新安装
 
-重新运行 `启动 oixCloud.command` 即可覆盖安装
+启动器安装的版本可重新运行 `启动 oixCloud.command`，脚本会检查版本并按需更新或安装
+
+Homebrew 安装请运行 `brew reinstall oixcloud-external-proxy-program`；由 Homebrew 服务运行时，完成后再运行 `brew services restart oixcloud-external-proxy-program`
 
 macOS 12、13 使用 legacy 通用版，该版本尚未经过充分实机测试；macOS 11 不再受支持
 
@@ -196,7 +200,7 @@ legacy 版 v0.0.31–v0.0.52 启动时可能弹出「需要代理认证」，指
 
 ### Quick check
 
-Open "Tools > Diagnostics..." from the menu bar first
+Open "Tools > Diagnostics…" from the menu bar first
 
 Diagnostics checks the account, nodes, listeners, and Surge status
 
@@ -211,9 +215,9 @@ If the helper says the config was written but Surge did not switch, select the o
 | Symptom | Action |
 |---|---|
 | No menu bar icon | Run `oixcloud-external-proxy-program --tray` in a local graphical session and check whether the menu bar hid the icon |
-| Logged out | Open "Account > Log in..." and enter the Access Token again |
+| Logged out | Open "Account > Sign in…" and use an Access Token, email/password, or Google sign-in when offered |
 | No traffic in Surge | Confirm the profile is connected, a node is selected, and `Set as System Proxy` is enabled |
-| Settings did not change | Use "Connection > Connect Surge" again |
+| Settings did not change | Use "Connection > Apply in Surge" again |
 | Another instance is running | The tray and `--serve` cannot run together; stop one of them |
 | Docker returns `401` | Match the URL credentials with `lanAuth` in `config.json` |
 | Docker is unhealthy | Run `docker compose logs -f`, then check `curl http://127.0.0.1:6172/health` |
@@ -269,7 +273,7 @@ The updater verifies SHA-256, the Developer ID, and the exact version
 
 A failed post-install check automatically restores the previous version
 
-Run `启动 oixCloud.command` again or choose "Tools > Check for Updates" from the menu bar
+For launcher/manual installations, run `启动 oixCloud.command` again or choose "Tools > Check for updates". For Homebrew installations, follow "Tools > Update with Homebrew…"; see [Homebrew installation](configuration.md#homebrew-installation)
 
 If the GitHub API is rate-limited or unavailable, the current launcher reads the stable tag from the official release page and downloads that tag's `SHA256SUMS`. The binary must still pass checksum, Developer ID, and exact-version verification; no GitHub token is needed in the launcher
 
@@ -279,7 +283,9 @@ If the release page or checksum manifest is also unavailable, the existing local
 
 | Log | Path |
 |---|---|
-| Menu bar app | `~/Library/Logs/oixcloud/` |
+| Launcher/helper login item | `~/Library/Logs/oixcloud/com.oixcloud.external-proxy-program.tray.log` |
+| Homebrew service | `$(brew --prefix)/var/log/oixcloud-external-proxy-program.log` |
+| Manual CLI launch | Standard output and error in the current terminal |
 | Launcher | `oixcloud-external-proxy-program.log` beside the launcher |
 | Node processes started by Surge | Search for `oixcloud-external-proxy-program` in Surge logs |
 | macOS crash reports | `~/Library/Logs/DiagnosticReports/` |
@@ -291,6 +297,22 @@ oixcloud-external-proxy-program --version
 ```
 
 Never publish an Access Token, email password, or LAN authentication password
+
+### macOS connection diagnostics
+
+Tools > Diagnostics… reports IPv4/IPv6 egress selection, node-fetch timing and local service status, and probes active node connections
+
+Single-port mode tests the current node. Port-mapping mode samples up to five active mappings in port order, with up to three concurrent probes; no current-node selection is needed
+
+Each sample measures a fresh DNS query, tunnel establishment including TLS/ECH, and the first HTTP round trip, then sends a request through the actual SOCKS5 or HTTP listener using its current authentication settings
+
+The window shows progress and lets you copy the completed report. Only a complete HTTP 204 response from `http://cp.cloudflare.com/generate_204` counts as success
+
+Probes use an independent DNS cache and fresh proxy streams. TCP does not reuse an old tunnel; HTTP/3 may reuse an existing QUIC session. The helper does not switch nodes or change the Surge profile
+
+Node fetching may use cached results, so its timing is not a live latency measurement. HTTP samples do not test UDP, every node, or every website; one failed test target does not establish that all nodes are down
+
+If node probes pass but the local proxy fails, inspect listeners and mappings. If both pass while Surge stays red, check its active profile, ports and test URL, and include the failure time and matching `[Network]` logs
 
 ### Network and DNS diagnostics
 
@@ -308,7 +330,7 @@ New diagnostics omit signed query names, credentials, and actual node addresses.
 
 ### Unexpected subscription response format
 
-v0.0.47 automatically tries the backup domain and releases each request session when finished. An unexpected format alone does not establish network interception.
+The helper automatically tries the backup domain and releases each request session when finished. An unexpected format alone does not establish network interception.
 
 If failures persist, provide the time and nearby `[Panel] endpoint=managed_config` logs. They contain fixed reason codes, domain indexes, network routes, HTTP status, content type, byte counts and timing, without tokens, URLs, response bodies or node details.
 
@@ -354,7 +376,9 @@ launchctl kickstart -k "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
 
 ### Reinstall
 
-Run `启动 oixCloud.command` again to replace the current installation
+For launcher installations, run `启动 oixCloud.command` again to check the version and update or install as needed
+
+For Homebrew installations, run `brew reinstall oixcloud-external-proxy-program`, followed by `brew services restart oixcloud-external-proxy-program` if managed as a Homebrew service
 
 macOS 12 and 13 use the universal legacy build, which has not been fully tested on physical hardware. macOS 11 is no longer supported
 

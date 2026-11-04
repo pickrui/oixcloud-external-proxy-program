@@ -6,7 +6,9 @@
 - OpenSurge 管理 Web GUI、mihomo TUN、DHCP/DNS、PF、IPv4 forwarding 和设备策略
 - 两者通过 `127.0.0.1` 上的 HTTP proxy provider 与本地代理端口通信
 
-当前适配已使用 OpenSurge v0.1.21 与其内置 mihomo 1.19.27 完成配置 overlay、provider 加载和真实本地代理出口验证
+既有集成验证记录使用 OpenSurge v0.1.21 与 mihomo 1.19.27，覆盖配置 overlay、provider 加载和真实本地代理出口
+
+以下操作说明已对照 [OpenSurge v0.3.2 用户指南](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md)修订；这不代表已对 v0.3.2 完成同等集成实测
 
 ## 准备
 
@@ -15,7 +17,7 @@
 - 从 [OpenSurge Releases](https://github.com/YTwsy/OpenSurge-for-Mac/releases) 下载与 Mac 架构匹配的安装包
 - 在尝试局域网 DHCP 接管前准备路由器管理入口、原 DHCP 配置和备用恢复设备
 
-OpenSurge 的 GitHub 安装包当前未签名，按其说明使用系统设置中的「仍要打开」，不要全局关闭 Gatekeeper
+[OpenSurge v0.3.2 安装包](https://github.com/YTwsy/OpenSurge-for-Mac/releases/tag/v0.3.2)未进行 Developer ID 签名或公证，按其说明使用系统设置中的「仍要打开」，不要全局关闭 Gatekeeper
 
 ## 导入
 
@@ -29,7 +31,7 @@ OpenSurge 的 GitHub 安装包当前未签名，按其说明使用系统设置�
 
 4. Finder 会选中该文件
 5. 打开 OpenSurge Web GUI 的「来源」页面
-6. 在「本地 mihomo YAML」中选择或拖入 `OpenSurge.yaml`
+6. 在「来源」页面的完整 YAML 导入入口选择或拖入 `OpenSurge.yaml`，点击「导入为草稿」
 7. 结构校验通过后，网关停止时设为下次启动版本，网关运行时选择应用并重载
 
 不要把 `http://127.0.0.1:6172/opensurge` 粘贴到 OpenSurge 的 HTTPS 订阅框
@@ -80,7 +82,7 @@ OpenSurge 不会登录或修改未知路由器
 
 不要在没有备用恢复设备和路由器管理入口时直接测试家庭主网络
 
-当前接管以协作式 IPv4 为主，IPv6、手工静态网关、DoH 和 Private Relay 可能绕过 Mac
+以上基础流程以 IPv4 为主；OpenSurge v0.3.2 另提供实验性下游 IPv6 接管，须按[上游指南](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md)单独配置并验收；未接管的 IPv6、手工指定其他网关的设备，以及部分 DoH / Private Relay 路径仍可能绕过预期的网关或 DNS 策略
 
 ### 旁路由模式
 
@@ -113,7 +115,7 @@ oixCloud 登录、套餐、流量、节点筛选和精简规则仍在 oixCloud �
 
 ## 安全与故障恢复
 
-- oixCloud 账户凭据由助手管理，macOS 保存的访问令牌使用登录钥匙串，不交给 OpenSurge root helper
+- oixCloud 账户凭据由助手管理，macOS 访问令牌优先保存在登录钥匙串，不能使用钥匙串时回退到本地配置文件，不交给 OpenSurge root helper
 - 导出目录权限为 `0700`，YAML 权限为 `0600`
 - 开启局域网鉴权时，YAML 会包含访问本地 provider 所需的 Basic Auth userinfo，请勿转发
 - OpenSurge 启动和配置校验前，oixCloud helper 必须正在运行
@@ -126,11 +128,15 @@ oixCloud 登录、套餐、流量、节点筛选和精简规则仍在 oixCloud �
 curl -f http://127.0.0.1:6172/health
 ```
 
+`/health` 仅证明本地 HTTP 服务能响应，不验证登录或节点出口
+
 检查 wrapper：
 
 ```sh
 curl -f http://127.0.0.1:6172/opensurge
 ```
+
+开启局域网鉴权后，检查 `/opensurge` 需提供同一组凭据，例如 `curl -f -u 用户名 http://127.0.0.1:6172/opensurge`，按提示输入密码
 
 如果 `/health` 正常但 OpenSurge 显示 provider 不可用：
 
@@ -159,7 +165,9 @@ This integration runs the oixCloud helper as an unprivileged local egress for Op
 - OpenSurge owns the Web GUI, mihomo TUN, DHCP/DNS, PF, IPv4 forwarding, and device policies
 - They communicate through a loopback HTTP proxy provider and local proxy ports
 
-The integration has been validated with OpenSurge v0.1.21 and its bundled mihomo 1.19.27, including config overlay, provider loading, and a real local proxy egress check
+The recorded integration validation used OpenSurge v0.1.21 and mihomo 1.19.27, covering config overlay, provider loading, and a real local proxy egress check
+
+These instructions have been checked against the [OpenSurge v0.3.2 user guide](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md); equivalent integration testing with v0.3.2 has not been repeated
 
 ### Requirements
 
@@ -168,7 +176,7 @@ The integration has been validated with OpenSurge v0.1.21 and its bundled mihomo
 - Download the matching package from [OpenSurge Releases](https://github.com/YTwsy/OpenSurge-for-Mac/releases)
 - Before DHCP takeover, preserve router access, the original DHCP settings, and a static recovery device
 
-The current GitHub packages are unsigned. Follow OpenSurge's Open Anyway instructions instead of disabling Gatekeeper globally
+The [OpenSurge v0.3.2 installers](https://github.com/YTwsy/OpenSurge-for-Mac/releases/tag/v0.3.2) are not Developer ID signed or notarized. Follow OpenSurge's Open Anyway instructions instead of disabling Gatekeeper globally
 
 ### Import
 
@@ -182,7 +190,7 @@ The current GitHub packages are unsigned. Follow OpenSurge's Open Anyway instruc
 
 4. Finder selects the generated file
 5. Open the Sources page in the OpenSurge Web GUI
-6. Select or drop `OpenSurge.yaml` under Local mihomo YAML
+6. Select or drop `OpenSurge.yaml` in the full YAML import area on the Sources page, then import it as a draft
 7. After structural validation, set it as the next-start version or apply and reload the running gateway
 
 Do not paste `http://127.0.0.1:6172/opensurge` into the HTTPS subscription field
@@ -233,7 +241,7 @@ Never run the router DHCP server and OpenSurge DHCP server together on one LAN
 
 Do not begin on the primary home network without a recovery device and verified router access
 
-The current design is cooperative IPv4. IPv6, static gateways, DoH, and Private Relay may bypass the Mac
+The basic flow above focuses on IPv4. OpenSurge v0.3.2 also offers experimental downstream IPv6 takeover, which requires separate setup and validation using the [upstream guide](https://github.com/YTwsy/OpenSurge-for-Mac/blob/v0.3.2/docs/user/app-user-guide.zh-CN.md). Unmanaged IPv6, clients using another static gateway, and some DoH / Private Relay paths can still bypass the intended gateway or DNS policy
 
 #### Manual same-LAN gateway
 
@@ -266,7 +274,7 @@ Continue to manage oixCloud login, plan details, traffic, the node filter, and s
 
 ### Security and recovery
 
-- The helper manages oixCloud account credentials and stores saved macOS access tokens in the login keychain; they are never passed to the OpenSurge root helper
+- The helper manages oixCloud account credentials and prefers the login keychain for saved macOS access tokens, falling back to the local config when unavailable; they are never passed to the OpenSurge root helper
 - The export directory is `0700` and the YAML is `0600`
 - When LAN authentication is enabled, the YAML includes Basic Auth userinfo for the local provider; do not share it
 - The oixCloud helper must be running before OpenSurge starts or validates the profile
@@ -279,11 +287,15 @@ Check the helper:
 curl -f http://127.0.0.1:6172/health
 ```
 
+`/health` checks only that the local HTTP service responds, not sign-in or upstream node connectivity
+
 Check the wrapper:
 
 ```sh
 curl -f http://127.0.0.1:6172/opensurge
 ```
+
+With LAN authentication enabled, `/opensurge` requires the same credentials; for example, run `curl -f -u username http://127.0.0.1:6172/opensurge` and enter the password when prompted
 
 If `/health` works but the provider is unavailable:
 
