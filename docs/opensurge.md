@@ -19,9 +19,9 @@ OpenSurge 的 GitHub 安装包当前未签名，按其说明使用系统设置�
 
 ## 导入
 
-1. 点击菜单栏云朵图标
+1. 点击菜单栏 oixCloud 图标
 2. 打开「连接设置 › 导出 OpenSurge 配置」
-3. helper 会启用登录时启动，并将 profile 写入：
+3. helper 会将 profile 写入以下位置；启动器或手动安装的版本会同时启用登录时启动，Homebrew 版本请用 `brew services start oixcloud-external-proxy-program` 管理启动：
 
    ```text
    ~/.config/oixcloud-external-proxy-program/OpenSurge.yaml
@@ -109,14 +109,14 @@ Mac 的下游接口与上游接口分离，由 OpenSurge 为独立网络提供 D
 
 节点健康检测从网关 Mac 发起，不能替代某台下游设备的 DHCP、DNS 与 TUN 验收
 
-oixCloud 登录、套餐、流量、节点筛选和精简规则仍在云朵菜单中管理
+oixCloud 登录、套餐、流量、节点筛选和精简规则仍在 oixCloud 菜单中管理
 
 ## 安全与故障恢复
 
-- oixCloud 凭据留在用户配置中，不交给 OpenSurge root helper
+- oixCloud 账户凭据由助手管理，macOS 保存的访问令牌使用登录钥匙串，不交给 OpenSurge root helper
 - 导出目录权限为 `0700`，YAML 权限为 `0600`
 - 开启局域网鉴权时，YAML 会包含访问本地 provider 所需的 Basic Auth userinfo，请勿转发
-- OpenSurge 启动和配置校验前，云朵 helper 必须正在运行
+- OpenSurge 启动和配置校验前，oixCloud helper 必须正在运行
 - helper 退出时现有 OpenSurge 连接会失败，重新打开或启动 helper 后刷新 provider
 - OpenSurge 网关停止不等于路由器 DHCP 和 Mac 网络设置已经恢复，必须完成恢复状态机再退出
 
@@ -134,10 +134,10 @@ curl -f http://127.0.0.1:6172/opensurge
 
 如果 `/health` 正常但 OpenSurge 显示 provider 不可用：
 
-1. 确认云朵菜单仍处于登录状态
+1. 确认 oixCloud 菜单仍处于登录状态
 2. 在 OpenSurge Provider 页面执行刷新
 3. 重新导出 YAML 并应用
-4. 查看云朵「工具 › 诊断…」与 OpenSurge 诊断页
+4. 查看 oixCloud「工具 › 诊断…」与 OpenSurge 诊断页
 
 ## 许可边界
 
@@ -172,9 +172,9 @@ The current GitHub packages are unsigned. Follow OpenSurge's Open Anyway instruc
 
 ### Import
 
-1. Click the cloud icon in the menu bar
-2. Open "Connection > Export OpenSurge Config"
-3. The helper enables launch at login and writes:
+1. Click the oixCloud icon in the menu bar
+2. Open "Connection > Export OpenSurge config"
+3. The helper writes the profile below and enables launch at login for launcher/manual installations. For Homebrew installations, manage startup with `brew services start oixcloud-external-proxy-program`:
 
    ```text
    ~/.config/oixcloud-external-proxy-program/OpenSurge.yaml
@@ -262,14 +262,14 @@ After import and startup, the OpenSurge GUI can:
 
 Health tests originate from the gateway Mac and do not replace DHCP, DNS, and TUN validation from a downstream device
 
-Continue to manage oixCloud login, plan details, traffic, the node filter, and simple rules from the cloud menu
+Continue to manage oixCloud login, plan details, traffic, the node filter, and simple rules from the oixCloud menu
 
 ### Security and recovery
 
-- oixCloud credentials remain in the user's config and are never passed to the OpenSurge root helper
+- The helper manages oixCloud account credentials and stores saved macOS access tokens in the login keychain; they are never passed to the OpenSurge root helper
 - The export directory is `0700` and the YAML is `0600`
 - When LAN authentication is enabled, the YAML includes Basic Auth userinfo for the local provider; do not share it
-- The cloud helper must be running before OpenSurge starts or validates the profile
+- The oixCloud helper must be running before OpenSurge starts or validates the profile
 - If the helper exits, existing OpenSurge egress fails; restart the helper and refresh the provider
 - Stopping the OpenSurge gateway does not by itself restore router DHCP or Mac network settings; finish the recovery state machine before quitting
 
@@ -287,10 +287,10 @@ curl -f http://127.0.0.1:6172/opensurge
 
 If `/health` works but the provider is unavailable:
 
-1. Confirm that the cloud menu is still logged in
+1. Confirm that the oixCloud menu is still logged in
 2. Refresh the provider in OpenSurge
 3. Export and apply the YAML again
-4. Check Tools > Diagnostics in the cloud menu and the OpenSurge Diagnostics page
+4. Check Tools > Diagnostics in the oixCloud menu and the OpenSurge Diagnostics page
 
 ### Licensing boundary
 

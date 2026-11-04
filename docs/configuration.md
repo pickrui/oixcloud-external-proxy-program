@@ -79,7 +79,7 @@ oixcloud-external-proxy-program --tray
 
 ### 账户配置
 
-推荐在菜单栏「账户 › 登录…」填写 Access Token
+在菜单栏「账户 › 登录…」选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可通过浏览器登录，Google 登录仅限已注册账号
 
 配置文件位于：
 
@@ -230,9 +230,11 @@ oixcloud-external-proxy-program --serve --mode map --listen 6172
 
 ### 停止自动启动
 
-推荐重新运行 `启动 oixCloud.command` 并选择「卸载自动启动」
+Homebrew 服务请运行 `brew services stop oixcloud-external-proxy-program`
 
-也可手动运行：
+启动器或手动安装的版本可关闭菜单栏「连接设置 › 开机启动」；也可重新运行 `启动 oixCloud.command` 并选择「卸载自动启动」
+
+仅针对启动器或助手创建的独立启动项，也可手动运行：
 
 ```bash
 launchctl bootout "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"
@@ -316,7 +318,7 @@ oixcloud-external-proxy-program --tray
 
 ### Account configuration
 
-Use "Account > Sign in…" in the menu bar and enter an Access Token
+Open "Account > Sign in…" in the menu bar to use an Access Token or email and password. When "Sign in with Google" is available, you can also sign in through your browser; registered accounts only
 
 The configuration file is:
 
@@ -467,9 +469,11 @@ oixcloud-external-proxy-program --serve --mode map --listen 6172
 
 ### Disable automatic startup
 
-Run `启动 oixCloud.command` again and choose "Remove Autostart"
+For a Homebrew service, run `brew services stop oixcloud-external-proxy-program`
 
-Manual alternative:
+For launcher/manual installations, turn off "Connection > Start at login", or run `启动 oixCloud.command` and choose 卸载自动启动 (Remove Autostart)
+
+Manual alternative for the independent login item created by the launcher or helper:
 
 ```bash
 launchctl bootout "gui/$(id -u)/com.oixcloud.external-proxy-program.tray"

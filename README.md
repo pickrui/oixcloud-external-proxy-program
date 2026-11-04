@@ -13,6 +13,7 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 | 场景 | 文档 |
 |---|---|
 | 在当前 Mac 使用 Surge | 继续阅读本页 |
+| 使用 Homebrew 安装与管理服务 | [Homebrew 安装](docs/configuration.md#homebrew-安装) |
 | 使用 OpenSurge GUI 与 DHCP/DNS 接管 | [OpenSurge 接入指南](docs/opensurge.md) |
 | 部署到 Linux、NAS 或家用服务器 | [Docker 部署](docs/docker.md) |
 | 保留现有 Surge 配置或自定义规则 | [配置参考](docs/configuration.md) |
@@ -23,7 +24,7 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 准备：
 
 - Surge for Mac
-- oixCloud 账户和 Access Token
+- 可用的 oixCloud 账户，支持 Access Token、邮箱密码或 Google 登录
 - macOS 12 或更高版本
 
 1. 下载并解压仓库
@@ -32,11 +33,11 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 
 2. 双击 `启动 oixCloud.command`
 
-   首次使用选择「常驻启动」
+   选择「常驻启动」可在登录 Mac 后自动运行，关闭终端后也会继续运行；仅临时使用可选择「临时启动」
 
-3. 点击菜单栏云朵图标，打开「账户 › 登录…」
+3. 点击菜单栏 oixCloud 图标，打开「账户 › 登录…」
 
-   粘贴 Access Token，也可使用邮箱和密码
+   选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可在浏览器中完成登录，Google 登录仅限已注册账号
 
 4. 打开「连接设置 › 接入 Surge」
 
@@ -44,11 +45,7 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 
 默认使用本地多端口映射，节点直接在 Surge 策略组中选择
 
-完成标志：
-
-- 菜单栏显示云朵图标
-- Surge 出现 oixCloud 配置和节点策略组
-- 切换节点后可以正常访问网络
+完成后，Surge 应显示 oixCloud 配置和节点策略组，选择节点后可以正常访问网络；仅看到菜单栏图标不代表已经连接成功
 
 macOS 12、13 自动使用 legacy 通用版，该版本尚未经过充分实机测试；macOS 11 不再受支持，构建工具链已不支持该部署目标
 
@@ -70,7 +67,7 @@ OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观�
 
 `启动 oixCloud.command` 每次运行也会检查更新
 
-更新器会校验 SHA-256、Developer ID 和版本号，安装失败时自动恢复旧版本；自 v0.0.51 起，macOS 保存的访问令牌与节点缓存密钥使用登录钥匙串；降级到 v0.0.50 或更早版本需要重新登录；旧版本保存配置后再升级，也需要重新登录
+内置更新器会校验 SHA-256、Developer ID 和版本号，安装校验失败时自动恢复旧版本；macOS 的令牌存储方式见[账户配置](docs/configuration.md#账户配置)
 
 Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 
@@ -81,11 +78,14 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 查看账户与流量 | 账户 |
 | 切换中文或英文 | 工具 › 语言 |
 | 切换接入模式 | 连接设置 › 接入模式… |
+| 选择节点 | 默认多端口映射模式在 Surge 策略组选择；单端口模式在助手「节点」菜单选择 |
+| 筛选下发节点、切换精简规则 | 连接设置中的节点筛选入口与「精简规则」 |
 | 修改规则后同步 | 连接设置 › 接入 Surge |
 | 导出 OpenSurge profile | 连接设置 › 导出 OpenSurge 配置 |
 | 检查运行状态 | [工具 › 诊断…](docs/troubleshooting.md#macos-连接诊断) |
-| 更新程序 | 工具 › 检查更新 |
-| 停止自动启动 | 重新运行 `启动 oixCloud.command`，选择「卸载自动启动」 |
+| 更新程序 | 启动器或手动安装：工具 › 检查更新；Homebrew：工具 › 通过 Homebrew 更新… |
+| 管理开机启动 | 启动器或手动安装：连接设置 › 开机启动；Homebrew：参照 [Homebrew 服务命令](docs/configuration.md#homebrew-安装) |
+| 移除启动器安装的自动启动项 | 重新运行 `启动 oixCloud.command`，选择「卸载自动启动」 |
 
 ### 更多
 
@@ -110,6 +110,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | Scenario | Guide |
 |---|---|
 | Use Surge on this Mac | Continue on this page |
+| Install and manage the service with Homebrew | [Homebrew installation](docs/configuration.md#homebrew-installation) |
 | Use the OpenSurge GUI and DHCP/DNS takeover | [OpenSurge integration](docs/opensurge.md#english) |
 | Run on Linux, a NAS, or a home server | [Docker deployment](docs/docker.md#english) |
 | Keep an existing Surge profile or add custom rules | [Configuration](docs/configuration.md#english) |
@@ -120,7 +121,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 Requirements:
 
 - Surge for Mac
-- An oixCloud account and Access Token
+- An active oixCloud account; Access Token, email/password, and Google sign-in are supported
 - macOS 12 or later
 
 1. Download and extract the repository
@@ -129,11 +130,11 @@ Requirements:
 
 2. Double-click `启动 oixCloud.command`
 
-   Choose persistent startup on first use
+   Choose 常驻启动 (persistent startup) to run at login and keep running after Terminal closes, or 临时启动 for temporary use
 
-3. Click the cloud icon in the menu bar and open "Account > Sign in…"
+3. Click the oixCloud icon in the menu bar and open "Account > Sign in…"
 
-   Paste the Access Token, or use email and password
+   Use an Access Token or email and password. If "Sign in with Google" is available, complete sign-in in your browser; registered accounts only
 
 4. Open "Connection > Apply in Surge"
 
@@ -141,11 +142,7 @@ Requirements:
 
 Local multi-port mapping is the default; select nodes directly in Surge policy groups
 
-The setup is complete when:
-
-- The cloud icon is visible in the menu bar
-- Surge shows the oixCloud profile and node policy groups
-- Network access works after selecting a node
+After setup, Surge should show the oixCloud profile and node policy groups, and network access should work with a selected node. A visible menu bar icon alone does not confirm a working connection
 
 macOS 12 and 13 use the universal legacy build, which has not been fully tested on physical hardware. macOS 11 is no longer supported: the build toolchain no longer targets it
 
@@ -153,7 +150,7 @@ macOS 12 and 13 use the universal legacy build, which has not been fully tested 
 
 OpenSurge provides the Web GUI, mihomo TUN, DHCP/DNS, device policies, and traffic visibility. This helper continues to own the oixCloud account, nodes, and local egress
 
-1. Open "Connection > Export OpenSurge Config" from the menu bar
+1. Open "Connection > Export OpenSurge config" from the menu bar
 2. Import the selected `OpenSurge.yaml` from OpenSurge's Sources page
 3. Choose DHCP takeover, manual same-LAN gateway, or an isolated downstream LAN in OpenSurge Network Settings
 
@@ -163,11 +160,11 @@ See [OpenSurge integration and DHCP/DNS takeover](docs/opensurge.md#english) for
 
 ### Updates
 
-For launcher or manual installations, use "Tools > Check for Updates" from the menu bar. For Homebrew installations, run `brew update`, `brew upgrade oixcloud-external-proxy-program`, then restart the service; see [Homebrew installation](docs/configuration.md#homebrew-installation)
+For launcher or manual installations, use "Tools > Check for updates" from the menu bar. For Homebrew installations, run `brew update`, `brew upgrade oixcloud-external-proxy-program`, then restart the service; see [Homebrew installation](docs/configuration.md#homebrew-installation)
 
 `启动 oixCloud.command` also checks for updates whenever it runs
 
-The updater verifies SHA-256, the Developer ID, and the exact version; failed installation checks restore the previous version. Starting with v0.0.51, macOS stores saved access tokens and node-cache keys in the login keychain. Downgrading to v0.0.50 or earlier requires signing in again. If the older version saves the configuration, signing in is also required after upgrading again
+The built-in updater verifies SHA-256, the Developer ID, and the exact version; failed installation checks restore the previous version. See [Account configuration](docs/configuration.md#account-configuration) for token storage on macOS
 
 Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update commands
 
@@ -178,11 +175,14 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | View account and traffic | Account |
 | Change the UI language | Tools > Language |
 | Change connection mode | Connection > Mode… |
+| Select a node | In Surge policy groups for the default port-mapping mode; in the helper’s Nodes menu for single-port mode |
+| Filter supplied nodes or toggle lean rules | The node filter entry and Lean rules in Connection |
 | Apply changed settings | Connection > Apply in Surge |
-| Export an OpenSurge profile | Connection > Export OpenSurge Config |
-| Check runtime status | Tools > Diagnostics... |
-| Update the helper | Tools > Check for Updates |
-| Disable automatic startup | Run `启动 oixCloud.command` and choose Remove Autostart |
+| Export an OpenSurge profile | Connection > Export OpenSurge config |
+| Check runtime status | Tools > Diagnostics… |
+| Update the helper | Launcher/manual install: Tools > Check for updates; Homebrew: Tools > Update with Homebrew… |
+| Manage startup at login | Launcher/manual install: Connection > Start at login; Homebrew: see [service commands](docs/configuration.md#homebrew-installation) |
+| Remove the launcher’s login item | Run `启动 oixCloud.command` and choose 卸载自动启动 (Remove Autostart) |
 
 ### More
 
