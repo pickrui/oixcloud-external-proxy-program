@@ -47,7 +47,7 @@ brew services restart oixcloud-external-proxy-program
 
 v0.0.56 起，Homebrew 版本的更新与开机启动均由 Homebrew 管理，菜单栏会显示对应命令；不再通过内置更新器替换 Cellar 中的程序，也不再创建第二份独立启动项
 
-首次改用 Homebrew 服务前，先退出手动启动的 Helper；如果曾用启动器安装常驻启动，先运行启动器并选择「卸载自动启动」，再运行 `brew services start`。已有冲突的排查步骤见 [Homebrew 重启没有生效](troubleshooting.md#homebrew-重启没有生效)
+首次改用 Homebrew 服务前，先退出手动启动的 Helper；如果曾用启动器安装常驻启动，先运行启动器并选择「卸载自动启动」，再运行 `brew services start`；已有冲突的排查步骤见 [Homebrew 重启没有生效](troubleshooting.md#homebrew-重启没有生效)
 
 Homebrew 服务使用默认配置路径；自定义配置请使用 `oixcloud-external-proxy-program --tray --config /绝对路径/config.json` 手动启动，并在升级后退出再按原方式打开
 

@@ -158,7 +158,7 @@ launchctl list | awk '$3 == "sh.brew.oixcloud-external-proxy-program" || $3 == "
 
 Homebrew 新版对应 `sh.brew.oixcloud-external-proxy-program`，旧版对应 `homebrew.mxcl.oixcloud-external-proxy-program`；启动器和旧版菜单栏创建的独立启动项对应 `com.oixcloud.external-proxy-program.tray`
 
-如果运行的是独立启动项或手动副本，`brew services restart` 不会重启它。决定改用 Homebrew 后，先在 Helper 中退出，再用启动器的「卸载自动启动」移除独立启动项，最后运行：
+如果运行的是独立启动项或手动副本，`brew services restart` 不会重启它；决定改用 Homebrew 后，先在 Helper 中退出，再用启动器的「卸载自动启动」移除独立启动项，最后运行：
 
 ```bash
 brew update
@@ -170,9 +170,9 @@ brew services restart oixcloud-external-proxy-program
 
 ### 文件与文件夹权限中出现多个同名项目
 
-同名权限项本身不能证明有多个 Helper 同时运行。先核对是否曾从 Homebrew、启动器及不同下载目录运行程序，并固定使用一种安装方式
+同名权限项本身不能证明有多个 Helper 同时运行；先核对是否曾从 Homebrew、启动器及不同下载目录运行程序，并固定使用一种安装方式
 
-更新不会自动清除系统已保存的权限项，不需要为此重置所有应用的隐私权限。若固定安装方式后仍不断新增，请反馈 macOS 版本、Helper 版本、安装方式及程序路径，路径中的用户名可隐藏
+更新不会自动清除系统已保存的权限项，不需要为此重置所有应用的隐私权限；若固定安装方式后仍不断新增，请反馈 macOS 版本、Helper 版本、安装方式及程序路径，路径中的用户名可隐藏
 
 ### 重启菜单栏程序
 

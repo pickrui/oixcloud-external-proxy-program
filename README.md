@@ -66,9 +66,7 @@ OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观�
 
 ### 更新
 
-通过启动器或手动安装的版本，可用菜单栏「工具 › 检查更新」直接更新
-
-Homebrew 安装的版本请使用 `brew update`、`brew upgrade oixcloud-external-proxy-program`，再重启 Homebrew 服务，详见 [Homebrew 安装](docs/configuration.md#homebrew-安装)
+通过启动器或手动安装的版本，可用菜单栏「工具 › 检查更新」直接更新；Homebrew 安装的版本请使用 `brew update`、`brew upgrade oixcloud-external-proxy-program`，再重启服务，详见 [Homebrew 安装](docs/configuration.md#homebrew-安装)
 
 `启动 oixCloud.command` 每次运行也会检查更新
 
@@ -165,9 +163,7 @@ See [OpenSurge integration and DHCP/DNS takeover](docs/opensurge.md#english) for
 
 ### Updates
 
-For launcher or manual installations, use "Tools > Check for Updates" from the menu bar
-
-For Homebrew installations, run `brew update`, `brew upgrade oixcloud-external-proxy-program`, then restart the Homebrew service; see [Homebrew installation](docs/configuration.md#homebrew-installation)
+For launcher or manual installations, use "Tools > Check for Updates" from the menu bar. For Homebrew installations, run `brew update`, `brew upgrade oixcloud-external-proxy-program`, then restart the service; see [Homebrew installation](docs/configuration.md#homebrew-installation)
 
 `启动 oixCloud.command` also checks for updates whenever it runs
 
