@@ -35,11 +35,11 @@ Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge 
 
    选择「常驻启动」可在登录 Mac 后自动运行，关闭终端后也会继续运行；仅临时使用可选择「临时启动」
 
-3. 点击菜单栏 oixCloud 图标，打开「账户 › 登录…」
+3. 点击菜单栏 oixCloud 图标，打开「登录…」
 
    选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可在浏览器中完成登录，Google 登录仅限已注册账号
 
-4. 打开「连接设置 › 接入 Surge」
+4. 打开「客户端接入 › 接入 Surge」
 
    Surge 首次要求安装时确认，然后开启 `Set as System Proxy`
 
@@ -53,7 +53,7 @@ macOS 12、13 自动使用 legacy 通用版，该版本尚未经过充分实机�
 
 OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观察，本助手继续负责 oixCloud 账户、节点与本地出站
 
-1. 在菜单栏打开「连接设置 › 导出 OpenSurge 配置」
+1. 在菜单栏打开「客户端接入 › 导出 OpenSurge 配置」
 2. 在 OpenSurge 的「来源」页面导入 Finder 中选中的 `OpenSurge.yaml`
 3. 在 OpenSurge 的「网络设置」中选择局域网 DHCP 接管、旁路由或独立下游 LAN
 
@@ -76,15 +76,15 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 需求 | 入口 |
 |---|---|
 | 查看账户与流量 | 账户 |
-| 切换中文或英文 | 工具 › 语言 |
-| 切换接入模式 | 连接设置 › 接入模式… |
+| 切换中文或英文 | 设置 › 语言 |
+| 切换接入模式 | 设置 › 接入模式… |
 | 选择节点 | 默认多端口映射模式在 Surge 策略组选择；单端口模式在助手「节点」菜单选择 |
-| 筛选下发节点、切换精简规则 | 连接设置中的节点筛选入口与「精简规则」 |
-| 修改规则后同步 | 连接设置 › 接入 Surge |
-| 导出 OpenSurge profile | 连接设置 › 导出 OpenSurge 配置 |
+| 刷新、筛选节点或精简规则 | 节点 › 更新节点或节点筛选…，客户端接入 › 精简规则 |
+| 修改规则后同步 | 客户端接入 › 接入 Surge |
+| 导出 OpenSurge profile | 客户端接入 › 导出 OpenSurge 配置 |
 | 检查运行状态 | [工具 › 诊断…](docs/troubleshooting.md#macos-连接诊断) |
 | 更新程序 | 启动器或手动安装：工具 › 检查更新；Homebrew：工具 › 通过 Homebrew 更新… |
-| 管理开机启动 | 启动器或手动安装：连接设置 › 开机启动；Homebrew：参照 [Homebrew 服务命令](docs/configuration.md#homebrew-安装) |
+| 管理开机启动 | 启动器或手动安装：设置 › 开机启动；Homebrew：参照 [Homebrew 服务命令](docs/configuration.md#homebrew-安装) |
 | 移除启动器安装的自动启动项 | 重新运行 `启动 oixCloud.command`，选择「卸载自动启动」 |
 
 ### 更多
@@ -132,11 +132,11 @@ Requirements:
 
    Choose 常驻启动 (persistent startup) to run at login and keep running after Terminal closes, or 临时启动 for temporary use
 
-3. Click the oixCloud icon in the menu bar and open "Account > Sign in…"
+3. Click the oixCloud icon in the menu bar and open "Sign in…"
 
    Use an Access Token or email and password. If "Sign in with Google" is available, complete sign-in in your browser; registered accounts only
 
-4. Open "Connection > Apply in Surge"
+4. Open "Client Setup > Apply in Surge"
 
    Confirm installation if Surge asks, then enable `Set as System Proxy`
 
@@ -150,7 +150,7 @@ macOS 12 and 13 use the universal legacy build, which has not been fully tested 
 
 OpenSurge provides the Web GUI, mihomo TUN, DHCP/DNS, device policies, and traffic visibility. This helper continues to own the oixCloud account, nodes, and local egress
 
-1. Open "Connection > Export OpenSurge config" from the menu bar
+1. Open "Client Setup > Export OpenSurge config" from the menu bar
 2. Import the selected `OpenSurge.yaml` from OpenSurge's Sources page
 3. Choose DHCP takeover, manual same-LAN gateway, or an isolated downstream LAN in OpenSurge Network Settings
 
@@ -173,15 +173,15 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | Task | Menu |
 |---|---|
 | View account and traffic | Account |
-| Change the UI language | Tools > Language |
-| Change connection mode | Connection > Mode… |
+| Change the UI language | Settings > Language |
+| Change connection mode | Settings > Mode… |
 | Select a node | In Surge policy groups for the default port-mapping mode; in the helper’s Nodes menu for single-port mode |
-| Filter supplied nodes or toggle lean rules | The node filter entry and Lean rules in Connection |
-| Apply changed settings | Connection > Apply in Surge |
-| Export an OpenSurge profile | Connection > Export OpenSurge config |
+| Refresh or filter nodes, or toggle lean rules | Nodes > Refresh nodes or Node Filter…, Client Setup > Lean rules |
+| Apply changed settings | Client Setup > Apply in Surge |
+| Export an OpenSurge profile | Client Setup > Export OpenSurge config |
 | Check runtime status | Tools > Diagnostics… |
 | Update the helper | Launcher/manual install: Tools > Check for updates; Homebrew: Tools > Update with Homebrew… |
-| Manage startup at login | Launcher/manual install: Connection > Start at login; Homebrew: see [service commands](docs/configuration.md#homebrew-installation) |
+| Manage startup at login | Launcher/manual install: Settings > Start at login; Homebrew: see [service commands](docs/configuration.md#homebrew-installation) |
 | Remove the launcher’s login item | Run `启动 oixCloud.command` and choose 卸载自动启动 (Remove Autostart) |
 
 ### More

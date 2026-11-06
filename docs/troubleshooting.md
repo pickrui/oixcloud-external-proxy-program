@@ -21,9 +21,9 @@ HTTP 407 表示网络代理要求鉴权，请检查系统代理凭据；HTTP 403
 | 现象 | 处理 |
 |---|---|
 | 看不到菜单栏图标 | 在本机图形会话运行 `oixcloud-external-proxy-program --tray`，并检查菜单栏是否隐藏了图标 |
-| 提示未登录 | 打开「账户 › 登录…」，使用 Access Token、邮箱密码或窗口提供的 Google 登录 |
+| 提示未登录 | 打开「登录…」，使用 Access Token、邮箱密码或窗口提供的 Google 登录 |
 | Surge 没有流量 | 确认已接入 Surge、已选择节点，并开启 `Set as System Proxy` |
-| 修改设置后没有变化 | 重新点「连接设置 › 接入 Surge」 |
+| 修改设置后没有变化 | 重新点「客户端接入 › 接入 Surge」 |
 | 提示已有实例 | 托盘和 `--serve` 不能同时运行，停止其中一个 |
 | Docker 返回 `401` | 检查 URL 和 `config.json` 中的 `lanAuth` 是否一致 |
 | Docker 状态不健康 | 运行 `docker compose logs -f`，再检查 `curl http://127.0.0.1:6172/health` |
@@ -215,9 +215,9 @@ If the helper says the config was written but Surge did not switch, select the o
 | Symptom | Action |
 |---|---|
 | No menu bar icon | Run `oixcloud-external-proxy-program --tray` in a local graphical session and check whether the menu bar hid the icon |
-| Logged out | Open "Account > Sign in…" and use an Access Token, email/password, or Google sign-in when offered |
+| Logged out | Open "Sign in…" and use an Access Token, email/password, or Google sign-in when offered |
 | No traffic in Surge | Confirm the profile is connected, a node is selected, and `Set as System Proxy` is enabled |
-| Settings did not change | Use "Connection > Apply in Surge" again |
+| Settings did not change | Use "Client Setup > Apply in Surge" again |
 | Another instance is running | The tray and `--serve` cannot run together; stop one of them |
 | Docker returns `401` | Match the URL credentials with `lanAuth` in `config.json` |
 | Docker is unhealthy | Run `docker compose logs -f`, then check `curl http://127.0.0.1:6172/health` |
