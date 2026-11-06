@@ -24,7 +24,7 @@
 ## 导入
 
 1. 点击菜单栏 oixCloud 图标
-2. 打开「连接设置 › 导出 OpenSurge 配置」
+2. 打开「客户端接入 › 导出 OpenSurge 配置」
 3. helper 会将 profile 写入以下位置；启动器或手动安装的版本会同时启用登录时启动，Homebrew 版本请用 `brew services start oixcloud-external-proxy-program` 管理启动：
 
    ```text
@@ -58,7 +58,9 @@ proxy-providers:
 
 这是 [mihomo 的 provider 下载策略](https://wiki.metacubex.one/en/config/proxy-providers/#proxy)，只指定订阅下载与刷新直连；节点选择和业务流量仍由 `oixCloud` 策略组控制
 
-v0.0.57 起自动生成该字段；升级后请重新执行「连接设置 › 导出 OpenSurge 配置」，再在 OpenSurge 中导入并应用；旧 YAML 不会因程序升级而自动更新
+v0.0.57 起自动生成该字段；升级后请重新执行「客户端接入 › 导出 OpenSurge 配置」，再在 OpenSurge 中导入并应用；旧 YAML 不会因程序升级而自动更新
+
+v0.0.59 起新导出的节点 Provider 每 24 小时刷新一次，已导入的配置可重新导出并导入，或将 Provider 的 `interval` 改为 `86400`
 
 尚未升级的 v0.0.56 及更早版本可按上面的步骤手动补上该字段，再次从旧版本导出时也需补上
 
@@ -70,7 +72,7 @@ v0.0.57 起自动生成该字段；升级后请重新执行「连接设置 › �
 - `oixCloud` Selector，候选为 provider 节点与 `DIRECT`
 - helper 的 `PROCESS-NAME` 与 `PROCESS-PATH` 直连规则，避免 TUN 回环
 - `MATCH,oixCloud` 终止规则
-- 每 10 分钟刷新 provider，每 5 分钟进行一次延迟健康检查
+- 每 24 小时刷新 Provider，每 5 分钟进行一次延迟健康检查
 
 provider 只暴露本地端口，不包含远端节点地址、PSK 或 ECH 参数
 
@@ -205,7 +207,7 @@ The [OpenSurge v0.3.2 installers](https://github.com/YTwsy/OpenSurge-for-Mac/rel
 ### Import
 
 1. Click the oixCloud icon in the menu bar
-2. Open "Connection > Export OpenSurge config"
+2. Open "Client Setup > Export OpenSurge config"
 3. The helper writes the profile below and enables launch at login for launcher/manual installations. For Homebrew installations, manage startup with `brew services start oixcloud-external-proxy-program`:
 
    ```text
@@ -239,7 +241,9 @@ proxy-providers:
 
 This is [mihomo's provider download policy](https://wiki.metacubex.one/en/config/proxy-providers/#proxy): it sends subscription downloads and refreshes directly while node selection and application traffic still use the `oixCloud` group
 
-Starting with v0.0.57, generated profiles include this field. After upgrading, use "Connection > Export OpenSurge config", then import and apply the file in OpenSurge again; upgrading the helper does not automatically update an existing YAML file
+Starting with v0.0.57, generated profiles include this field. After upgrading, use "Client Setup > Export OpenSurge config", then import and apply the file in OpenSurge again; upgrading the helper does not automatically update an existing YAML file
+
+Starting with v0.0.59, newly exported node providers refresh every 24 hours. For an existing profile, export and import it again or set the provider’s `interval` to `86400`
 
 Users staying on v0.0.56 or earlier can add the field manually as shown above, including after exporting the file again from an older binary
 
@@ -251,7 +255,7 @@ The profile contains:
 - An `oixCloud` Selector containing the provider nodes and `DIRECT`
 - `PROCESS-NAME` and `PROCESS-PATH` direct rules for the helper to prevent a TUN loop
 - A terminal `MATCH,oixCloud` rule
-- A ten-minute provider interval and five-minute health checks
+- A 24-hour provider interval and five-minute health checks
 
 The provider exposes only local ports, not remote server addresses, PSKs, or ECH parameters
 

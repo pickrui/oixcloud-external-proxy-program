@@ -71,7 +71,7 @@ oixcloud-external-proxy-program --tray
 
 ### 账户配置
 
-在菜单栏「账户 › 登录…」选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可通过浏览器登录，Google 登录仅限已注册账号
+在菜单栏「登录…」选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可通过浏览器登录，Google 登录仅限已注册账号
 
 配置文件位于：
 
@@ -93,7 +93,7 @@ macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件�
 
 ### 界面语言
 
-默认跟随系统，菜单栏「工具 › 语言」可选中文、English 或跟随系统，选择会保存并立即生效
+默认跟随系统，菜单栏「设置 › 语言」可选中文、English 或跟随系统，选择会保存并立即生效
 
 配置文件的 `"language": "zh"` 或 `"language": "en"` 可固定语言，`"auto"` 或省略该字段则跟随系统
 
@@ -106,7 +106,7 @@ macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件�
 | `map`，默认 | Surge 策略组 | 从 `7200` 起，每个节点一个端口 |
 | `single` | 菜单栏「节点」 | 默认 `7100` |
 
-修改模式后重新点「连接设置 › 接入 Surge」
+修改模式后重新点「客户端接入 › 接入 Surge」
 
 ```json
 {
@@ -134,20 +134,22 @@ macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件�
 | 设置 | 用途 |
 |---|---|
 | 接入模式 | 切换 `map` 与 `single` |
-| 节点筛选… | 按线路、地区和名称选择下发的节点，有套餐且面板允许时显示 |
-| 精简规则 | 仅保留基础规则 |
+| 节点 › 节点筛选… | 按线路、地区和名称选择下发的节点，面板支持筛选时显示 |
+| 客户端接入 › 精简规则 | 仅保留基础规则 |
 | 允许局域网访问 | 让同一网络设备访问本机服务 |
 
 上述设置变更后重新接入 Surge
 
 ### 节点筛选
 
+Helper 默认每 24 小时在后台更新节点，也可从「节点 › 更新节点」立即刷新
+
 程序拉取节点时只请求 `nodes=auto`，由面板决定下发哪些节点：
 
 - 未设置筛选时节点来自「智能优选」
 - 设置筛选后按筛选下发
 
-在「连接设置 › 节点筛选…」中点按线路或地区，可在「不筛选 → 仅保留 → 排除」之间切换，也可填写名称包含 / 名称排除，例如 `香港|日本`、`测试|维护`
+在「节点 › 节点筛选…」中点按线路或地区，可在「不筛选 → 仅保留 → 排除」之间切换，也可填写名称包含 / 名称排除，例如 `香港|日本`、`测试|维护`
 
 读取过筛选后，菜单项显示「节点筛选 · 智能优选」或「节点筛选 · 已自定义 · 保留 N / M 个节点」
 
@@ -168,7 +170,7 @@ macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件�
 Premium = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter="Premium", update-interval=600
 ```
 
-菜单栏「连接设置 › 复制本机节点列表 URL」可复制该地址
+菜单栏「客户端接入 › 复制本机节点列表 URL」可复制该地址
 
 ### 自定义 Surge 配置
 
@@ -228,7 +230,7 @@ oixcloud-external-proxy-program --serve --mode map --listen 6172
 
 Homebrew 服务请运行 `brew services stop oixcloud-external-proxy-program`
 
-启动器或手动安装的版本可关闭菜单栏「连接设置 › 开机启动」；也可重新运行 `启动 oixCloud.command` 并选择「卸载自动启动」
+启动器或手动安装的版本可关闭菜单栏「设置 › 开机启动」；也可重新运行 `启动 oixCloud.command` 并选择「卸载自动启动」
 
 仅针对启动器或助手创建的独立启动项，也可手动运行：
 
@@ -306,7 +308,7 @@ oixcloud-external-proxy-program --tray
 
 ### Account configuration
 
-Open "Account > Sign in…" in the menu bar to use an Access Token or email and password. When "Sign in with Google" is available, you can also sign in through your browser; registered accounts only
+Open "Sign in…" in the menu bar to use an Access Token or email and password. When "Sign in with Google" is available, you can also sign in through your browser; registered accounts only
 
 The configuration file is:
 
@@ -328,7 +330,7 @@ Node-cache keys also prefer the login keychain, falling back to a `0600` local k
 
 ### Interface language
 
-The interface follows the system by default. Choose 中文, English, or Follow system under Tools > Language; the selection is saved and takes effect immediately
+The interface follows the system by default. Choose 中文, English, or Follow system under Settings > Language; the selection is saved and takes effect immediately
 
 Set `"language": "zh"` or `"language": "en"` in the config to pin a language; use `"auto"` or omit the field to follow the system
 
@@ -369,20 +371,22 @@ Fixed node ports:
 | Setting | Purpose |
 |---|---|
 | Connection Mode | Switch between `map` and `single` |
-| Node Filter… | Choose nodes by line, region, and name; shown for accounts with a plan when allowed by the panel |
-| Lean rules | Keep only basic rules |
+| Nodes > Node Filter… | Choose nodes by line, region, and name when the panel supports filtering |
+| Client Setup > Lean rules | Keep only basic rules |
 | Allow LAN access | Serve other devices on the same network |
 
 Reconnect Surge after changing these settings
 
 ### Node Filter
 
+The helper refreshes nodes every 24 hours by default. For an immediate refresh, choose Nodes > Refresh nodes
+
 The helper requests nodes with `nodes=auto` and lets the panel decide which nodes to send:
 
 - Without a filter, nodes come from Smart Selection
 - With a filter, the panel sends the nodes the filter keeps
 
-In "Connection > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes. Node names are in Chinese, so use patterns such as `香港|日本` or `测试|维护`
+In "Nodes > Node Filter…", click a line or region to cycle Any → Only → Exclude, and optionally fill in Name contains / Name excludes. Node names are in Chinese, so use patterns such as `香港|日本` or `测试|维护`
 
 Once the filter has been read, the menu item shows "Node Filter · Smart Selection" or "Node Filter · Customized · N of M nodes kept"
 
@@ -403,7 +407,7 @@ Hong Kong = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter=
 Premium = select, policy-path=http://127.0.0.1:6172/list, policy-regex-filter="Premium", update-interval=600
 ```
 
-"Connection > Copy local node list URL" copies this address
+"Client Setup > Copy local node list URL" copies this address
 
 ### Custom Surge configuration
 
@@ -463,7 +467,7 @@ oixcloud-external-proxy-program --serve --mode map --listen 6172
 
 For a Homebrew service, run `brew services stop oixcloud-external-proxy-program`
 
-For launcher/manual installations, turn off "Connection > Start at login", or run `启动 oixCloud.command` and choose 卸载自动启动 (Remove Autostart)
+For launcher/manual installations, turn off "Settings > Start at login", or run `启动 oixCloud.command` and choose 卸载自动启动 (Remove Autostart)
 
 Manual alternative for the independent login item created by the launcher or helper:
 
