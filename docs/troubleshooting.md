@@ -146,7 +146,7 @@ HTTP 抽检不覆盖 UDP、所有节点或所有网站；测试目标失败本�
 
 若持续失败，请提供发生时间与附近的 `[Panel] endpoint=managed_config` 日志，日志使用固定原因码、域名序号、网络路径、HTTP 状态、响应类型、字节数和耗时，不包含 token、URL、正文或节点信息
 
-默认域名序号 1 为 `oix-api.dler.io`、2 为 `oics.net`；自定义域名以配置顺序为准，0 表示整条直连或代理路径超时
+域名序号按 `apiDomains` 配置顺序，从 1 开始；0 表示整条直连或代理路径超时
 
 ### Homebrew 重启没有生效
 
@@ -334,7 +334,7 @@ The helper automatically tries the backup domain and releases each request sessi
 
 If failures persist, provide the time and nearby `[Panel] endpoint=managed_config` logs. They contain fixed reason codes, domain indexes, network routes, HTTP status, content type, byte counts and timing, without tokens, URLs, response bodies or node details.
 
-Default domain index 1 is `oix-api.dler.io` and index 2 is `oics.net`. Custom domains follow their configured order; index 0 identifies a whole-route timeout.
+Domain indexes follow the `apiDomains` configuration order, starting at 1; index 0 identifies a whole-route timeout.
 
 ### Homebrew restart has no effect
 
