@@ -140,6 +140,14 @@ macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件�
 
 上述设置变更后重新接入 Surge
 
+### MITM 证书
+
+macOS 14 及以上可在「客户端接入 › MITM 证书」启用账户证书，默认关闭；账户尚无证书时可按提示创建，然后重新接入 Surge
+
+也可在配置中设置 `"mitm": true`；证书只用于用户模块添加的主机名，上游证书校验保持开启；仍需在 Surge 或系统中信任账户证书
+
+通过局域网读取包含证书的配置须通过局域网鉴权；仅在可信设备和网络上开启此功能
+
 ### 节点筛选
 
 Helper 默认每 24 小时在后台更新节点，也可从「节点 › 更新节点」立即刷新
@@ -376,6 +384,14 @@ Fixed node ports:
 | Allow LAN access | Serve other devices on the same network |
 
 Reconnect Surge after changing these settings
+
+### MITM certificate
+
+On macOS 14+, enable Client Setup > MITM certificate to include the account's CA. It is off by default. If the account has no CA, follow the prompt to create one, then apply the profile in Surge again
+
+The configuration equivalent is `"mitm": true`. The CA is used only for hostnames added by the user's modules, and upstream certificate verification stays enabled. The CA must still be trusted in Surge or the system
+
+LAN clients need LAN authentication to read a profile containing the CA. Enable this only on trusted devices and networks
 
 ### Node Filter
 

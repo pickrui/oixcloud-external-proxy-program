@@ -80,6 +80,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 切换接入模式 | 设置 › 接入模式… |
 | 选择节点 | 默认多端口映射模式在 Surge 策略组选择；单端口模式在助手「节点」菜单选择 |
 | 刷新、筛选节点或精简规则 | 节点 › 更新节点或节点筛选…，客户端接入 › 精简规则 |
+| 按需附带账户 MITM 证书（macOS 14+） | 客户端接入 › MITM 证书 |
 | 修改规则后同步 | 客户端接入 › 接入 Surge |
 | 导出 OpenSurge profile | 客户端接入 › 导出 OpenSurge 配置 |
 | 检查运行状态 | [工具 › 诊断…](docs/troubleshooting.md#macos-连接诊断) |
@@ -177,6 +178,7 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | Change connection mode | Settings > Mode… |
 | Select a node | In Surge policy groups for the default port-mapping mode; in the helper’s Nodes menu for single-port mode |
 | Refresh or filter nodes, or toggle lean rules | Nodes > Refresh nodes or Node Filter…, Client Setup > Lean rules |
+| Include the account's MITM certificate (macOS 14+) | Client Setup > MITM certificate |
 | Apply changed settings | Client Setup > Apply in Surge |
 | Export an OpenSurge profile | Client Setup > Export OpenSurge config |
 | Check runtime status | Tools > Diagnostics… |
@@ -194,6 +196,4 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 
 ### License
 
-Proprietary software; see [NOTICE](NOTICE)
-
-Third-party licenses are in [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)
+Proprietary software; see [NOTICE](NOTICE). Third-party licenses are in [ThirdPartyNotices](ThirdPartyNotices/THIRD-PARTY-NOTICES.txt)

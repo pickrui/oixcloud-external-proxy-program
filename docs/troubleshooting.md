@@ -16,6 +16,8 @@ HTTP 407 表示网络代理要求鉴权，请检查系统代理凭据；HTTP 403
 
 提示「配置已写入，Surge 未自动切换」时，在 Surge 手动选择 oixCloud 配置并重载
 
+自 v0.0.61 起，本地 Surge 配置复用最近取得的远端模板，减少重复等待；手动刷新节点同时清除模板缓存，注销也会清除缓存；「接入 Surge」直接访问本机配置服务，所有重试共用 60 秒等待预算；首次生成仍可能需要等待面板和订阅响应
+
 ### 常见问题
 
 | 现象 | 处理 |
@@ -132,7 +134,9 @@ HTTP 抽检不覆盖 UDP、所有节点或所有网站；测试目标失败本�
 
 - `stage=select`：出口选择失败，查看 `reason` 和 `route`
 - `stage=bind`：网卡查询或绑定失败，查看 `operation`、`errno` 和 `route`
-- `stage=query`：DNS 查询失败，查看 `operation`、错误码及 `elapsed_ms`；认证 DNS 的 UDP / TCP 回退可用相同的 `query` 标识关联
+- `stage=query`：DNS 解析过程失败，查看 `operation`、错误码及 `elapsed_ms`
+
+v0.0.61 起，macOS 14 及以上和 Linux 的托管 DNS 日志以 `oix DNS` 标识解析服务，`transport=dot` 或 `transport=doh` 标识传输方式：`operation=bootstrap` 为解析服务自身的地址解析失败，`operation=connect` 为 TCP 建立失败，`operation=handshake` 为 TLS 阶段失败，`operation=lookup` 为整次解析超时；TCP 失败保留 `errno`，可区分连接拒绝等原因；Legacy 的认证 DNS 继续用相同 `query` 标识关联 UDP / TCP 回退
 
 保持出现问题时的 Surge 系统代理、增强模式与配置，复现一次失败，并附上版本、失败时间及附近完整的 `[Network]` 和 DNS 错误日志
 
@@ -209,6 +213,8 @@ The top of the menu shows the latest action's progress or result; failures expla
 HTTP 407 means the network proxy requires authentication: check its credentials. HTTP 403 can also come from network filtering, so try another network first; sign in again when the helper reports an expired sign-in
 
 If the helper says the config was written but Surge did not switch, select the oixCloud profile in Surge and reload it
+
+From v0.0.61, local Surge profiles reuse the last valid remote template to avoid repeated waits. Refreshing nodes manually or signing out clears this cache. Apply in Surge reads directly from the local config service, with one 60-second budget shared by all retries. The first profile may still need to wait for the panel and subscription
 
 ### Common issues
 
@@ -320,7 +326,9 @@ Starting with v0.0.46, both main and Legacy emit network failures with a `[Netwo
 
 - `stage=select`: egress selection failed; inspect `reason` and `route`
 - `stage=bind`: interface lookup or binding failed; inspect `operation`, `errno`, and `route`
-- `stage=query`: DNS query failed; inspect `operation`, the error code, and `elapsed_ms`; authentication DNS UDP / TCP fallback shares the same `query` identifier
+- `stage=query`: DNS resolution failed; inspect `operation`, the error code, and `elapsed_ms`
+
+From v0.0.61, managed DNS logs on macOS 14+ and Linux identify the service as `oix DNS` and the transport as `dot` or `doh`. `operation=bootstrap` means the resolver's own address lookup failed, `connect` means TCP setup failed, `handshake` identifies a TLS failure, and `lookup` marks the whole lookup's deadline. TCP failures preserve `errno` to distinguish causes such as connection refusal. Legacy authentication DNS continues to share a `query` identifier across UDP/TCP fallback
 
 Keep the Surge system proxy, enhanced mode, and configuration that reproduce the issue. Reproduce one failure and include the application, macOS, and Surge versions, the failure time, and surrounding `[Network]` and DNS error lines
 
