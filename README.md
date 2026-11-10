@@ -82,6 +82,7 @@ Docker 使用 `latest`，更新命令见 [Docker 部署](docs/docker.md)
 | 刷新、筛选节点或精简规则 | 节点 › 更新节点或节点筛选…，客户端接入 › 精简规则 |
 | 按需附带账户 MITM 证书（macOS 14+） | 客户端接入 › MITM 证书 |
 | 修改规则后同步 | 客户端接入 › 接入 Surge |
+| 节点更新后自动同步（默认关闭） | 客户端接入 › 节点更新后自动接入 Surge |
 | 导出 OpenSurge profile | 客户端接入 › 导出 OpenSurge 配置 |
 | 检查运行状态 | [工具 › 诊断…](docs/troubleshooting.md#macos-连接诊断) |
 | 更新程序 | 启动器或手动安装：工具 › 检查更新；Homebrew：工具 › 通过 Homebrew 更新… |
@@ -180,6 +181,7 @@ Docker uses `latest`; see [Docker deployment](docs/docker.md#english) for update
 | Refresh or filter nodes, or toggle lean rules | Nodes > Refresh nodes or Node Filter…, Client Setup > Lean rules |
 | Include the account's MITM certificate (macOS 14+) | Client Setup > MITM certificate |
 | Apply changed settings | Client Setup > Apply in Surge |
+| Reapply after node updates (off by default) | Client Setup > Automatically reapply Surge after node updates |
 | Export an OpenSurge profile | Client Setup > Export OpenSurge config |
 | Check runtime status | Tools > Diagnostics… |
 | Update the helper | Launcher/manual install: Tools > Check for updates; Homebrew: Tools > Update with Homebrew… |
