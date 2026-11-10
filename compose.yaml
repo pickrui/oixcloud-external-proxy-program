@@ -16,7 +16,7 @@ services:
       - /tmp:rw,noexec,nosuid,size=16m
     ports:
       - "6172:6172/tcp"
-      - "7200-7299:7200-7299/tcp"
+      - "7200-7399:7200-7399/tcp"
       - "10000-10099:10000-10099/udp"
     volumes:
       - ./config.json:/config/config.json:ro

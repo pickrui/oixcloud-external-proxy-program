@@ -1,8 +1,6 @@
 # oixCloud Surge / OpenSurge 助手 / helper
 
-把 oixCloud 节点接入 Surge，或使用 OpenSurge GUI 构建 DHCP/DNS 全屋网关
-
-Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge GUI
+把 oixCloud 节点接入 Surge，或使用 OpenSurge GUI 构建 DHCP/DNS 全屋网关<br>Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with the OpenSurge GUI
 
 **[中文](#中文) · [English](#english)**
 

@@ -124,10 +124,24 @@ curl http://127.0.0.1:6172/health
 | `custom.conf` | 自定义 Surge 配置，只读挂载 |
 | `oixcloud-data` | 身份密钥与节点缓存 |
 | `6172/tcp` | 配置、节点列表和健康检查 |
-| `7200-7299/tcp` | 默认节点映射端口 |
+| `7200-7399/tcp` | 默认节点映射端口 |
 | `10000-10099/udp` | 配置范围内的 SOCKS5 UDP 转发端口 |
 
-节点超过 100 个或使用范围外的固定端口时，扩大 `compose.yaml` 的端口范围
+Compose 默认发布 200 个节点 TCP 端口，但端口范围是否足够应以 `/list` 或导出的 Surge 配置中的实际端口为准，不能只看当前节点数；Helper 会保留现有节点的端口，重启时恢复已保存的分配；已占用端口会被跳过，旧版本在节点变更后也可能留下较高的分配
+
+如果部分节点报 `Connection refused`，先检查这些节点的端口是否都在 Compose 发布的范围内；例如已分配到 `7304-7315`，旧版 `7200-7299` 映射无法访问，需要将 `compose.yaml` 中的 TCP 映射改为：
+
+```yaml
+      - "7200-7399:7200-7399/tcp"
+```
+
+如果实际端口更高、修改过 `mapBasePort` 或使用范围外的固定端口，继续调整映射以覆盖实际端口，并同步放行宿主机防火墙；修改后在部署目录重建容器：
+
+```sh
+docker compose up -d --force-recreate helper
+```
+
+仅执行 `docker compose restart` 不会更新端口映射；保留现有 `oixcloud-data` 卷和配置，无需清空节点状态
 
 镜像以非 root 用户运行，根文件系统只读，并移除所有 Linux capabilities
 
@@ -263,10 +277,24 @@ curl http://127.0.0.1:6172/health
 | `custom.conf` | Custom Surge configuration, mounted read-only |
 | `oixcloud-data` | Identity keys and node cache |
 | `6172/tcp` | Profiles, node lists, and health checks |
-| `7200-7299/tcp` | Default mapped node ports |
+| `7200-7399/tcp` | Default mapped node ports |
 | `10000-10099/udp` | Configured SOCKS5 UDP relay ports |
 
-Expand the port range in `compose.yaml` for more than 100 nodes or fixed ports outside the default range
+Compose publishes 200 node TCP ports by default. Check the actual ports in `/list` or the exported Surge profile rather than relying on the current node count. Helper keeps existing node assignments and restores saved ports at startup. Occupied ports are skipped, and older versions can retain higher assignments after node changes
+
+If some nodes report `Connection refused`, check whether their actual ports are published by Compose. For example, ports `7304-7315` are outside the old `7200-7299` mapping. Change the TCP mapping in `compose.yaml` to:
+
+```yaml
+      - "7200-7399:7200-7399/tcp"
+```
+
+Extend or adjust this mapping further if the actual ports are higher, `mapBasePort` has changed, or fixed listeners use other ports. Allow the same ports through the host firewall. Then recreate the container from the deployment directory:
+
+```sh
+docker compose up -d --force-recreate helper
+```
+
+`docker compose restart` does not update published ports. Keep the existing `oixcloud-data` volume and configuration; clearing node state is unnecessary
 
 The image runs as a non-root user with a read-only root filesystem and no Linux capabilities
 
