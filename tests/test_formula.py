@@ -40,7 +40,15 @@ class FormulaTest(unittest.TestCase):
         self.assertIn("depends_on macos: :monterey", text)
         self.assertIn("on_arm do", text)
         self.assertIn("on_intel do", text)
-        self.assertIn("oixcloud-external-proxy-program-legacy", text)
+        app_bundle = "oixcloud-helper-legacy.zip" in text
+        prefix = "oixcloud-helper" if app_bundle else "oixcloud-external-proxy-program"
+        suffix = ".zip" if app_bundle else ""
+        expected_assets = [f"{prefix}-{arch}{suffix}" for arch in ("arm64", "amd64", "legacy")]
+        assets = re.findall(r'url "[^"\n]*/([^/"\n]+)"', text)
+        self.assertCountEqual(assets, expected_assets)
+        if app_bundle:
+            self.assertEqual(text.count('(prefix/"oixCloud Helper.app").install "Contents"'), 3)
+            self.assertEqual(text.count('bin.install_symlink prefix/"oixCloud Helper.app/Contents/MacOS/oixcloud-helper" => "oixcloud-external-proxy-program"'), 3)
         self.assertIn('bin.install_symlink bin/"oixcloud-external-proxy-program" => "oixcloud-helper"', text)
         self.assertIn("service do", text)
         self.assertIn('run [opt_bin/"oixcloud-external-proxy-program", "--tray"]', text)

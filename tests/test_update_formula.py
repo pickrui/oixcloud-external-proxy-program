@@ -124,9 +124,10 @@ class ReleaseValidationTest(unittest.TestCase):
         parts[-1] += 1
         return "v" + ".".join(str(part) for part in parts)
 
-    def release(self, tag="v0.0.35"):
+    def release(self, tag="v0.0.35", *, app_bundle=False):
         assets = []
-        for index, name in enumerate(update_formula.ASSETS):
+        names = (*update_formula.ASSETS, *(update_formula.APP_ASSETS if app_bundle else ()))
+        for index, name in enumerate(names):
             assets.append({"name": name, "digest": "sha256:" + str(index + 1) * 64,
                            "browser_download_url": f"https://github.com/{update_formula.REPO}/releases/download/{tag}/{name}"})
         text = "".join(f"{asset['digest'][7:]}  {asset['name']}\n" for asset in assets).encode()
@@ -237,17 +238,20 @@ class ReleaseValidationTest(unittest.TestCase):
 
     def test_missing_or_duplicate_formula_asset_is_not_partially_rewritten(self):
         content = update_formula.DEFAULT_FORMULA_PATH.read_text()
-        malformed = content.replace("-legacy\"", "-missing\"")
+        app_bundle = "oixcloud-helper-legacy.zip" in content
+        asset = (update_formula.APP_ASSETS if app_bundle else update_formula.ASSETS)[2]
+        malformed = content.replace(asset, "missing-" + asset)
         for text in [malformed, content + content]:
             with self.assertRaises(ValueError):
-                update_formula_text(text, "0.0.32", "1" * 64, "2" * 64, "3" * 64)
+                update_formula_text(text, self.upgrade_tag(), "1" * 64, "2" * 64, "3" * 64,
+                                    app_bundle=app_bundle)
 
     def test_check_mode_and_failed_release_keep_formula_unchanged(self):
         with tempfile.TemporaryDirectory() as directory:
             formula = Path(directory) / "formula.rb"
             original = update_formula.DEFAULT_FORMULA_PATH.read_text()
             formula.write_text(original)
-            release, body = self.release(self.upgrade_tag())
+            release, body = self.release(self.upgrade_tag(), app_bundle="oixcloud-helper-legacy.zip" in original)
             for check, fail in [(True, False), (False, True)]:
                 argv = ["update_formula.py", "--formula", str(formula)] + (["--check"] if check else [])
                 with patch.object(sys, "argv", argv), patch.object(update_formula, "fetch_release_metadata", return_value=release), \
