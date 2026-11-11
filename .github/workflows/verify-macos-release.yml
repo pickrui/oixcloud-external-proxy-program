@@ -78,16 +78,20 @@ jobs:
           brew tap "$tap" "https://github.com/$HELPER_RELEASE_REPO"
           brew install --formula "$formula"
           brew list --versions "$formula"
-          brew info --json=v2 --installed "$formula" > brew-info.json
-          python3 - "$VERSION" "$GITHUB_WORKSPACE/Formula/oixcloud-external-proxy-program.rb" <<'PYTHON'
+          brew info --json=v2 --formula "$formula" > brew-info.json
+          python3 - "$VERSION" "$GITHUB_WORKSPACE/Formula/oixcloud-external-proxy-program.rb" "$formula" <<'PYTHON'
           import json,re,sys
           from pathlib import Path
-          info=json.loads(Path('brew-info.json').read_text())['formulae'][0]
+          matches=[item for item in json.loads(Path('brew-info.json').read_text())['formulae'] if item['full_name']==sys.argv[3]]
+          assert len(matches)==1
+          info=matches[0]
           revision=re.search(r'^  revision ([0-9]+)',Path(sys.argv[2]).read_text(),re.M)
           expected=int(revision[1]) if revision else 0
           assert info['versions']['stable']==sys.argv[1].removeprefix('v')
           assert info['revision']==expected
-          print('Actual Homebrew installed revision:',info['revision'])
+          installed_version=sys.argv[1].removeprefix('v')+(f'_{expected}' if expected else '')
+          assert [item['version'] for item in info['installed']]==[installed_version]
+          print('Actual Homebrew installed package:',info['full_name'],installed_version)
           PYTHON
           python3 "$GITHUB_WORKSPACE/scripts/verify_macos_startup.py" \
             --raw "$primary_raw" --app "$primary_app" --brew-prefix "$(brew --prefix "$formula")" \
