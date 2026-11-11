@@ -31,6 +31,9 @@ jobs:
         env:
           VERSION: ${{ inputs.version }}
           ARCH: ${{ matrix.asset }}
+          HOMEBREW_NO_AUTO_UPDATE: 1
+          HOMEBREW_NO_ANALYTICS: 1
+          HOMEBREW_NO_INSTALL_CLEANUP: 1
         run: |
           set -euo pipefail
           [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
@@ -66,4 +69,28 @@ jobs:
             [[ "$(/usr/libexec/PlistBuddy -c 'Print OIXStandaloneSHA256' "$app/Contents/Info.plist")" == "$(shasum -a 256 "$file" | awk '{print $1}')" ]]
             [[ "$("$app/Contents/MacOS/oixcloud-helper" --version)" == "oixcloud-external-proxy-program $VERSION" ]]
             "$app/Contents/MacOS/oixcloud-helper" --check-config --config "$GITHUB_WORKSPACE/config.example.json"
+            python3 "$GITHUB_WORKSPACE/scripts/verify_macos_startup.py" \
+              --raw "$work/$file" --app "$app" --work "$work/startup-$flavor" --version "$VERSION"
+            if [[ "$flavor" == "$ARCH" ]]; then primary_app="$app"; primary_raw="$work/$file"; fi
           done
+          tap=pickrui/oixcloud-external-proxy-program
+          formula="$tap/oixcloud-external-proxy-program"
+          brew tap "$tap" "https://github.com/$HELPER_RELEASE_REPO"
+          brew install --formula "$formula"
+          brew list --versions "$formula"
+          brew info --json=v2 --installed "$formula" > brew-info.json
+          python3 - "$VERSION" "$GITHUB_WORKSPACE/Formula/oixcloud-external-proxy-program.rb" <<'PYTHON'
+          import json,re,sys
+          from pathlib import Path
+          info=json.loads(Path('brew-info.json').read_text())['formulae'][0]
+          revision=re.search(r'^  revision ([0-9]+)',Path(sys.argv[2]).read_text(),re.M)
+          expected=int(revision[1]) if revision else 0
+          assert info['versions']['stable']==sys.argv[1].removeprefix('v')
+          assert info['revision']==expected
+          print('Actual Homebrew installed revision:',info['revision'])
+          PYTHON
+          python3 "$GITHUB_WORKSPACE/scripts/verify_macos_startup.py" \
+            --raw "$primary_raw" --app "$primary_app" --brew-prefix "$(brew --prefix "$formula")" \
+            --work "$work/brew-startup" --version "$VERSION"
+          brew uninstall --formula "$formula"
+          brew untap "$tap"

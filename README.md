@@ -63,7 +63,7 @@ OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观�
 
 通过启动器或手动安装的版本，可用菜单栏「工具 › 检查更新」直接更新；Homebrew 安装的版本请使用 `brew update`、`brew upgrade oixcloud-external-proxy-program`，再重启服务，详见 [Homebrew 安装](docs/configuration.md#homebrew-安装)
 
-`启动 oixCloud.command` 每次运行也会检查更新；旧单文件安装可能先升级单文件，重启后再在线迁移为 `~/Applications/oixCloud Helper.app`。如仍显示「已安装…，点击重启」，请点击该客户端菜单项完成重启。迁移保留原命令、配置和开机启动入口
+`启动 oixCloud.command` 每次运行也会检查更新；旧单文件安装可能先升级单文件，重启后再在线迁移为 `~/Applications/oixCloud Helper.app`；如仍显示「已安装…，点击重启」，请点击该客户端菜单项完成重启；迁移保留原命令、配置和开机启动入口
 
 内置更新器会校验 SHA-256、Developer ID 和版本号，安装校验失败时自动恢复旧版本；macOS 的令牌存储方式见[账户配置](docs/configuration.md#账户配置)
 
