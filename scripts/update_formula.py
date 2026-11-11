@@ -14,6 +14,7 @@ import urllib.request
 REPO = "pickrui/oixcloud-external-proxy-program"
 DEFAULT_FORMULA_PATH = Path(__file__).resolve().parents[1] / "Formula" / "oixcloud-external-proxy-program.rb"
 ASSETS = tuple(f"oixcloud-external-proxy-program-{arch}" for arch in ("arm64", "amd64", "legacy"))
+APP_ASSETS = tuple(f"oixcloud-helper-{arch}.zip" for arch in ("arm64", "amd64", "legacy"))
 VERSION_PATTERN = r"(?:0|[1-9][0-9]*)(?:\.(?:0|[1-9][0-9]*)){1,2}"
 
 
@@ -94,7 +95,7 @@ def release_assets(release_data: dict, repo: str) -> dict[str, dict]:
         if not isinstance(asset, dict):
             raise ValueError("Invalid release asset metadata")
         name = asset.get("name")
-        if name not in (*ASSETS, "SHA256SUMS"):
+        if name not in (*ASSETS, *APP_ASSETS, "SHA256SUMS"):
             continue
         expected = f"https://github.com/{repo}/releases/download/{tag}/{name}"
         if name in assets or asset.get("browser_download_url") != expected:
@@ -103,6 +104,8 @@ def release_assets(release_data: dict, repo: str) -> dict[str, dict]:
     missing = set((*ASSETS, "SHA256SUMS")) - assets.keys()
     if missing:
         raise ValueError(f"Missing release assets: {', '.join(sorted(missing))}")
+    if set(APP_ASSETS) & assets.keys() and not set(APP_ASSETS) <= assets.keys():
+        raise ValueError("Incomplete app bundle assets")
     return assets
 
 
@@ -121,7 +124,7 @@ def fetch_sha256sums_from_release(release_data: dict, repo: str) -> dict[str, st
     body = download(assets["SHA256SUMS"]["browser_download_url"], limit=64 * 1024)
     check_asset_digest(assets["SHA256SUMS"], hashlib.sha256(body).hexdigest())
     checksums = parse_sha256sums_content(body.decode("utf-8"))
-    for name in ASSETS:
+    for name in (*ASSETS, *(name for name in APP_ASSETS if name in assets)):
         if name not in checksums:
             raise ValueError(f"Missing checksum: {name}")
         check_asset_digest(assets[name], checksums[name])
@@ -129,7 +132,7 @@ def fetch_sha256sums_from_release(release_data: dict, repo: str) -> dict[str, st
 
 
 def update_formula_text(content: str, new_version: str, arm64_sha: str,
-                        amd64_sha: str, legacy_sha: str) -> str:
+                        amd64_sha: str, legacy_sha: str, *, app_bundle: bool = False) -> str:
     version = normalize_tag(new_version)[1:]
     digests = [validate_sha256(value) for value in (arm64_sha, amd64_sha, legacy_sha)]
     versions = re.findall(r'^[ \t]*version "([^"\n]+)"', content, flags=re.MULTILINE)
@@ -137,9 +140,32 @@ def update_formula_text(content: str, new_version: str, arm64_sha: str,
         raise ValueError("Expected exactly one formula version")
     if normalize_tag(versions[0])[1:] != version:
         content = re.sub(r'^[ \t]*revision [0-9]+[ \t]*\n', '', content, flags=re.MULTILINE)
+    elif app_bundle:
+        previous_digests = {
+            asset: digest.lower() for asset, digest in re.findall(
+                r'^[ \t]*url "[^"\n]*/([^/"\n]+)"\n[ \t]*sha256 "([0-9a-fA-F]{64})"',
+                content, flags=re.MULTILINE) if asset in APP_ASSETS
+        }
+        if previous_digests != dict(zip(APP_ASSETS, digests)):
+            revision = re.search(r'^[ \t]*revision ([0-9]+)', content, flags=re.MULTILINE)
+            next_revision = int(revision[1]) + 1 if revision else 1
+            content = re.sub(r'^[ \t]*revision [0-9]+[ \t]*\n', '', content, flags=re.MULTILINE)
+            content = re.sub(r'(^[ \t]*version "[^"\n]+"\n)',
+                             lambda m: f'{m[1]}  revision {next_revision}\n', content, flags=re.MULTILINE)
     content = re.sub(r'(^[ \t]*version )"[^"\n]+"', lambda m: f'{m[1]}"{version}"',
                      content, flags=re.MULTILINE)
-    for asset, sha256 in zip(ASSETS, digests):
+    if not app_bundle and any(asset in content for asset in APP_ASSETS):
+        raise ValueError("Refusing to replace an app formula with standalone assets")
+    if app_bundle:
+        install_pattern = r'(?m)^([ \t]*)bin.install "oixcloud-external-proxy-program-(?:arm64|amd64|legacy)" => "oixcloud-external-proxy-program"$'
+        content, count = re.subn(install_pattern, lambda m:
+            f'{m[1]}(prefix/"oixCloud Helper.app").install "Contents"\n'
+            f'{m[1]}bin.install_symlink prefix/"oixCloud Helper.app/Contents/MacOS/oixcloud-helper" => "oixcloud-external-proxy-program"', content)
+        if count not in (0, 3) or content.count('(prefix/"oixCloud Helper.app").install "Contents"') != 3:
+            raise ValueError("Expected three app installation blocks")
+        for standalone, app in zip(ASSETS, APP_ASSETS):
+            content = content.replace('/' + standalone + '"', '/' + app + '"')
+    for asset, sha256 in zip(APP_ASSETS if app_bundle else ASSETS, digests):
         pattern = rf'(^[ \t]*url "[^"\n]*/{re.escape(asset)}"\n[ \t]*sha256 )"[^"\n]+"'
         content, count = re.subn(pattern, lambda m: f'{m[1]}"{sha256}"', content, flags=re.MULTILINE)
         if count != 1:
@@ -183,7 +209,10 @@ def main() -> int:
             raise ValueError(f"Refusing to downgrade {current_version} to {target_version}")
         checksums = fetch_sha256sums_from_release(release, args.repo)
         content = args.formula.read_text(encoding="utf-8")
-        updated = update_formula_text(content, target_version, *(checksums[name] for name in ASSETS))
+        app_bundle = set(APP_ASSETS) <= release_assets(release, args.repo).keys()
+        selected = APP_ASSETS if app_bundle else ASSETS
+        updated = update_formula_text(content, target_version, *(checksums[name] for name in selected),
+                                      app_bundle=app_bundle)
         if content == updated:
             print(f"Formula is already up to date: {target_version}")
         elif args.check:

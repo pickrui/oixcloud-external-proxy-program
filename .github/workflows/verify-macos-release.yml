@@ -1,0 +1,69 @@
+name: Verify macOS release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Published release tag to verify'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Published files (${{ matrix.runner }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-26
+            asset: arm64
+          - runner: macos-26-intel
+            asset: amd64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Verify and run the published signed files
+        env:
+          VERSION: ${{ inputs.version }}
+          ARCH: ${{ matrix.asset }}
+        run: |
+          set -euo pipefail
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          HELPER_RELEASE_REPO=pickrui/oixcloud-external-proxy-program
+          work=$(mktemp -d)
+          trap 'rm -rf "$work"' EXIT
+          base="https://github.com/$HELPER_RELEASE_REPO/releases/download/$VERSION"
+          cd "$work"
+          curl --fail --silent --show-error --location --connect-timeout 10 --max-time 60 --retry 2 "$base/SHA256SUMS" --output SHA256SUMS
+          sw_vers
+          uname -m
+          for flavor in "$ARCH" legacy; do
+            file="oixcloud-external-proxy-program-$flavor"
+            curl --fail --silent --show-error --location --connect-timeout 10 --max-time 60 --retry 2 "$base/$file" --output "$file"
+            awk -v name="$file" '$2 == name { print; count++ } END { if (count != 1) exit 1 }' SHA256SUMS > expected
+            shasum -a 256 --check expected
+            codesign --verify --strict -R='anchor apple generic and certificate leaf[subject.OU] = "WJHBZFHR7D"' "$file"
+            lipo -archs "$file"
+            chmod +x "$file"
+            version=$("./$file" --version)
+            [[ "$version" == "oixcloud-external-proxy-program $VERSION" ]]
+            echo "$version ($flavor)"
+            "./$file" --check-config --config "$GITHUB_WORKSPACE/config.example.json"
+            archive="oixcloud-helper-$flavor.zip"
+            curl --fail --silent --show-error --location --connect-timeout 10 --max-time 60 --retry 2 "$base/$archive" --output "$archive"
+            awk -v name="$archive" '$2 == name { print; count++ } END { if (count != 1) exit 1 }' SHA256SUMS > expected
+            shasum -a 256 --check expected
+            mkdir "$flavor"
+            ditto -x -k "$archive" "$flavor"
+            app="$flavor/oixCloud Helper.app"
+            codesign --verify --strict -R='anchor apple generic and certificate leaf[subject.OU] = "WJHBZFHR7D"' "$app"
+            [[ "$(/usr/libexec/PlistBuddy -c 'Print CFBundleDisplayName' "$app/Contents/Info.plist")" == "oixCloud Helper" ]]
+            [[ "$(/usr/libexec/PlistBuddy -c 'Print OIXStandaloneSHA256' "$app/Contents/Info.plist")" == "$(shasum -a 256 "$file" | awk '{print $1}')" ]]
+            [[ "$("$app/Contents/MacOS/oixcloud-helper" --version)" == "oixcloud-external-proxy-program $VERSION" ]]
+            "$app/Contents/MacOS/oixcloud-helper" --check-config --config "$GITHUB_WORKSPACE/config.example.json"
+          done

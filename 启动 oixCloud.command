@@ -11,7 +11,7 @@ case "$ARCH" in
   arm64) ASSET_ARCH="arm64" ;;
   x86_64|amd64) ASSET_ARCH="amd64" ;;
   *)
-    /usr/bin/osascript -e 'display alert "oixCloud" message "不支持当前 Mac 芯片架构" as critical' >/dev/null 2>&1 || true
+    /usr/bin/osascript -e 'display alert "oixCloud Helper" message "不支持当前 Mac 芯片架构" as critical' >/dev/null 2>&1 || true
     echo "不支持当前 Mac 芯片架构：$ARCH"
     exit 1
     ;;
@@ -19,7 +19,7 @@ esac
 
 MAJOR="$(/usr/bin/sw_vers -productVersion | /usr/bin/cut -d. -f1)"
 if [[ "$MAJOR" -lt 12 ]]; then
-  /usr/bin/osascript -e 'display alert "oixCloud" message "需要 macOS 12 或更高版本" as critical' >/dev/null 2>&1 || true
+  /usr/bin/osascript -e 'display alert "oixCloud Helper" message "需要 macOS 12 或更高版本" as critical' >/dev/null 2>&1 || true
   echo "需要 macOS 12 或更高版本，当前为 $(/usr/bin/sw_vers -productVersion)"
   exit 1
 fi
@@ -43,11 +43,11 @@ PLIST_PATH="${HOME}/Library/LaunchAgents/${PLIST_LABEL}.plist"
 LAUNCHD_SERVICE="gui/$(id -u)/${PLIST_LABEL}"
 
 notify() {
-  /usr/bin/osascript -e "display notification \"$1\" with title \"oixCloud\"" >/dev/null 2>&1 || true
+  /usr/bin/osascript -e "display notification \"$1\" with title \"oixCloud Helper\"" >/dev/null 2>&1 || true
 }
 
 alert() {
-  /usr/bin/osascript -e "display alert \"oixCloud\" message \"$1\" as critical" >/dev/null 2>&1 || true
+  /usr/bin/osascript -e "display alert \"oixCloud Helper\" message \"$1\" as critical" >/dev/null 2>&1 || true
 }
 
 log() {
@@ -490,7 +490,7 @@ choose_launch_mode() {
   while true; do
     {
       printf '\033[2J\033[H'
-      printf '请选择 oixCloud 启动方式\n\n'
+      printf '请选择 oixCloud Helper 启动方式\n\n'
       if [[ "$selected" -eq 0 ]]; then
         printf '> 1. 临时启动（关闭这个终端窗口后程序会退出）\n'
       else
@@ -556,11 +556,11 @@ uninstall_launch_agent() {
     /bin/launchctl unload -w "$PLIST_PATH" >/dev/null 2>&1 || true
     /bin/rm -f "$PLIST_PATH"
     log "已停止并删除自动启动配置：${PLIST_PATH}"
-    notify "已卸载 oixCloud 自动启动"
+    notify "已卸载 oixCloud Helper 自动启动"
   else
     /bin/launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || true
     log "未找到自动启动配置，无需卸载：${PLIST_PATH}"
-    notify "未找到 oixCloud 自动启动配置"
+    notify "未找到 oixCloud Helper 自动启动配置"
   fi
 }
 
@@ -598,22 +598,22 @@ start_with_launch_agent() {
     return 1
   fi
 
-  log "正在通过系统自动启动项启动 oixCloud 菜单栏程序..."
+  log "正在通过系统自动启动项启动 oixCloud Helper 菜单栏程序..."
   # unload -w persists a disabled override across reboots. Re-enable before
   # bootstrap, and do not stop an existing service if this step fails.
   if ! /bin/launchctl enable "$LAUNCHD_SERVICE" >> "$LOG_FILE" 2>&1; then
-    report_launch_agent_failure "无法启用 oixCloud 自动启动项"
+    report_launch_agent_failure "无法启用 oixCloud Helper 自动启动项"
     return 1
   fi
   /bin/launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || \
     /bin/launchctl unload "$PLIST_PATH" >/dev/null 2>&1 || true
 
   if ! /bin/launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH" >> "$LOG_FILE" 2>&1; then
-    report_launch_agent_failure "无法加载 oixCloud 自动启动项"
+    report_launch_agent_failure "无法加载 oixCloud Helper 自动启动项"
     return 1
   fi
   if ! /bin/launchctl kickstart "$LAUNCHD_SERVICE" >> "$LOG_FILE" 2>&1; then
-    report_launch_agent_failure "无法启动 oixCloud 自动启动项"
+    report_launch_agent_failure "无法启动 oixCloud Helper 自动启动项"
     return 1
   fi
 
@@ -623,19 +623,19 @@ start_with_launch_agent() {
     sleep 1
     service_pid="$(launch_agent_pid)" || service_pid=""
     if [[ -n "$service_pid" && "$service_pid" == "$previous_pid" ]]; then
-      log "oixCloud 自动启动项正在运行：${PLIST_LABEL} (PID ${service_pid})"
+      log "oixCloud Helper 自动启动项正在运行：${PLIST_LABEL} (PID ${service_pid})"
       notify "oixCloud 已启动"
       return 0
     fi
     previous_pid="$service_pid"
   done
-  report_launch_agent_failure "oixCloud 自动启动项已加载，但进程未能持续运行"
+  report_launch_agent_failure "oixCloud Helper 自动启动项已加载，但进程未能持续运行"
   return 1
 }
 
 start_temporarily() {
-  log "正在临时启动 oixCloud 菜单栏程序，关闭此终端窗口后程序会退出"
-  notify "oixCloud 正在临时启动"
+  log "正在临时启动 oixCloud Helper 菜单栏程序，关闭此终端窗口后程序会退出"
+  notify "oixCloud Helper 正在临时启动"
   /bin/launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || \
     /bin/launchctl unload "$PLIST_PATH" >/dev/null 2>&1 || true
   exec "$INSTALL_PATH" --tray
@@ -693,10 +693,10 @@ main() {
         alert "无法更新或安装本地缓存的 oixCloud，请查看 ${LOG_FILE}"
         exit 1
       fi
-      notify "更新检查失败，将启动本地缓存的 oixCloud"
+      notify "更新检查失败，将启动本地缓存的 oixCloud Helper"
     elif [[ "$update_status" -eq 2 && -x "$INSTALL_PATH" ]]; then
       log "更新检查失败，将启动现有已安装命令"
-      notify "更新检查失败，将启动现有 oixCloud"
+      notify "更新检查失败，将启动现有 oixCloud Helper"
     else
       alert "无法更新并安装 oixCloud，请查看 ${LOG_FILE}"
       exit 1

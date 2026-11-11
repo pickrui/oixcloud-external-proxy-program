@@ -3,8 +3,10 @@ import sys
 import contextlib
 import hashlib
 import io
+import re
 import json
 import tempfile
+import subprocess
 from unittest.mock import patch
 import unittest
 
@@ -131,6 +133,61 @@ class ReleaseValidationTest(unittest.TestCase):
         assets.append({"name": "SHA256SUMS", "digest": "sha256:" + hashlib.sha256(text).hexdigest(),
                        "browser_download_url": f"https://github.com/{update_formula.REPO}/releases/download/{tag}/SHA256SUMS"})
         return {"tag_name": tag, "draft": False, "prerelease": False, "assets": assets}, text
+
+    def test_app_release_switches_formula_without_changing_commands_or_services(self):
+        release, _ = self.release()
+        for name in update_formula.APP_ASSETS:
+            release["assets"].append({"name": name, "digest": "sha256:" + "e" * 64,
+                "browser_download_url": f"https://github.com/{update_formula.REPO}/releases/download/{release['tag_name']}/{name}"})
+        manifest = next(asset for asset in release["assets"] if asset["name"] == "SHA256SUMS")
+        body = "".join(f"{asset['digest'][7:]}  {asset['name']}\n" for asset in release["assets"]
+                       if asset is not manifest).encode()
+        manifest["digest"] = "sha256:" + hashlib.sha256(body).hexdigest()
+        with patch.object(update_formula, "download", return_value=body):
+            checksums = update_formula.fetch_sha256sums_from_release(release, update_formula.REPO)
+        self.assertTrue(set(update_formula.APP_ASSETS) <= checksums.keys())
+        formula = update_formula.DEFAULT_FORMULA_PATH.read_text()
+        updated = update_formula.update_formula_text(formula, "99.0.0", *(["e" * 64] * 3), app_bundle=True)
+        for name in update_formula.APP_ASSETS:
+            self.assertIn('/' + name + '"', updated)
+        self.assertEqual(updated.count('(prefix/"oixCloud Helper.app").install "Contents"'), 3)
+        self.assertEqual(updated.count('bin.install_symlink bin/"oixcloud-external-proxy-program" => "oixcloud-helper"'), 3)
+        self.assertIn('run [opt_bin/"oixcloud-external-proxy-program", "--tray"]', updated)
+        self.assertEqual(updated, update_formula.update_formula_text(updated, "99.0.0", *(["e" * 64] * 3), app_bundle=True))
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "app.rb"
+            path.write_text(updated)
+            subprocess.run(["ruby", "-c", str(path)], check=True, capture_output=True)
+        with self.assertRaises(ValueError):
+            update_formula.update_formula_text(updated, "99.0.1", *(["e" * 64] * 3))
+
+    def test_same_version_app_migration_is_upgradeable_and_idempotent(self):
+        formula = update_formula.DEFAULT_FORMULA_PATH.read_text()
+        version = update_formula.get_current_formula_version(update_formula.DEFAULT_FORMULA_PATH)
+        updated = update_formula.update_formula_text(formula, version, *(["e" * 64] * 3), app_bundle=True)
+        before = re.search(r"revision ([0-9]+)", formula)
+        expected = int(before[1]) + 1 if before else 1
+        self.assertIn(f"revision {expected}", updated)
+        self.assertEqual(updated, update_formula.update_formula_text(updated, version, *(["e" * 64] * 3), app_bundle=True))
+        rebuilt = update_formula.update_formula_text(updated, version, *(["f" * 64] * 3), app_bundle=True)
+        self.assertIn(f"revision {expected + 1}", rebuilt)
+
+    def test_same_version_platform_digest_swap_increases_revision(self):
+        formula = update_formula.DEFAULT_FORMULA_PATH.read_text()
+        version = update_formula.get_current_formula_version(update_formula.DEFAULT_FORMULA_PATH)
+        updated = update_formula.update_formula_text(formula, version, "a" * 64, "b" * 64, "c" * 64, app_bundle=True)
+        revision = int(re.search(r"revision ([0-9]+)", updated)[1])
+        swapped = update_formula.update_formula_text(updated, version, "b" * 64, "a" * 64, "c" * 64, app_bundle=True)
+        self.assertIn(f"revision {revision + 1}", swapped)
+        self.assertEqual(swapped, update_formula.update_formula_text(swapped, version, "b" * 64, "a" * 64, "c" * 64, app_bundle=True))
+
+    def test_incomplete_app_release_is_rejected(self):
+        release, _ = self.release()
+        name = update_formula.APP_ASSETS[0]
+        release["assets"].append({"name": name,
+            "browser_download_url": f"https://github.com/{update_formula.REPO}/releases/download/{release['tag_name']}/{name}"})
+        with self.assertRaises(ValueError):
+            update_formula.release_assets(release, update_formula.REPO)
 
     def test_rejects_unsafe_tags_before_network_access(self):
         for tag in ['v1.2.3"; touch /tmp/invalid', "$(id)", "v1.2.3-beta", "../latest", "vv1.2.3"]:
