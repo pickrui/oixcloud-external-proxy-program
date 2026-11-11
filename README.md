@@ -63,7 +63,7 @@ OpenSurge 可提供 Web GUI、mihomo TUN、DHCP/DNS、设备策略和流量观�
 
 通过启动器或手动安装的版本，可用菜单栏「工具 › 检查更新」直接更新；Homebrew 安装的版本请使用 `brew update`、`brew upgrade oixcloud-external-proxy-program`，再重启服务，详见 [Homebrew 安装](docs/configuration.md#homebrew-安装)
 
-`启动 oixCloud.command` 每次运行也会检查更新；支持应用包的版本会自动迁移为 `~/Applications/oixCloud Helper.app`，保留原命令、配置和开机启动入口
+`启动 oixCloud.command` 每次运行也会检查更新；旧单文件安装可能先升级单文件，重启后再在线迁移为 `~/Applications/oixCloud Helper.app`。如仍显示「已安装…，点击重启」，请点击该客户端菜单项完成重启。迁移保留原命令、配置和开机启动入口
 
 内置更新器会校验 SHA-256、Developer ID 和版本号，安装校验失败时自动恢复旧版本；macOS 的令牌存储方式见[账户配置](docs/configuration.md#账户配置)
 
@@ -162,7 +162,7 @@ See [OpenSurge integration and DHCP/DNS takeover](docs/opensurge.md#english) for
 
 For launcher or manual installations, use "Tools > Check for updates" from the menu bar. For Homebrew installations, run `brew update`, `brew upgrade oixcloud-external-proxy-program`, then restart the service; see [Homebrew installation](docs/configuration.md#homebrew-installation)
 
-`启动 oixCloud.command` also checks for updates whenever it runs
+`启动 oixCloud.command` also checks for updates on each launch. An older standalone installation may first update its command, then migrate online to `~/Applications/oixCloud Helper.app` after restarting. If the client shows "Installed … — click to restart", select that menu item to finish restarting. The original commands, configuration and login startup entry are retained
 
 The built-in updater verifies SHA-256, the Developer ID, and the exact version; failed installation checks restore the previous version. See [Account configuration](docs/configuration.md#account-configuration) for token storage on macOS
 
