@@ -1,11 +1,11 @@
 class OixcloudExternalProxyProgram < Formula
   desc "Connect oixCloud nodes to Surge, or build a DHCP/DNS gateway with OpenSurge"
   homepage "https://github.com/pickrui/oixcloud-external-proxy-program"
-  version "0.0.70"
+  version "0.0.71"
   license :cannot_represent
 
   url "https://github.com/pickrui/oixcloud-external-proxy-program/releases/download/v#{version}/oixcloud-helper-legacy.zip"
-  sha256 "07211fb4454f946de82fddebb2520277df9da3b4a1e06208c23b6c1e42129184"
+  sha256 "2e94bbf920e2bbcd3ee0da6ac201e376b197653ac71825a07341280de9d11a5a"
 
   depends_on macos: :monterey
 
@@ -13,7 +13,7 @@ class OixcloudExternalProxyProgram < Formula
     on_sonoma :or_newer do
       on_arm do
         url "https://github.com/pickrui/oixcloud-external-proxy-program/releases/download/v#{version}/oixcloud-helper-arm64.zip"
-        sha256 "7e1e8a930591b691385952dc18f9734a00685ccdfaf628eda9072fba42f6c997"
+        sha256 "a1faef388feb82734e7f8226f4159864c789cc207e150e52f6c2a671774a4976"
 
         def install
           (prefix/"oixCloud Helper.app").install "Contents"
@@ -24,7 +24,7 @@ class OixcloudExternalProxyProgram < Formula
 
       on_intel do
         url "https://github.com/pickrui/oixcloud-external-proxy-program/releases/download/v#{version}/oixcloud-helper-amd64.zip"
-        sha256 "43da8f57cd56819188961287aaa5ba00f9c1b587701aee71f994b3b799e2e665"
+        sha256 "f89ee4a066c6e607e6070139a2f4d17df49d4cbdb1891d9d5b4f31a7c48974fa"
 
         def install
           (prefix/"oixCloud Helper.app").install "Contents"
