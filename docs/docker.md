@@ -45,6 +45,8 @@ docker compose run --rm --no-deps helper --config /config/config.json --enroll-d
 
 首次使用时按终端提示在网页或 Telegram 确认设备，看到已批准后再启动服务，保留 `oixcloud-data` 卷即可在更新后继续使用这台设备
 
+如果登记被拒绝，命令会停止，待原请求过期后，可重新运行 `--enroll-device` 获取新码
+
 ```bash
 docker compose up -d
 docker compose ps
@@ -91,7 +93,7 @@ TCP 用于 SOCKS5 握手和保持 UDP ASSOCIATE 关联，客户端把 UDP 数据
 
 ### 节点筛选
 
-容器没有菜单栏界面，拉取节点时只请求 `nodes=auto`，由面板按节点筛选或「智能优选」下发节点
+容器没有菜单栏界面，拉取节点时由面板按账户保存的节点筛选或「智能优选」下发节点
 
 筛选跟随登录令牌：在 macOS 菜单栏「节点 › 节点筛选…」或网页用户中心修改后，使用同一账号或同一 Access Token 的容器会在客户端下次更新配置或节点列表时下发新的节点（节点结果最多缓存 30 秒），无需重启容器
 
@@ -206,7 +208,7 @@ docker compose run --rm --no-deps helper --config /config/config.json --check-co
 docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
 ```
 
-On first use, follow the terminal instructions to approve the device on the website or in Telegram. Start the service after approval and keep the `oixcloud-data` volume when updating to retain this device identity
+On first use, follow the terminal instructions to approve the device on the website or in Telegram. Start the service after approval and keep the `oixcloud-data` volume when updating to retain this device identity. If the request is denied, the command stops. Run `--enroll-device` again after the original request expires
 
 ```bash
 docker compose up -d
@@ -250,7 +252,7 @@ Recreate the container and refresh the provider after changing the configuration
 
 ### Node Filter
 
-The container has no menu bar UI. It requests nodes with `nodes=auto`, and the panel sends nodes according to the node filter or Smart Selection
+The container has no menu bar UI. The panel sends nodes according to the account’s saved node filter or Smart Selection
 
 The filter follows the sign-in token. After it is changed from "Nodes > Node Filter…" in the macOS menu bar or in the web user center, a container using the same account or Access Token serves the new nodes the next time a client updates its config or node list (node results are cached for up to 30 seconds); no restart is needed
 
