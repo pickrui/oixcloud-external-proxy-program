@@ -40,6 +40,12 @@ NAS ACL、rootless Docker 或用户命名空间映射可能使用不同的权限
 
 ```bash
 docker compose run --rm --no-deps helper --config /config/config.json --check-config
+docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
+```
+
+首次使用时按终端提示在网页或 Telegram 确认设备，看到已批准后再启动服务，保留 `oixcloud-data` 卷即可在更新后继续使用这台设备
+
+```bash
 docker compose up -d
 docker compose ps
 ```
@@ -197,6 +203,12 @@ NAS ACLs, rootless Docker, or user-namespace mappings can require different perm
 
 ```bash
 docker compose run --rm --no-deps helper --config /config/config.json --check-config
+docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
+```
+
+On first use, follow the terminal instructions to approve the device on the website or in Telegram. Start the service after approval and keep the `oixcloud-data` volume when updating to retain this device identity
+
+```bash
 docker compose up -d
 docker compose ps
 ```

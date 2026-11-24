@@ -35,7 +35,7 @@
 
 3. 点击菜单栏 oixCloud 图标，打开「登录…」
 
-   选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可在浏览器中完成登录，Google 登录仅限已注册账号
+   选择 Access Token 或邮箱密码登录；窗口提供「使用 Google 登录」时，也可在浏览器中完成登录，Google 登录仅限已注册账号，若提示需要批准，在菜单栏选择「批准这台设备…」，按提示在网页或 Telegram 确认
 
 4. 打开「客户端接入 › 接入 Surge」
 
@@ -134,7 +134,7 @@ Requirements:
 
 3. Click the oixCloud icon in the menu bar and open "Sign in…"
 
-   Use an Access Token or email and password. If "Sign in with Google" is available, complete sign-in in your browser; registered accounts only
+   Use an Access Token or email and password. If "Sign in with Google" is available, complete sign-in in your browser; registered accounts only. If approval is requested, choose “Approve This Device…” in the menu bar and follow the instructions on the website or in Telegram
 
 4. Open "Client Setup > Apply in Surge"
 
