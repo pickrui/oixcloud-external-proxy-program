@@ -43,7 +43,7 @@ docker compose run --rm --no-deps helper --config /config/config.json --check-co
 docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
 ```
 
-首次使用时按终端提示在网页或 Telegram 确认设备，看到已批准后再启动服务，保留 `oixcloud-data` 卷即可在更新后继续使用这台设备
+首次使用时按终端提示输入验证器中的 6 位动态码。如果提示使用邮箱，输入 `send` 并回车，再输入邮件里的 8 位验证码。批准后终端会加载节点，完成后即可启动服务。旧面板仍支持网页或 Telegram 确认。保留 `oixcloud-data` 卷即可在更新后继续使用这台设备
 
 如果登记被拒绝，命令会停止，待原请求过期后，可重新运行 `--enroll-device` 获取新码
 
@@ -208,7 +208,7 @@ docker compose run --rm --no-deps helper --config /config/config.json --check-co
 docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
 ```
 
-On first use, follow the terminal instructions to approve the device on the website or in Telegram. Start the service after approval and keep the `oixcloud-data` volume when updating to retain this device identity. If the request is denied, the command stops. Run `--enroll-device` again after the original request expires
+On first use, enter the 6-digit code from your authenticator when prompted. If the terminal asks for an email code, type `send`, press Return, then enter the 8-digit code from the email. The terminal loads nodes after approval. You can then start the service. Older panels also support approval on the website or in Telegram. Keep the `oixcloud-data` volume when updating to retain this device identity. If the request is denied, the command stops. Run `--enroll-device` again after the original request expires
 
 ```bash
 docker compose up -d
