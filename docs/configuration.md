@@ -85,7 +85,7 @@ oixcloud-external-proxy-program --tray
 { "accessToken": "你的 Access Token" }
 ```
 
-用邮箱密码登录时，助手换取并保存 Token，不保存密码
+在新版面板主动使用 Access Token 登录时，符合条件的新设备会自动获准，用邮箱密码登录时，助手换取并保存 Token，不保存密码
 
 macOS 保存配置时优先把访问令牌移入登录钥匙串，并在文件中保留 `accessTokenInKeychain` 标记；若钥匙串写入或读回失败，令牌仍保存在权限为 `0600` 的配置文件中；手写的 `accessToken` 优先使用
 
@@ -352,7 +352,7 @@ Minimal configuration:
 { "accessToken": "your Access Token" }
 ```
 
-Email and password login exchanges them for a stored token; the password is not saved
+On an updated panel, signing in explicitly with an Access Token automatically approves an eligible new device. Email and password login exchanges them for a stored token; the password is not saved
 
 On macOS, saving the configuration prefers the login keychain and leaves an `accessTokenInKeychain` marker in the file. If writing or reading back the keychain token fails, the token stays in the `0600` configuration file. A manually supplied `accessToken` takes precedence
 

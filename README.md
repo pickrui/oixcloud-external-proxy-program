@@ -35,7 +35,7 @@
 
 3. 点击菜单栏 oixCloud 图标，打开「登录…」
 
-   选择 Access Token 或邮箱密码登录，若窗口提供「使用 Google 登录」，已注册账号也可在浏览器中完成登录，若提示需要批准，选择菜单栏的「批准这台设备…」，按提示输入验证器中的 6 位动态码或邮箱收到的 8 位验证码，批准后会自动加载节点，若误点拒绝，点「重新获取」即可发起新申请，旧面板需等首次申请满 10 分钟，并支持网页或 Telegram 确认
+   在新版面板主动使用 Access Token 登录时，符合条件的新设备会自动获准，也可使用邮箱密码登录，若窗口提供「使用 Google 登录」，已注册账号也可在浏览器中完成登录，若提示需要批准，选择菜单栏的「批准这台设备…」，按提示输入验证器中的 6 位动态码或邮箱收到的 8 位验证码，批准后会自动加载节点，若误点拒绝，点「重新获取」即可发起新申请，旧面板需等首次申请满 10 分钟，并支持网页或 Telegram 确认
 
 4. 打开「客户端接入 › 接入 Surge」
 
@@ -134,7 +134,7 @@ Requirements:
 
 3. Click the oixCloud icon in the menu bar and open "Sign in…"
 
-   Use an Access Token or email and password. If "Sign in with Google" is available, complete sign-in in your browser if your account is already registered. If approval is requested, choose “Approve This Device…” in the menu bar. Enter the 6-digit code from your authenticator or request an 8-digit code by email. Nodes load automatically after approval. Older panels also support approval on the website or in Telegram. If you declined by mistake, select “Get a New Code” to start another request. On older panels, try again ten minutes after the original request.
+   On an updated panel, signing in explicitly with an Access Token automatically approves an eligible new device. You can also use email and password. If "Sign in with Google" is available, complete sign-in in your browser if your account is already registered. If approval is requested, choose “Approve This Device…” in the menu bar. Enter the 6-digit code from your authenticator or request an 8-digit code by email. Nodes load automatically after approval. Older panels also support approval on the website or in Telegram. If you declined by mistake, select “Get a New Code” to start another request. On older panels, try again ten minutes after the original request.
 
 4. Open "Client Setup > Apply in Surge"
 
