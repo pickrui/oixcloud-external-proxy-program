@@ -40,14 +40,9 @@ NAS ACL、rootless Docker 或用户命名空间映射可能使用不同的权限
 
 ```bash
 docker compose run --rm --no-deps helper --config /config/config.json --check-config
-docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
 ```
 
-在新版面板，显式配置 Access Token 后运行 `--enroll-device`，符合条件的新设备会自动获准，如果终端要求验证，请按提示输入验证器中的 6 位动态码，如果提示使用邮箱，输入 `send` 并回车，再输入邮件里的 8 位验证码
-
-批准后终端会加载节点，完成后即可启动服务，更新时请保留 `oixcloud-data` 卷以继续使用这台设备
-
-误点拒绝后，可再次运行 `--enroll-device` 发起新申请，旧面板需等首次申请满 10 分钟，并支持网页或 Telegram 确认
+启动后，助手在首次获取节点时自动登记这台设备，更新时请保留 `oixcloud-data` 卷以继续使用同一设备身份
 
 ```bash
 docker compose up -d
@@ -207,12 +202,9 @@ NAS ACLs, rootless Docker, or user-namespace mappings can require different perm
 
 ```bash
 docker compose run --rm --no-deps helper --config /config/config.json --check-config
-docker compose run --rm --no-deps helper --config /config/config.json --enroll-device
 ```
 
-On an updated panel, running `--enroll-device` with an explicitly configured Access Token automatically approves an eligible new device. If verification is requested, enter the 6-digit code from your authenticator when prompted. If the terminal asks for an email code, type `send`, press Return, then enter the 8-digit code from the email. The terminal loads nodes after approval. You can then start the service. Older panels also support approval on the website or in Telegram. Keep the `oixcloud-data` volume when updating to retain this device identity.
-
-If you declined by mistake, run `--enroll-device` again to start a new request. On older panels, retry ten minutes after the original request.
+Helper registers this device automatically the first time it fetches nodes. Keep the `oixcloud-data` volume when updating to retain the same device identity.
 
 ```bash
 docker compose up -d
